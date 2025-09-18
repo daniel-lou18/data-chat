@@ -3,6 +3,19 @@ import { useTableState } from "../hooks/useTableState";
 import { housePriceColumns } from "./table/housePriceColumns";
 import { UnifiedChatInterface } from "./table/UnifiedChatInterface";
 import { DataTable } from "./table/DataTable";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  getGroupedRowModel,
+  getExpandedRowModel,
+} from "@tanstack/react-table";
+import {
+  textSearch,
+  numericComparison,
+  numericWithText,
+} from "./table/filterFunctions";
 
 interface HousePriceTableProps {
   data: HousePriceData[];
@@ -11,6 +24,36 @@ interface HousePriceTableProps {
 export function HousePriceTable({ data }: HousePriceTableProps) {
   // TanStack Table recommended pattern: centralize ALL table state
   const tableState = useTableState();
+
+  // Create the table instance to share between DataTable and UnifiedChatInterface
+  const table = useReactTable({
+    data,
+    columns: housePriceColumns,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getGroupedRowModel: getGroupedRowModel(),
+    getExpandedRowModel: getExpandedRowModel(),
+    enableRowSelection: true,
+    enableGrouping: true,
+    state: {
+      sorting: tableState.sorting,
+      columnFilters: tableState.columnFilters,
+      rowSelection: tableState.rowSelection,
+      grouping: tableState.grouping,
+      expanded: tableState.expanded,
+    },
+    onSortingChange: tableState.setSorting,
+    onColumnFiltersChange: tableState.setColumnFilters,
+    onRowSelectionChange: tableState.setRowSelection,
+    onGroupingChange: tableState.setGrouping,
+    onExpandedChange: tableState.setExpanded,
+    filterFns: {
+      textSearch,
+      numericComparison,
+      numericWithText,
+    },
+  });
 
   return (
     <div className="max-w-8xl mx-auto flex h-[calc(100vh-10rem)] bg-white shadow-xl rounded-lg overflow-hidden">
@@ -124,20 +167,7 @@ export function HousePriceTable({ data }: HousePriceTableProps) {
         </div>
 
         <div className="flex-1 overflow-auto">
-          <DataTable
-            data={data}
-            columns={housePriceColumns}
-            sorting={tableState.sorting}
-            onSortingChange={tableState.setSorting}
-            columnFilters={tableState.columnFilters}
-            onColumnFiltersChange={tableState.setColumnFilters}
-            rowSelection={tableState.rowSelection}
-            onRowSelectionChange={tableState.setRowSelection}
-            grouping={tableState.grouping}
-            onGroupingChange={tableState.setGrouping}
-            expanded={tableState.expanded}
-            onExpandedChange={tableState.setExpanded}
-          />
+          <DataTable table={table} data={data} />
         </div>
       </div>
 
@@ -158,6 +188,7 @@ export function HousePriceTable({ data }: HousePriceTableProps) {
             setGrouping={tableState.setGrouping}
             setExpanded={tableState.setExpanded}
             data={data}
+            table={table}
           />
         </div>
       </div>

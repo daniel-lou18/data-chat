@@ -1,83 +1,11 @@
-import {
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
-  getGroupedRowModel,
-  getExpandedRowModel,
-  useReactTable,
-  type ColumnDef,
-  type SortingState,
-  type ColumnFiltersState,
-  type RowSelectionState,
-  type GroupingState,
-  type ExpandedState,
-  type OnChangeFn,
-} from "@tanstack/react-table";
-import {
-  textSearch,
-  numericComparison,
-  numericWithText,
-} from "./filterFunctions";
+import { flexRender, type Table } from "@tanstack/react-table";
 
 interface DataTableProps<T> {
+  table: Table<T>;
   data: T[];
-  columns: ColumnDef<T, any>[];
-  sorting: SortingState;
-  onSortingChange: OnChangeFn<SortingState>;
-  columnFilters: ColumnFiltersState;
-  onColumnFiltersChange: OnChangeFn<ColumnFiltersState>;
-  rowSelection: RowSelectionState;
-  onRowSelectionChange: OnChangeFn<RowSelectionState>;
-  grouping: GroupingState;
-  onGroupingChange: OnChangeFn<GroupingState>;
-  expanded: ExpandedState;
-  onExpandedChange: OnChangeFn<ExpandedState>;
 }
 
-export function DataTable<T>({
-  data,
-  columns,
-  sorting,
-  onSortingChange,
-  columnFilters,
-  onColumnFiltersChange,
-  rowSelection,
-  onRowSelectionChange,
-  grouping,
-  onGroupingChange,
-  expanded,
-  onExpandedChange,
-}: DataTableProps<T>) {
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getGroupedRowModel: getGroupedRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
-    enableRowSelection: true,
-    enableGrouping: true,
-    state: {
-      sorting,
-      columnFilters,
-      rowSelection,
-      grouping,
-      expanded,
-    },
-    onSortingChange,
-    onColumnFiltersChange,
-    onRowSelectionChange,
-    onGroupingChange,
-    onExpandedChange,
-    filterFns: {
-      textSearch,
-      numericComparison,
-      numericWithText,
-    },
-  });
-
+export function DataTable<T>({ table, data }: DataTableProps<T>) {
   return (
     <div className="h-full flex flex-col">
       {/* Table content with scrolling */}

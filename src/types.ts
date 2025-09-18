@@ -3,4 +3,5 @@ export interface HousePriceData {
   city: string;
   province: string;
   averagePricePerM2: number;
+  population: number;
 }

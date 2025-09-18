@@ -5,6 +5,7 @@ import {
   applyFiltering,
   applySelection,
   applyGrouping,
+  applyAnalytics,
 } from "./tools";
 
 const google = createGoogleGenerativeAI({
@@ -20,6 +21,7 @@ export async function generateTextService(prompt: string) {
       ...applyFiltering,
       ...applySelection,
       ...applyGrouping,
+      ...applyAnalytics,
     },
   });
 
@@ -43,6 +45,7 @@ export async function generateTextService(prompt: string) {
           filtering: null,
           selection: null,
           grouping: null,
+          analytics: null,
           text: toolResult.output.message,
         };
       }
@@ -59,6 +62,7 @@ export async function generateTextService(prompt: string) {
           },
           selection: null,
           grouping: null,
+          analytics: null,
           text: toolResult.output.message,
         };
       }
@@ -74,6 +78,7 @@ export async function generateTextService(prompt: string) {
             count: toolResult.output.count,
           },
           grouping: null,
+          analytics: null,
           text: toolResult.output.message,
         };
       }
@@ -89,6 +94,27 @@ export async function generateTextService(prompt: string) {
             groupByField: toolResult.output.groupByField,
             aggregations: toolResult.output.aggregations,
           },
+          analytics: null,
+          text: toolResult.output.message,
+        };
+      }
+      case "analyze_data": {
+        return {
+          success: true,
+          type: "analytics",
+          sorting: null,
+          filtering: null,
+          selection: null,
+          grouping: null,
+          analytics: {
+            operation: toolResult.output.operation,
+            field: toolResult.output.field,
+            secondaryField: toolResult.output.secondaryField,
+            value: toolResult.output.value,
+            count: toolResult.output.count,
+            scope: toolResult.output.scope,
+            operator: toolResult.output.operator,
+          },
           text: toolResult.output.message,
         };
       }
@@ -102,6 +128,7 @@ export async function generateTextService(prompt: string) {
     filtering: null,
     selection: null,
     grouping: null,
+    analytics: null,
     text: "No action applied",
   };
 }

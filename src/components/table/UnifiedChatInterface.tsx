@@ -6,10 +6,12 @@ import {
   type RowSelectionState,
   type GroupingState,
   type ExpandedState,
+  type Table,
 } from "@tanstack/react-table";
 import { generateTextService } from "../../services/generateTextService";
 import { type HousePriceData } from "../../types";
-import { useNaturalLanguageGrouping } from "../../hooks/useNaturalLanguageGrouping";
+import { useTableOperations } from "../../hooks/useTableOperations";
+import { formatAnalyticsResult } from "../../utils/chatInterfaceHelpers";
 
 interface UnifiedChatInterfaceProps {
   setSorting: OnChangeFn<SortingState>;
@@ -18,6 +20,7 @@ interface UnifiedChatInterfaceProps {
   setGrouping: OnChangeFn<GroupingState>;
   setExpanded: OnChangeFn<ExpandedState>;
   data: HousePriceData[];
+  table: Table<HousePriceData>;
 }
 
 interface ChatMessage {
@@ -34,17 +37,22 @@ export function UnifiedChatInterface({
   setGrouping,
   setExpanded,
   data,
+  table,
 }: UnifiedChatInterfaceProps) {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Natural language grouping hook
-  const groupingControls = useNaturalLanguageGrouping(
+  // Table operations hook - handles all business logic
+  const operations = useTableOperations(
+    setSorting,
+    setColumnFilters,
+    setRowSelection,
     setGrouping,
     setExpanded,
-    data
+    data,
+    table
   );
 
   const addMessage = (role: "user" | "assistant", content: string) => {
@@ -56,152 +64,6 @@ export function UnifiedChatInterface({
     };
     setMessages((prev) => [...prev, newMessage]);
     return newMessage;
-  };
-
-  const convertToTanStackFilter = (
-    operator: string,
-    value: string | number,
-    secondValue?: string | number
-  ): any => {
-    switch (operator) {
-      case "equals":
-        return value;
-      case "contains":
-        return { type: "contains", value };
-      case "startsWith":
-        return { type: "startsWith", value };
-      case "endsWith":
-        return { type: "endsWith", value };
-      case "greaterThan":
-        return { type: "greaterThan", value };
-      case "lessThan":
-        return { type: "lessThan", value };
-      case "greaterThanOrEqual":
-        return { type: "greaterThanOrEqual", value };
-      case "lessThanOrEqual":
-        return { type: "lessThanOrEqual", value };
-      case "between":
-        return { type: "between", value: [value, secondValue] };
-      default:
-        return value;
-    }
-  };
-
-  const applySelectionAction = (
-    action: string,
-    criteria: any,
-    count: number | undefined,
-    data: HousePriceData[]
-  ): RowSelectionState => {
-    const selection: RowSelectionState = {};
-
-    switch (action) {
-      case "selectAll":
-        data.forEach((_, index) => {
-          selection[index.toString()] = true;
-        });
-        break;
-
-      case "selectNone":
-        // Return empty selection (already initialized as empty)
-        break;
-
-      case "selectWhere":
-        if (criteria) {
-          data.forEach((row, index) => {
-            if (matchesCriteria(row, criteria)) {
-              selection[index.toString()] = true;
-            }
-          });
-        }
-        break;
-
-      case "selectTop":
-        const topCount = count || 10;
-        for (let i = 0; i < Math.min(topCount, data.length); i++) {
-          selection[i.toString()] = true;
-        }
-        break;
-
-      case "selectBottom":
-        const bottomCount = count || 10;
-        const startIndex = Math.max(0, data.length - bottomCount);
-        for (let i = startIndex; i < data.length; i++) {
-          selection[i.toString()] = true;
-        }
-        break;
-
-      case "selectRandom":
-        const randomCount = Math.min(count || 5, data.length);
-        const randomIndices = getRandomIndices(data.length, randomCount);
-        randomIndices.forEach((index) => {
-          selection[index.toString()] = true;
-        });
-        break;
-
-      case "invertSelection":
-        // This would need current selection state - for now, select all
-        data.forEach((_, index) => {
-          selection[index.toString()] = true;
-        });
-        break;
-    }
-
-    return selection;
-  };
-
-  const matchesCriteria = (row: HousePriceData, criteria: any): boolean => {
-    const { fieldName, operator, value, secondValue } = criteria;
-    const cellValue = row[fieldName as keyof HousePriceData];
-
-    switch (operator) {
-      case "equals":
-        return cellValue === value;
-      case "contains":
-        return (
-          typeof cellValue === "string" &&
-          cellValue.toLowerCase().includes(value.toString().toLowerCase())
-        );
-      case "startsWith":
-        return (
-          typeof cellValue === "string" &&
-          cellValue.toLowerCase().startsWith(value.toString().toLowerCase())
-        );
-      case "endsWith":
-        return (
-          typeof cellValue === "string" &&
-          cellValue.toLowerCase().endsWith(value.toString().toLowerCase())
-        );
-      case "greaterThan":
-        return typeof cellValue === "number" && cellValue > (value as number);
-      case "lessThan":
-        return typeof cellValue === "number" && cellValue < (value as number);
-      case "greaterThanOrEqual":
-        return typeof cellValue === "number" && cellValue >= (value as number);
-      case "lessThanOrEqual":
-        return typeof cellValue === "number" && cellValue <= (value as number);
-      case "between":
-        return (
-          typeof cellValue === "number" &&
-          cellValue >= (value as number) &&
-          cellValue <= (secondValue as number)
-        );
-      default:
-        return false;
-    }
-  };
-
-  const getRandomIndices = (maxIndex: number, count: number): number[] => {
-    const indices = Array.from({ length: maxIndex }, (_, i) => i);
-    const result: number[] = [];
-
-    for (let i = 0; i < count; i++) {
-      const randomIndex = Math.floor(Math.random() * indices.length);
-      result.push(indices[randomIndex]);
-      indices.splice(randomIndex, 1);
-    }
-
-    return result;
   };
 
   const handleSendMessage = async (message: string) => {
@@ -223,34 +85,27 @@ export function UnifiedChatInterface({
           result.text || "Action completed successfully!"
         );
 
-        // Apply the action based on the result type
-        if (result.type === "sorting" && result.sorting) {
-          const { fieldName, direction } = result.sorting;
-          setSorting([{ id: fieldName, desc: direction === "desc" }]);
-        } else if (result.type === "filtering" && result.filtering) {
-          const { fieldName, operator, value, secondValue } = result.filtering;
-          const filterValue = convertToTanStackFilter(
-            operator,
-            value,
-            secondValue
-          );
-          setColumnFilters([{ id: fieldName, value: filterValue }]);
-        } else if (result.type === "selection" && result.selection) {
-          const { action, criteria, count } = result.selection;
-          const newSelection = applySelectionAction(
-            action,
-            criteria,
-            count,
-            data
-          );
-          setRowSelection(newSelection);
-        } else if (result.type === "grouping" && result.grouping) {
-          const { action, groupByField, aggregations } = result.grouping;
-          groupingControls.applyGroupingAction(
-            action,
-            groupByField,
-            aggregations
-          );
+        // Delegate to appropriate operation handler
+        switch (result.type) {
+          case "sorting":
+            operations.applySorting(result);
+            break;
+          case "filtering":
+            operations.applyFiltering(result);
+            break;
+          case "selection":
+            operations.applySelection(result);
+            break;
+          case "grouping":
+            operations.applyGrouping(result);
+            break;
+          case "analytics":
+            const analyticsResult = await operations.applyAnalytics(result);
+            if (analyticsResult) {
+              // Add analytics result to chat
+              addMessage("assistant", formatAnalyticsResult(analyticsResult));
+            }
+            break;
         }
       } else {
         addMessage(

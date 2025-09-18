@@ -65,26 +65,44 @@ export const housePriceColumns = [
     header: "Average Price per m²",
     cell: (info) => (
       <span className="text-gray-900 font-semibold">
-        €
-        {info.getValue().toLocaleString("en-US", {
+        {info.getValue().toLocaleString("fr-FR", {
           minimumFractionDigits: 0,
           maximumFractionDigits: 0,
-        })}
+        })}{" "}
+        €
       </span>
     ),
     aggregatedCell: ({ getValue }) => {
       const value = getValue() as number;
       return (
         <span className="text-gray-700 font-medium">
-          €
-          {value?.toLocaleString("en-US", {
+          {value?.toLocaleString("fr-FR", {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
-          }) || "0"}
+          }) || "0"}{" "}
+          €
         </span>
       );
     },
     aggregationFn: "mean",
+    filterFn: numericComparison,
+  }),
+  columnHelper.accessor("population", {
+    header: "Population",
+    cell: (info) => (
+      <span className="text-gray-900 font-medium">
+        {info.getValue().toLocaleString("fr-FR")}
+      </span>
+    ),
+    aggregatedCell: ({ getValue }) => {
+      const value = getValue() as number;
+      return (
+        <span className="text-gray-700 font-medium">
+          {value?.toLocaleString("fr-FR") || "0"}
+        </span>
+      );
+    },
+    aggregationFn: "sum",
     filterFn: numericComparison,
   }),
 ];

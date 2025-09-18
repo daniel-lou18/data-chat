@@ -1,89 +1,42 @@
-import { useState } from "react";
-import { type OnChangeFn, type RowSelectionState } from "@tanstack/react-table";
-import { generateTextService } from "../services/generateTextService";
+import { type RowSelectionState } from "@tanstack/react-table";
 import { type HousePriceData } from "../types";
 
-export interface UseNaturalLanguageSelectionReturn {
-  prompt: string;
-  setPrompt: (prompt: string) => void;
-  isProcessing: boolean;
-  lastSelectionMessage: string;
-  handleNaturalLanguageSelection: () => Promise<void>;
-  handleKeyPress: (e: React.KeyboardEvent) => void;
-  clearSelection: () => void;
+/**
+ * Converts filter operations to TanStack Table format
+ */
+export function convertToTanStackFilter(
+  operator: string,
+  value: string | number,
+  secondValue?: string | number
+): any {
+  switch (operator) {
+    case "equals":
+      return value;
+    case "contains":
+      return { type: "contains", value };
+    case "startsWith":
+      return { type: "startsWith", value };
+    case "endsWith":
+      return { type: "endsWith", value };
+    case "greaterThan":
+      return { type: "greaterThan", value };
+    case "lessThan":
+      return { type: "lessThan", value };
+    case "greaterThanOrEqual":
+      return { type: "greaterThanOrEqual", value };
+    case "lessThanOrEqual":
+      return { type: "lessThanOrEqual", value };
+    case "between":
+      return { type: "between", value: [value, secondValue] };
+    default:
+      return value;
+  }
 }
 
-export function useNaturalLanguageSelection(
-  setRowSelection: OnChangeFn<RowSelectionState>,
-  data: HousePriceData[]
-): UseNaturalLanguageSelectionReturn {
-  const [prompt, setPrompt] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [lastSelectionMessage, setLastSelectionMessage] = useState("");
-
-  const handleNaturalLanguageSelection = async () => {
-    if (!prompt.trim()) return;
-
-    setIsProcessing(true);
-    setLastSelectionMessage("");
-
-    try {
-      const result = await generateTextService(prompt);
-
-      if (result.success && result.type === "selection" && result.selection) {
-        const { action, criteria, count } = result.selection;
-
-        // Apply the selection based on the action
-        const newSelection = applySelectionAction(
-          action,
-          criteria,
-          count,
-          data
-        );
-        setRowSelection(newSelection);
-
-        setLastSelectionMessage(result.text || `Applied selection: ${action}`);
-        setPrompt(""); // Clear the input after successful selection
-      } else {
-        setLastSelectionMessage(
-          "Could not understand the selection request. Try something like 'Select all rows' or 'Select cities starting with A'."
-        );
-      }
-    } catch (error) {
-      console.error("Error processing natural language selection:", error);
-      setLastSelectionMessage(
-        "An error occurred while processing your request."
-      );
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const clearSelection = () => {
-    setRowSelection({});
-    setLastSelectionMessage("All selections cleared");
-    setPrompt("");
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      handleNaturalLanguageSelection();
-    }
-  };
-
-  return {
-    prompt,
-    setPrompt,
-    isProcessing,
-    lastSelectionMessage,
-    handleNaturalLanguageSelection,
-    handleKeyPress,
-    clearSelection,
-  };
-}
-
-// Helper function to apply selection actions
-function applySelectionAction(
+/**
+ * Applies selection actions to create a new row selection state
+ */
+export function applySelectionAction(
   action: string,
   criteria: any,
   count: number | undefined,
@@ -146,8 +99,10 @@ function applySelectionAction(
   return selection;
 }
 
-// Helper function to check if a row matches criteria
-function matchesCriteria(row: HousePriceData, criteria: any): boolean {
+/**
+ * Checks if a row matches the given criteria
+ */
+export function matchesCriteria(row: HousePriceData, criteria: any): boolean {
   const { fieldName, operator, value, secondValue } = criteria;
   const cellValue = row[fieldName as keyof HousePriceData];
 
@@ -188,8 +143,10 @@ function matchesCriteria(row: HousePriceData, criteria: any): boolean {
   }
 }
 
-// Helper function to get random indices
-function getRandomIndices(maxIndex: number, count: number): number[] {
+/**
+ * Generates random indices for selection
+ */
+export function getRandomIndices(maxIndex: number, count: number): number[] {
   const indices = Array.from({ length: maxIndex }, (_, i) => i);
   const result: number[] = [];
 

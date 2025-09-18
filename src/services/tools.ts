@@ -6,7 +6,13 @@ export const applySorting = {
     description: "Apply sorting to the data in the table",
     inputSchema: z.object({
       fieldName: z
-        .enum(["postalCode", "city", "province", "averagePricePerM2"])
+        .enum([
+          "postalCode",
+          "city",
+          "province",
+          "averagePricePerM2",
+          "population",
+        ])
         .describe("The field to sort by"),
       direction: z.enum(["asc", "desc"]).describe("The direction to sort by"),
     }),
@@ -29,7 +35,13 @@ export const applyFiltering = {
       "Apply filtering to the data in the table based on column values",
     inputSchema: z.object({
       fieldName: z
-        .enum(["postalCode", "city", "province", "averagePricePerM2"])
+        .enum([
+          "postalCode",
+          "city",
+          "province",
+          "averagePricePerM2",
+          "population",
+        ])
         .describe("The field to filter by"),
       operator: z
         .enum([
@@ -120,7 +132,13 @@ export const applySelection = {
       criteria: z
         .object({
           fieldName: z
-            .enum(["postalCode", "city", "province", "averagePricePerM2"])
+            .enum([
+              "postalCode",
+              "city",
+              "province",
+              "averagePricePerM2",
+              "population",
+            ])
             .describe("The field to base selection on"),
           operator: z
             .enum([
@@ -212,14 +230,26 @@ export const applyGrouping = {
         .enum(["groupBy", "clearGrouping", "expandAll", "collapseAll"])
         .describe("The grouping action to perform"),
       groupByField: z
-        .enum(["postalCode", "city", "province", "averagePricePerM2"])
+        .enum([
+          "postalCode",
+          "city",
+          "province",
+          "averagePricePerM2",
+          "population",
+        ])
         .optional()
         .describe("The field to group by (required for groupBy action)"),
       aggregations: z
         .array(
           z.object({
             field: z
-              .enum(["postalCode", "city", "province", "averagePricePerM2"])
+              .enum([
+                "postalCode",
+                "city",
+                "province",
+                "averagePricePerM2",
+                "population",
+              ])
               .describe("The field to aggregate"),
             function: z
               .enum(["count", "sum", "avg", "min", "max"])
@@ -264,6 +294,139 @@ export const applyGrouping = {
         action,
         groupByField,
         aggregations,
+        message,
+      };
+    },
+  }),
+};
+
+export const applyAnalytics = {
+  analyze_data: tool({
+    description:
+      "Perform data analysis and statistical calculations on table data",
+    inputSchema: z.object({
+      operation: z
+        .enum([
+          // Aggregation operations
+          "sum",
+          "average",
+          "count",
+          "min",
+          "max",
+          // Ranking operations
+          "topN",
+          "bottomN",
+          "percentile",
+          // Conditional operations
+          "sumWhere",
+          "averageWhere",
+          // Comparison operations
+          "compare",
+        ])
+        .describe("The type of analysis to perform"),
+      field: z
+        .enum([
+          "postalCode",
+          "city",
+          "province",
+          "averagePricePerM2",
+          "population",
+        ])
+        .describe("The primary field to analyze"),
+      secondaryField: z
+        .enum([
+          "postalCode",
+          "city",
+          "province",
+          "averagePricePerM2",
+          "population",
+        ])
+        .optional()
+        .describe("Secondary field for comparisons or conditions"),
+      value: z
+        .union([z.string(), z.number()])
+        .optional()
+        .describe("Value for conditional operations or thresholds"),
+      count: z
+        .number()
+        .positive()
+        .optional()
+        .describe("Number of items for topN/bottomN operations"),
+      scope: z
+        .enum(["all", "filtered", "selected", "visible"])
+        .default("filtered")
+        .describe("Data scope to analyze"),
+      operator: z
+        .enum(["gt", "lt", "eq", "gte", "lte"])
+        .optional()
+        .describe("Comparison operator for conditional operations"),
+    }),
+    execute: async ({
+      operation,
+      field,
+      secondaryField,
+      value,
+      count,
+      scope,
+      operator,
+    }) => {
+      console.log(
+        `Performing ${operation} analysis on ${field} with scope ${scope}${
+          count ? ` (n=${count})` : ""
+        }${value ? ` (value=${value})` : ""}`
+      );
+
+      let message = "";
+      switch (operation) {
+        case "sum":
+          message = `Calculated sum of ${field} for ${scope} data`;
+          break;
+        case "average":
+          message = `Calculated average of ${field} for ${scope} data`;
+          break;
+        case "count":
+          message = `Counted records in ${scope} data`;
+          break;
+        case "min":
+          message = `Found minimum ${field} in ${scope} data`;
+          break;
+        case "max":
+          message = `Found maximum ${field} in ${scope} data`;
+          break;
+        case "topN":
+          message = `Selected top ${
+            count || 5
+          } records by ${field} from ${scope} data`;
+          break;
+        case "bottomN":
+          message = `Selected bottom ${
+            count || 5
+          } records by ${field} from ${scope} data`;
+          break;
+        case "percentile":
+          message = `Calculated ${value}th percentile of ${field} for ${scope} data`;
+          break;
+        case "sumWhere":
+          message = `Calculated sum of ${field} where ${secondaryField} ${operator} ${value}`;
+          break;
+        case "averageWhere":
+          message = `Calculated average of ${field} where ${secondaryField} ${operator} ${value}`;
+          break;
+        case "compare":
+          message = `Compared ${field} between groups`;
+          break;
+        default:
+          message = `Performed ${operation} analysis`;
+      }
+
+      return {
+        operation,
+        field,
+        secondaryField,
+        value,
+        count,
+        scope,
+        operator,
         message,
       };
     },
