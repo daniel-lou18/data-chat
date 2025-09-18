@@ -4,7 +4,7 @@ import {
   type GroupingState,
   type ExpandedState,
 } from "@tanstack/react-table";
-import { generateTextService } from "../services/generateTextService";
+import { generateCommandService } from "../services/generateCommandService";
 import { type HousePriceData } from "../types";
 
 export interface UseNaturalLanguageGroupingReturn {
@@ -45,7 +45,7 @@ export function useNaturalLanguageGrouping(
     setLastGroupingMessage("");
 
     try {
-      const result = await generateTextService(prompt);
+      const result = await generateCommandService(prompt);
 
       if (result.success && result.type === "grouping" && result.grouping) {
         const { action, groupByField, aggregations } = result.grouping;

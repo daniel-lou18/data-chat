@@ -1,7 +1,7 @@
 import { type HousePriceData } from "../types";
 import { useTableState } from "../hooks/useTableState";
-import { housePriceColumns } from "./table/housePriceColumns";
-import { UnifiedChatInterface } from "./table/UnifiedChatInterface";
+import { tableColumns } from "./table/tableColumns";
+import { ChatInterface } from "./chat/ChatInterface";
 import { DataTable } from "./table/DataTable";
 import {
   useReactTable,
@@ -25,10 +25,10 @@ export function HousePriceTable({ data }: HousePriceTableProps) {
   // TanStack Table recommended pattern: centralize ALL table state
   const tableState = useTableState();
 
-  // Create the table instance to share between DataTable and UnifiedChatInterface
+  // Create the table instance to share between DataTable and ChatInterface
   const table = useReactTable({
     data,
-    columns: housePriceColumns,
+    columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
@@ -181,7 +181,7 @@ export function HousePriceTable({ data }: HousePriceTableProps) {
         </div>
 
         <div className="flex-1 overflow-hidden">
-          <UnifiedChatInterface
+          <ChatInterface
             setSorting={tableState.setSorting}
             setColumnFilters={tableState.setColumnFilters}
             setRowSelection={tableState.setRowSelection}

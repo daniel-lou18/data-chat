@@ -9,9 +9,9 @@ This directory contains a comprehensive, AI-powered table system with natural la
 #### **Core Components**
 
 - **`DataTable.tsx`** - Generic reusable table with sticky headers, scrolling, smart footer, row selection, and grouping support
-- **`UnifiedChatInterface.tsx`** - Unified AI-powered conversational interface for all natural language table operations
+- **`ChatInterface.tsx`** - Unified AI-powered conversational interface for all natural language table operations
 - **`HousePriceTable.tsx`** - Main orchestrating component with modern sidebar layout and icon-based controls
-- **`housePriceColumns.tsx`** - Column definitions with custom filter functions and aggregation support for each data type
+- **`tableColumns.tsx`** - Column definitions with custom filter functions and aggregation support for each data type
 - **`filterFunctions.ts`** - Centralized filter function implementations for different data types
 
 #### **Custom Hooks**
@@ -27,7 +27,7 @@ This directory contains a comprehensive, AI-powered table system with natural la
 
 #### **AI Services & Tools**
 
-- **`generateTextService.ts`** - Google Gemini integration for natural language processing with 5 operation types
+- **`generateCommandService.ts`** - Google Gemini integration for natural language processing with 5 operation types
 - **`tools.ts`** - AI function calling tools for sorting, filtering, selection, grouping, and analytics operations
 
 #### **Analytics Services & Architecture**
@@ -235,7 +235,7 @@ The architecture has been **significantly improved** with a focus on **separatio
 
 #### **Before: Monolithic Chat Interface**
 
-- ❌ 463+ lines in UnifiedChatInterface with duplicated logic
+- ❌ 463+ lines in ChatInterface with duplicated logic
 - ❌ Business logic mixed with UI components
 - ❌ Helper functions duplicated across multiple hooks
 - ❌ Difficult to test and maintain individual operations
@@ -244,7 +244,7 @@ The architecture has been **significantly improved** with a focus on **separatio
 
 ```typescript
 // 🎯 Clean separation of concerns
-UnifiedChatInterface.tsx (248 lines) - UI & orchestration only
+ChatInterface.tsx (248 lines) - UI & orchestration only
 ├── useTableOperations.ts - Business logic delegation
 ├── tableOperationUtils.ts - Reusable utility functions
 └── chatInterfaceHelpers.ts - UI formatting utilities
@@ -305,7 +305,7 @@ export function HousePriceTable({ data }) {
         {/* Table with full state integration */}
         <DataTable
           data={data}
-          columns={housePriceColumns}
+          columns={tableColumns}
           sorting={tableState.sorting}
           columnFilters={tableState.columnFilters}
           rowSelection={tableState.rowSelection}
@@ -317,7 +317,7 @@ export function HousePriceTable({ data }) {
 
       {/* Unified Chat Interface Sidebar */}
       <div className="w-80 bg-white border-l border-gray-200">
-        <UnifiedChatInterface
+        <ChatInterface
           setSorting={tableState.setSorting}
           setColumnFilters={tableState.setColumnFilters}
           setRowSelection={tableState.setRowSelection}
@@ -334,12 +334,12 @@ export function HousePriceTable({ data }) {
 ### **Refactored AI Integration Flow**
 
 ```mermaid
-User Input → UnifiedChatInterface → generateTextService → Gemini AI → Tools (5 types) → useTableOperations → Utility Functions → State/Analytics Update → UI Refresh
+User Input → ChatInterface → generateCommandService → Gemini AI → Tools (5 types) → useTableOperations → Utility Functions → State/Analytics Update → UI Refresh
 ```
 
 1. **User types natural language command** in the unified chat interface
-2. **UnifiedChatInterface processes input** and shows loading state
-3. **generateTextService sends to Gemini AI** with all 5 tool types available
+2. **ChatInterface processes input** and shows loading state
+3. **generateCommandService sends to Gemini AI** with all 5 tool types available
 4. **AI determines appropriate tool** (sort/filter/select/group/analytics) based on user intent
 5. **Tool executes and returns structured data** with operation details
 6. **useTableOperations hook delegates** to appropriate operation handler (applySorting, applyFiltering, etc.)

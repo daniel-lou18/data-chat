@@ -1,4 +1,5 @@
 import { flexRender, type Table } from "@tanstack/react-table";
+import { formatFilterValue } from "../../utils/dataTableUtils";
 
 interface DataTableProps<T> {
   table: Table<T>;
@@ -181,40 +182,10 @@ export function DataTable<T>({ table, data }: DataTableProps<T>) {
                 Filtered by{" "}
                 {table
                   .getState()
-                  .columnFilters.map((filter) => {
-                    const formatFilterValue = (filterValue: any): string => {
-                      if (typeof filterValue === "object" && filterValue.type) {
-                        const { type, value, secondValue } = filterValue;
-                        switch (type) {
-                          case "contains":
-                            return `contains "${value}"`;
-                          case "startsWith":
-                            return `starts with "${value}"`;
-                          case "endsWith":
-                            return `ends with "${value}"`;
-                          case "equals":
-                            return `= ${value}`;
-                          case "greaterThan":
-                            return `> ${value}`;
-                          case "lessThan":
-                            return `< ${value}`;
-                          case "greaterThanOrEqual":
-                            return `≥ ${value}`;
-                          case "lessThanOrEqual":
-                            return `≤ ${value}`;
-                          case "between":
-                            return `${value} - ${secondValue}`;
-                          default:
-                            return `= ${value}`;
-                        }
-                      }
-                      return Array.isArray(filterValue)
-                        ? filterValue.join(", ")
-                        : String(filterValue);
-                    };
-
-                    return `${filter.id}: ${formatFilterValue(filter.value)}`;
-                  })
+                  .columnFilters.map(
+                    (filter) =>
+                      `${filter.id}: ${formatFilterValue(filter.value)}`
+                  )
                   .join(", ")}
               </span>
             )}

@@ -1,4 +1,4 @@
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
+// import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText } from "ai";
 import {
   applySorting,
@@ -7,14 +7,20 @@ import {
   applyGrouping,
   applyAnalytics,
 } from "./tools";
+import { createOpenAI } from "@ai-sdk/openai";
 
-const google = createGoogleGenerativeAI({
-  apiKey: import.meta.env.VITE_GOOGLE_GENERATIVE_AI_API_KEY,
+// const google = createGoogleGenerativeAI({
+//   apiKey: import.meta.env.VITE_GOOGLE_GENERATIVE_AI_API_KEY,
+// });
+const openai = createOpenAI({
+  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
 });
 
-export async function generateTextService(prompt: string) {
+export async function generateCommandService(prompt: string) {
   const result = await generateText({
-    model: google("gemini-2.5-flash-lite"),
+    model: openai("gpt-5-nano"),
+    system:
+      "You are a helpful assistant that can help with sorting, filtering, selecting, grouping, and analyzing tabular data. Your task is to convert natural language into function calls to the tools provided.",
     prompt,
     tools: {
       ...applySorting,

@@ -8,7 +8,7 @@ import {
 
 const columnHelper = createColumnHelper<HousePriceData>();
 
-export const housePriceColumns = [
+export const tableColumns = [
   columnHelper.accessor("postalCode", {
     header: "Postal Code",
     cell: (info) => (
