@@ -89,27 +89,15 @@ export function ChatInterface({
           result.text || "Action completed successfully!"
         );
 
-        // Delegate to appropriate operation handler
-        switch (result.type) {
-          case "sorting":
-            operations.applySorting(result);
-            break;
-          case "filtering":
-            operations.applyFiltering(result);
-            break;
-          case "selection":
-            operations.applySelection(result);
-            break;
-          case "grouping":
-            operations.applyGrouping(result);
-            break;
-          case "analytics":
-            const analyticsResult = await operations.applyAnalytics(result);
-            if (analyticsResult) {
-              // Add analytics result to chat
-              addMessage("assistant", formatAnalyticsResult(analyticsResult));
-            }
-            break;
+        // Apply the operations using the unified handler
+        if (result.operationsResult) {
+          const analyticsResult = await operations.applyOperationsResult(
+            result.operationsResult
+          );
+          if (analyticsResult) {
+            // Add analytics result to chat
+            addMessage("assistant", formatAnalyticsResult(analyticsResult));
+          }
         }
       } else {
         addMessage(

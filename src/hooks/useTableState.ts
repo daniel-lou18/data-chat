@@ -99,3 +99,14 @@ export function useTableState(): UseTableStateReturn {
     resetAll,
   };
 }
+
+// function logState(state: TableState) {
+//   console.log(`
+//     Sorting: ${state.sorting.map((s) => s.id).join(", ")}
+//     Column Filters: ${state.columnFilters.map((c) => c.id).join(", ")}
+//     Global Filter: ${state.globalFilter}
+//     Row Selection: ${Object.keys(state.rowSelection).join(", ")}
+//     Grouping: ${state.grouping.join(", ")}
+//     Expanded: ${Object.keys(state.expanded).join(", ")}
+//     `);
+// }

@@ -11,16 +11,23 @@ import { type HousePriceData } from "../types";
 import { useNaturalLanguageGrouping } from "./useNaturalLanguageGrouping";
 import { useDataAnalytics, type AnalyticsResult } from "./useDataAnalytics";
 import {
-  convertToTanStackFilter,
+  convertFiltersToTanStack,
   applySelectionAction,
 } from "../utils/tableOperationUtils";
+import type {
+  Sorting,
+  Filter,
+  Selection,
+  Grouping,
+  Analytics,
+} from "../services/schemas";
+import type { OperationsResult } from "../services/tools";
 
 interface TableOperationHandlers {
-  applySorting: (result: any) => void;
-  applyFiltering: (result: any) => void;
-  applySelection: (result: any) => void;
-  applyGrouping: (result: any) => void;
-  applyAnalytics: (result: any) => Promise<AnalyticsResult | null>;
+  // Unified handler for all operations
+  applyOperationsResult: (
+    result: OperationsResult
+  ) => Promise<AnalyticsResult | null>;
 }
 
 export function useTableOperations(
@@ -42,78 +49,115 @@ export function useTableOperations(
   // Data analytics hook
   const analytics = useDataAnalytics(table, data);
 
-  const applySorting = (result: any) => {
-    if (result.type === "sorting" && result.sorting) {
-      const { fieldName, direction } = result.sorting;
-      setSorting([{ id: fieldName, desc: direction === "desc" }]);
-    }
-  };
-
-  const applyFiltering = (result: any) => {
-    if (result.type === "filtering" && result.filtering) {
-      const { fieldName, operator, value, secondValue } = result.filtering;
-      const filterValue = convertToTanStackFilter(operator, value, secondValue);
-      setColumnFilters([{ id: fieldName, value: filterValue }]);
-    }
-  };
-
-  const applySelection = (result: any) => {
-    if (result.type === "selection" && result.selection) {
-      const { action, criteria, count } = result.selection;
-      const newSelection = applySelectionAction(action, criteria, count, data);
-      setRowSelection(newSelection);
-    }
-  };
-
-  const applyGrouping = (result: any) => {
-    if (result.type === "grouping" && result.grouping) {
-      const { action, groupByField, aggregations } = result.grouping;
-      groupingControls.applyGroupingAction(action, groupByField, aggregations);
-    }
-  };
-
-  const applyAnalytics = async (
-    result: any
+  // Unified handler for OperationsResult
+  const applyOperationsResult = async (
+    operationsResult: OperationsResult
   ): Promise<AnalyticsResult | null> => {
-    if (result.type === "analytics" && result.analytics) {
-      const analyticsResult = await analytics.executeAnalysis({
-        operation: result.analytics.operation,
-        field: result.analytics.field,
-        secondaryField: result.analytics.secondaryField,
-        value: result.analytics.value,
-        count: result.analytics.count,
-        scope: result.analytics.scope || "filtered",
-        operator: result.analytics.operator,
-      });
+    let analyticsResult: AnalyticsResult | null = null;
 
-      // If the result includes data (like topN), also apply selection
-      if (analyticsResult.type === "data" && analyticsResult.data) {
-        const dataIndices = analyticsResult.data.map((item) =>
-          data.findIndex(
-            (row) =>
-              row.postalCode === item.postalCode && row.city === item.city
-          )
-        );
+    // Process each successful operation
+    for (const operationResult of operationsResult.results) {
+      if (!operationResult.success) continue;
 
-        const selection: RowSelectionState = {};
-        dataIndices.forEach((index) => {
-          if (index !== -1) {
-            selection[index.toString()] = true;
+      switch (operationResult.type) {
+        case "sort":
+          if ("data" in operationResult) {
+            const sortingArray = operationResult.data as Sorting[];
+            const tanStackSorting = sortingArray.map((sort) => ({
+              id: sort.fieldName,
+              desc: sort.direction === "desc",
+            }));
+            setSorting(tanStackSorting);
           }
-        });
-        setRowSelection(selection);
-      }
+          break;
 
-      return analyticsResult;
+        case "filter":
+          if ("data" in operationResult) {
+            const filters = operationResult.data as Filter[];
+            const columnFilters = convertFiltersToTanStack(filters);
+            setColumnFilters(columnFilters);
+          }
+          break;
+
+        case "clearFilters":
+          setColumnFilters([]);
+          break;
+
+        case "selection":
+          if ("data" in operationResult) {
+            const selection = operationResult.data as Selection;
+            const currentSelection = table.getState().rowSelection;
+            const newSelection = applySelectionAction(
+              selection,
+              data,
+              currentSelection
+            );
+            setRowSelection(newSelection);
+          }
+          break;
+
+        case "clearSelection":
+          setRowSelection({});
+          break;
+
+        case "group":
+          if ("data" in operationResult) {
+            const grouping = operationResult.data as Grouping;
+            groupingControls.applyGroupingAction(
+              "groupBy",
+              grouping.groupBy,
+              grouping.aggregations
+            );
+          }
+          break;
+
+        case "clearGrouping":
+          groupingControls.applyGroupingAction(
+            "clearGrouping",
+            undefined,
+            undefined
+          );
+          break;
+
+        case "analytics":
+          if ("data" in operationResult) {
+            const analyticsData = operationResult.data as Analytics;
+            analyticsResult = await analytics.executeAnalysis({
+              operation: analyticsData.operation,
+              field: analyticsData.field,
+              secondaryField: analyticsData.secondaryField,
+              value: analyticsData.value,
+              count: analyticsData.count,
+              scope: analyticsData.scope,
+              operator: analyticsData.operator,
+            });
+
+            // If the result includes data (like topN), also apply selection
+            if (analyticsResult.type === "data" && analyticsResult.data) {
+              const dataIndices = analyticsResult.data.map((item) =>
+                data.findIndex(
+                  (row) =>
+                    row.postalCode === item.postalCode && row.city === item.city
+                )
+              );
+
+              const selection: RowSelectionState = {};
+              dataIndices.forEach((index) => {
+                if (index !== -1) {
+                  selection[index.toString()] = true;
+                }
+              });
+              setRowSelection(selection);
+            }
+          }
+          break;
+      }
     }
-    return null;
+
+    return analyticsResult;
   };
 
   return {
-    applySorting,
-    applyFiltering,
-    applySelection,
-    applyGrouping,
-    applyAnalytics,
+    applyOperationsResult,
   };
 }

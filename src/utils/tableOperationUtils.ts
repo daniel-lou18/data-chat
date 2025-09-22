@@ -1,13 +1,18 @@
 import { type RowSelectionState } from "@tanstack/react-table";
 import { type HousePriceData } from "../types";
+import {
+  type Filter,
+  type Selection,
+  type Operator,
+  type Value,
+} from "../services/schemas";
 
 /**
- * Converts filter operations to TanStack Table format
+ * Converts a single filter operation to TanStack Table format
  */
-export function convertToTanStackFilter(
-  operator: string,
-  value: string | number,
-  secondValue?: string | number
+export function convertSingleFilterToTanStack(
+  operator: Operator,
+  value: Value | Value[]
 ): any {
   switch (operator) {
     case "equals":
@@ -27,27 +32,43 @@ export function convertToTanStackFilter(
     case "lessThanOrEqual":
       return { type: "lessThanOrEqual", value };
     case "between":
-      return { type: "between", value: [value, secondValue] };
+      return { type: "between", value };
+    case "in":
+      return { type: "in", value };
+    case "notIn":
+      return { type: "notIn", value };
     default:
       return value;
   }
 }
 
 /**
+ * Converts an array of Filter objects to TanStack Table column filters format
+ * Returns an array of column filter objects ready for setColumnFilters
+ */
+export function convertFiltersToTanStack(
+  filters: Filter[]
+): Array<{ id: string; value: any }> {
+  return filters.map((filter) => ({
+    id: filter.fieldName,
+    value: convertSingleFilterToTanStack(filter.operator, filter.value),
+  }));
+}
+
+/**
  * Applies selection actions to create a new row selection state
  */
 export function applySelectionAction(
-  action: string,
-  criteria: any,
-  count: number | undefined,
-  data: HousePriceData[]
+  selection: Selection,
+  data: HousePriceData[],
+  currentSelection?: RowSelectionState
 ): RowSelectionState {
-  const selection: RowSelectionState = {};
+  const newSelection: RowSelectionState = {};
 
-  switch (action) {
+  switch (selection.action) {
     case "selectAll":
       data.forEach((_, index) => {
-        selection[index.toString()] = true;
+        newSelection[index.toString()] = true;
       });
       break;
 
@@ -56,54 +77,64 @@ export function applySelectionAction(
       break;
 
     case "selectWhere":
-      if (criteria) {
+      if (selection.where) {
         data.forEach((row, index) => {
-          if (matchesCriteria(row, criteria)) {
-            selection[index.toString()] = true;
+          if (matchesFilters(row, selection.where!)) {
+            newSelection[index.toString()] = true;
           }
         });
       }
       break;
 
+    case "selectByIds":
+      // This would require ID mapping - for now, treat as selectNone
+      break;
+
     case "selectTop":
-      const topCount = count || 10;
+      const topCount = selection.count || 10;
       for (let i = 0; i < Math.min(topCount, data.length); i++) {
-        selection[i.toString()] = true;
+        newSelection[i.toString()] = true;
       }
       break;
 
     case "selectBottom":
-      const bottomCount = count || 10;
+      const bottomCount = selection.count || 10;
       const startIndex = Math.max(0, data.length - bottomCount);
       for (let i = startIndex; i < data.length; i++) {
-        selection[i.toString()] = true;
+        newSelection[i.toString()] = true;
       }
       break;
 
-    case "selectRandom":
-      const randomCount = Math.min(count || 5, data.length);
-      const randomIndices = getRandomIndices(data.length, randomCount);
-      randomIndices.forEach((index) => {
-        selection[index.toString()] = true;
-      });
-      break;
-
     case "invertSelection":
-      // This would need current selection state - for now, select all
+      // Invert the current selection
       data.forEach((_, index) => {
-        selection[index.toString()] = true;
+        const indexStr = index.toString();
+        newSelection[indexStr] = !(currentSelection?.[indexStr] ?? false);
       });
       break;
   }
 
-  return selection;
+  return newSelection;
 }
 
 /**
- * Checks if a row matches the given criteria
+ * Checks if a row matches an array of Filter objects (all must match - AND logic)
  */
-export function matchesCriteria(row: HousePriceData, criteria: any): boolean {
-  const { fieldName, operator, value, secondValue } = criteria;
+export function matchesFilters(
+  row: HousePriceData,
+  filters: Filter[]
+): boolean {
+  return filters.every((filter) => matchesExpression(row, filter));
+}
+
+/**
+ * Checks if a row matches a single filter expression
+ */
+export function matchesExpression(
+  row: HousePriceData,
+  expression: Filter
+): boolean {
+  const { fieldName, operator, value } = expression;
   const cellValue = row[fieldName as keyof HousePriceData];
 
   switch (operator) {
@@ -133,11 +164,24 @@ export function matchesCriteria(row: HousePriceData, criteria: any): boolean {
     case "lessThanOrEqual":
       return typeof cellValue === "number" && cellValue <= (value as number);
     case "between":
-      return (
-        typeof cellValue === "number" &&
-        cellValue >= (value as number) &&
-        cellValue <= (secondValue as number)
-      );
+      if (Array.isArray(value) && value.length >= 2) {
+        return (
+          typeof cellValue === "number" &&
+          cellValue >= (value[0] as number) &&
+          cellValue <= (value[1] as number)
+        );
+      }
+      return false;
+    case "in":
+      if (Array.isArray(value)) {
+        return value.includes(cellValue as any);
+      }
+      return cellValue === value;
+    case "notIn":
+      if (Array.isArray(value)) {
+        return !value.includes(cellValue as any);
+      }
+      return cellValue !== value;
     default:
       return false;
   }
