@@ -1,4 +1,4 @@
-import { type HousePriceData } from "../types";
+import type { GenericData } from "../components/table/tableColumns";
 
 /**
  * Ranking Service - Handles ranking, sorting, and comparative operations
@@ -10,20 +10,20 @@ export class RankingService {
   // ==========================================
 
   static getTopN(
-    data: HousePriceData[],
-    field: keyof HousePriceData,
+    data: GenericData[],
+    field: keyof GenericData,
     n: number
-  ): HousePriceData[] {
+  ): GenericData[] {
     return [...data]
       .sort((a, b) => (b[field] as number) - (a[field] as number))
       .slice(0, n);
   }
 
   static getBottomN(
-    data: HousePriceData[],
-    field: keyof HousePriceData,
+    data: GenericData[],
+    field: keyof GenericData,
     n: number
-  ): HousePriceData[] {
+  ): GenericData[] {
     return [...data]
       .sort((a, b) => (a[field] as number) - (b[field] as number))
       .slice(0, n);
@@ -34,8 +34,8 @@ export class RankingService {
   // ==========================================
 
   static getPercentile(
-    data: HousePriceData[],
-    field: keyof HousePriceData,
+    data: GenericData[],
+    field: keyof GenericData,
     percentile: number
   ): number {
     if (data.length === 0) return 0;
@@ -56,19 +56,19 @@ export class RankingService {
   }
 
   static getTopPercentile(
-    data: HousePriceData[],
-    field: keyof HousePriceData,
+    data: GenericData[],
+    field: keyof GenericData,
     percentile: number
-  ): HousePriceData[] {
+  ): GenericData[] {
     const threshold = this.getPercentile(data, field, 100 - percentile);
     return data.filter((row) => (row[field] as number) >= threshold);
   }
 
   static getBottomPercentile(
-    data: HousePriceData[],
-    field: keyof HousePriceData,
+    data: GenericData[],
+    field: keyof GenericData,
     percentile: number
-  ): HousePriceData[] {
+  ): GenericData[] {
     const threshold = this.getPercentile(data, field, percentile);
     return data.filter((row) => (row[field] as number) <= threshold);
   }
@@ -78,10 +78,10 @@ export class RankingService {
   // ==========================================
 
   static addRankings(
-    data: HousePriceData[],
-    field: keyof HousePriceData,
+    data: GenericData[],
+    field: keyof GenericData,
     ascending: boolean = false
-  ): Array<HousePriceData & { rank: number }> {
+  ): Array<GenericData & { rank: number }> {
     const sorted = [...data].sort((a, b) => {
       const aVal = a[field] as number;
       const bVal = b[field] as number;
@@ -95,8 +95,8 @@ export class RankingService {
   }
 
   static getRankOfValue(
-    data: HousePriceData[],
-    field: keyof HousePriceData,
+    data: GenericData[],
+    field: keyof GenericData,
     value: number,
     ascending: boolean = false
   ): number {
@@ -112,9 +112,9 @@ export class RankingService {
   // ==========================================
 
   static compareGroups(
-    group1: HousePriceData[],
-    group2: HousePriceData[],
-    field: keyof HousePriceData,
+    group1: GenericData[],
+    group2: GenericData[],
+    field: keyof GenericData,
     operation: "sum" | "average" | "count" | "max" | "min"
   ): { group1: number; group2: number; difference: number; ratio: number } {
     let value1: number, value2: number;
@@ -161,7 +161,7 @@ export class RankingService {
   // UTILITY METHODS
   // ==========================================
 
-  static validateRankingOperation(field: keyof HousePriceData): void {
+  static validateRankingOperation(field: keyof GenericData): void {
     const numericFields = ["postalCode", "averagePricePerM2", "population"];
     if (!numericFields.includes(field as string)) {
       throw new Error(

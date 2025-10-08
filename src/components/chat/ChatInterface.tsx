@@ -1,33 +1,24 @@
-import { useState } from "react";
-import {
-  type OnChangeFn,
-  type SortingState,
-  type ColumnFiltersState,
-  type RowSelectionState,
-  type GroupingState,
-  type ExpandedState,
-  type Table,
-} from "@tanstack/react-table";
-import { generateCommandService } from "../../services/generateCommandService";
-import { type HousePriceData } from "../../types";
-import { useTableOperations } from "../../hooks/useTableOperations";
-import { formatAnalyticsResult } from "../../utils/chatInterfaceUtils";
+import { type Table } from "@tanstack/react-table";
 import { MessagesList } from "./MessagesList";
 import { ErrorDisplay } from "./ErrorDisplay";
 import { MessageInput } from "./MessageInput";
 import { ClearChatButton } from "./ClearChatButton";
+import type { GenericData } from "../table/tableColumns";
 
 interface ChatInterfaceProps {
-  setSorting: OnChangeFn<SortingState>;
-  setColumnFilters: OnChangeFn<ColumnFiltersState>;
-  setRowSelection: OnChangeFn<RowSelectionState>;
-  setGrouping: OnChangeFn<GroupingState>;
-  setExpanded: OnChangeFn<ExpandedState>;
-  data: HousePriceData[];
-  table: Table<HousePriceData>;
+  messages: ChatMessage[];
+  error: string | null;
+  setError: (error: string | null) => void;
+  input: string;
+  setInput: (input: string) => void;
+  onSubmit: (message: string) => void;
+  isProcessing: boolean;
+  onClear: () => void;
+  data: GenericData[];
+  table: Table<GenericData>;
 }
 
-interface ChatMessage {
+export interface ChatMessage {
   id: string;
   role: "user" | "assistant";
   content: string;
@@ -35,93 +26,16 @@ interface ChatMessage {
 }
 
 export function ChatInterface({
-  setSorting,
-  setColumnFilters,
-  setRowSelection,
-  setGrouping,
-  setExpanded,
-  data,
-  table,
+  messages,
+  error,
+  setError,
+  input,
+  setInput,
+  onSubmit,
+  isProcessing,
+  onClear,
 }: ChatInterfaceProps) {
-  const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
   // Table operations hook - handles all business logic
-  const operations = useTableOperations(
-    setSorting,
-    setColumnFilters,
-    setRowSelection,
-    setGrouping,
-    setExpanded,
-    data,
-    table
-  );
-
-  const addMessage = (role: "user" | "assistant", content: string) => {
-    const newMessage: ChatMessage = {
-      id: Date.now().toString(),
-      role,
-      content,
-      timestamp: new Date(),
-    };
-    setMessages((prev) => [...prev, newMessage]);
-    return newMessage;
-  };
-
-  const handleSendMessage = async (message: string) => {
-    if (!message.trim()) return;
-
-    setIsProcessing(true);
-    setError(null);
-
-    // Add user message
-    addMessage("user", message);
-
-    try {
-      const result = await generateCommandService(message);
-
-      if (result.success) {
-        // Add assistant response
-        addMessage(
-          "assistant",
-          result.text || "Action completed successfully!"
-        );
-
-        // Apply the operations using the unified handler
-        if (result.operationsResult) {
-          const analyticsResult = await operations.applyOperationsResult(
-            result.operationsResult
-          );
-          if (analyticsResult) {
-            // Add analytics result to chat
-            addMessage("assistant", formatAnalyticsResult(analyticsResult));
-          }
-        }
-      } else {
-        addMessage(
-          "assistant",
-          result.text ||
-            "I couldn't understand your request. Please try rephrasing it."
-        );
-      }
-    } catch (error) {
-      console.error("Error processing message:", error);
-      setError("Something went wrong. Please try again.");
-      addMessage(
-        "assistant",
-        "Sorry, I encountered an error. Please try again."
-      );
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const clearChat = () => {
-    setMessages([]);
-    setError(null);
-  };
 
   return (
     <div className="h-full flex flex-col p-4 space-y-4">
@@ -131,10 +45,10 @@ export function ChatInterface({
         <MessageInput
           input={input}
           setInput={setInput}
-          onSubmit={handleSendMessage}
+          onSubmit={onSubmit}
           isProcessing={isProcessing}
         />
-        <ClearChatButton onClear={clearChat} isProcessing={isProcessing} />
+        <ClearChatButton onClear={onClear} isProcessing={isProcessing} />
       </div>
     </div>
   );

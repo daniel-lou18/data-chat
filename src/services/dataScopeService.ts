@@ -1,5 +1,5 @@
 import { type Table } from "@tanstack/react-table";
-import { type HousePriceData } from "../types";
+import type { GenericData } from "../components/table/tableColumns";
 
 /**
  * Data Scope Service - Handles data extraction from TanStack Table
@@ -10,29 +10,29 @@ export class DataScopeService {
   // DATA SCOPE EXTRACTION
   // ==========================================
 
-  static getAllData(originalData: HousePriceData[]): HousePriceData[] {
+  static getAllData(originalData: GenericData[]): GenericData[] {
     return originalData;
   }
 
-  static getFilteredData(table: Table<HousePriceData>): HousePriceData[] {
+  static getFilteredData(table: Table<GenericData>): GenericData[] {
     return table.getFilteredRowModel().rows.map((row) => row.original);
   }
 
-  static getSelectedData(table: Table<HousePriceData>): HousePriceData[] {
+  static getSelectedData(table: Table<GenericData>): GenericData[] {
     const selectedRows = table.getSelectedRowModel().rows;
     return selectedRows.map((row) => row.original);
   }
 
-  static getVisibleData(table: Table<HousePriceData>): HousePriceData[] {
+  static getVisibleData(table: Table<GenericData>): GenericData[] {
     // Gets data after all filtering, sorting, pagination
     return table.getRowModel().rows.map((row) => row.original);
   }
 
   static getGroupedData(
-    table: Table<HousePriceData>
-  ): Record<string, HousePriceData[]> {
+    table: Table<GenericData>
+  ): Record<string, GenericData[]> {
     const groupedRows = table.getGroupedRowModel().rows;
-    const groups: Record<string, HousePriceData[]> = {};
+    const groups: Record<string, GenericData[]> = {};
 
     groupedRows.forEach((row) => {
       if (row.getIsGrouped()) {
@@ -50,8 +50,8 @@ export class DataScopeService {
 
   static validateScope(
     scope: DataScope,
-    table: Table<HousePriceData>,
-    originalData: HousePriceData[]
+    table: Table<GenericData>,
+    originalData: GenericData[]
   ): { isValid: boolean; message?: string } {
     switch (scope) {
       case "all":
@@ -100,9 +100,9 @@ export class DataScopeService {
 
   static getDataByScope(
     scope: DataScope,
-    table: Table<HousePriceData>,
-    originalData: HousePriceData[]
-  ): HousePriceData[] {
+    table: Table<GenericData>,
+    originalData: GenericData[]
+  ): GenericData[] {
     switch (scope) {
       case "all":
         return this.getAllData(originalData);
@@ -126,8 +126,8 @@ export class DataScopeService {
 
   static getScopeMetadata(
     scope: DataScope,
-    table: Table<HousePriceData>,
-    originalData: HousePriceData[]
+    table: Table<GenericData>,
+    originalData: GenericData[]
   ): DataScopeMetadata {
     const data = this.getDataByScope(scope, table, originalData);
 

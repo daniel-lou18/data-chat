@@ -13,9 +13,12 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
-import type * as schemas_mutations_75 from "../schemas/mutations_75.js";
+import type * as lib_dataTransformers from "../lib/dataTransformers.js";
+import type * as lib_validators from "../lib/validators.js";
+import type * as tables_dvfPropertySales from "../tables/dvfPropertySales.js";
+import type * as tables_propertySales from "../tables/propertySales.js";
+import type * as types_PropertySales from "../types/PropertySales.js";
 import type * as types_index from "../types/index.js";
-import type * as utils_transformers_apiTransformers from "../utils/transformers/apiTransformers.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -26,9 +29,12 @@ import type * as utils_transformers_apiTransformers from "../utils/transformers/
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  "schemas/mutations_75": typeof schemas_mutations_75;
+  "lib/dataTransformers": typeof lib_dataTransformers;
+  "lib/validators": typeof lib_validators;
+  "tables/dvfPropertySales": typeof tables_dvfPropertySales;
+  "tables/propertySales": typeof tables_propertySales;
+  "types/PropertySales": typeof types_PropertySales;
   "types/index": typeof types_index;
-  "utils/transformers/apiTransformers": typeof utils_transformers_apiTransformers;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

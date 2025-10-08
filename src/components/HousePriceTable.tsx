@@ -1,59 +1,20 @@
-import { type HousePriceData } from "../types";
-import { useTableState } from "../hooks/useTableState";
-import { tableColumns } from "./table/tableColumns";
+import { type GenericData } from "./table/tableColumns";
 import { ChatInterface } from "./chat/ChatInterface";
 import { DataTable } from "./table/DataTable";
-import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
-  getGroupedRowModel,
-  getExpandedRowModel,
-} from "@tanstack/react-table";
-import {
-  textSearch,
-  numericComparison,
-  numericWithText,
-} from "./table/filterFunctions";
+import type { UseTableStateReturn } from "../hooks/useTableState";
 
 interface HousePriceTableProps {
-  data: HousePriceData[];
+  data: GenericData[];
+  tableState: UseTableStateReturn;
+  setTableState: (tableState: UseTableStateReturn) => void;
 }
 
-export function HousePriceTable({ data }: HousePriceTableProps) {
+export function HousePriceTable({
+  data,
+  tableState,
+  setTableState,
+}: HousePriceTableProps) {
   // TanStack Table recommended pattern: centralize ALL table state
-  const tableState = useTableState();
-
-  // Create the table instance to share between DataTable and ChatInterface
-  const table = useReactTable({
-    data,
-    columns: tableColumns,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getGroupedRowModel: getGroupedRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
-    enableRowSelection: true,
-    enableGrouping: true,
-    state: {
-      sorting: tableState.sorting,
-      columnFilters: tableState.columnFilters,
-      rowSelection: tableState.rowSelection,
-      grouping: tableState.grouping,
-      expanded: tableState.expanded,
-    },
-    onSortingChange: tableState.setSorting,
-    onColumnFiltersChange: tableState.setColumnFilters,
-    onRowSelectionChange: tableState.setRowSelection,
-    onGroupingChange: tableState.setGrouping,
-    onExpandedChange: tableState.setExpanded,
-    filterFns: {
-      textSearch,
-      numericComparison,
-      numericWithText,
-    },
-  });
 
   return (
     <div className="max-w-8xl mx-auto flex h-[calc(100vh-10rem)] bg-white shadow-xl rounded-lg overflow-hidden">
@@ -182,11 +143,14 @@ export function HousePriceTable({ data }: HousePriceTableProps) {
 
         <div className="flex-1 overflow-hidden">
           <ChatInterface
-            setSorting={tableState.setSorting}
-            setColumnFilters={tableState.setColumnFilters}
-            setRowSelection={tableState.setRowSelection}
-            setGrouping={tableState.setGrouping}
-            setExpanded={tableState.setExpanded}
+            messages={messages}
+            error={error}
+            setError={setError}
+            input={input}
+            setInput={setInput}
+            onSubmit={onSubmit}
+            isProcessing={isProcessing}
+            onClear={onClear}
             data={data}
             table={table}
           />

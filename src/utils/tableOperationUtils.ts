@@ -1,11 +1,11 @@
 import { type RowSelectionState } from "@tanstack/react-table";
-import { type HousePriceData } from "../types";
 import {
   type Filter,
   type Selection,
   type Operator,
   type Value,
 } from "../services/schemas";
+import type { GenericData } from "../components/table/tableColumns";
 
 /**
  * Converts a single filter operation to TanStack Table format
@@ -60,7 +60,7 @@ export function convertFiltersToTanStack(
  */
 export function applySelectionAction(
   selection: Selection,
-  data: HousePriceData[],
+  data: GenericData[],
   currentSelection?: RowSelectionState
 ): RowSelectionState {
   const newSelection: RowSelectionState = {};
@@ -120,10 +120,7 @@ export function applySelectionAction(
 /**
  * Checks if a row matches an array of Filter objects (all must match - AND logic)
  */
-export function matchesFilters(
-  row: HousePriceData,
-  filters: Filter[]
-): boolean {
+export function matchesFilters(row: GenericData, filters: Filter[]): boolean {
   return filters.every((filter) => matchesExpression(row, filter));
 }
 
@@ -131,11 +128,11 @@ export function matchesFilters(
  * Checks if a row matches a single filter expression
  */
 export function matchesExpression(
-  row: HousePriceData,
+  row: GenericData,
   expression: Filter
 ): boolean {
   const { fieldName, operator, value } = expression;
-  const cellValue = row[fieldName as keyof HousePriceData];
+  const cellValue = row[fieldName as keyof GenericData];
 
   switch (operator) {
     case "equals":

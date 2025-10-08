@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-table";
 import { generateCommandService } from "../services/generateCommandService";
 import { type HousePriceData } from "../types";
+import type { GenericData } from "../components/table/tableColumns";
 
 export interface UseNaturalLanguageGroupingReturn {
   prompt: string;
@@ -32,7 +33,7 @@ export interface AggregationFunction {
 export function useNaturalLanguageGrouping(
   setGrouping: OnChangeFn<GroupingState>,
   setExpanded: OnChangeFn<ExpandedState>,
-  data: HousePriceData[]
+  data: GenericData[]
 ): UseNaturalLanguageGroupingReturn {
   const [prompt, setPrompt] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);

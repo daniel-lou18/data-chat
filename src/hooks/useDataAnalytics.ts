@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { type Table } from "@tanstack/react-table";
-import { type HousePriceData } from "../types";
 import { AnalyticsService } from "../services/analyticsService";
 import { RankingService } from "../services/rankingService";
 import { DataScopeService, type DataScope } from "../services/dataScopeService";
+import type { GenericData } from "../components/table/tableColumns";
 
 export interface AnalyticsResult {
   type: "value" | "data" | "comparison";
   value?: number;
-  data?: HousePriceData[];
+  data?: GenericData[];
   comparison?: {
     group1: number;
     group2: number;
@@ -36,8 +36,8 @@ export interface UseDataAnalyticsReturn {
  * Integrates with TanStack Table to perform calculations on different data scopes
  */
 export function useDataAnalytics(
-  table: Table<HousePriceData>,
-  originalData: HousePriceData[]
+  table: Table<GenericData>,
+  originalData: GenericData[]
 ): UseDataAnalyticsReturn {
   const [isProcessing, setIsProcessing] = useState(false);
   const [lastResult, setLastResult] = useState<AnalyticsResult | null>(null);
@@ -88,10 +88,8 @@ export function useDataAnalytics(
         // AGGREGATION OPERATIONS
         // ==========================================
         case "sum": {
-          AnalyticsService.validateNumericOperation(
-            field as keyof HousePriceData
-          );
-          const sum = AnalyticsService.sum(data, field as keyof HousePriceData);
+          AnalyticsService.validateNumericOperation(field as keyof GenericData);
+          const sum = AnalyticsService.sum(data, field as keyof GenericData);
           result = {
             type: "value",
             value: sum,
@@ -102,12 +100,10 @@ export function useDataAnalytics(
         }
 
         case "average": {
-          AnalyticsService.validateNumericOperation(
-            field as keyof HousePriceData
-          );
+          AnalyticsService.validateNumericOperation(field as keyof GenericData);
           const avg = AnalyticsService.average(
             data,
-            field as keyof HousePriceData
+            field as keyof GenericData
           );
           result = {
             type: "value",
@@ -134,10 +130,8 @@ export function useDataAnalytics(
         }
 
         case "min": {
-          AnalyticsService.validateNumericOperation(
-            field as keyof HousePriceData
-          );
-          const min = AnalyticsService.min(data, field as keyof HousePriceData);
+          AnalyticsService.validateNumericOperation(field as keyof GenericData);
+          const min = AnalyticsService.min(data, field as keyof GenericData);
           result = {
             type: "value",
             value: min,
@@ -148,10 +142,8 @@ export function useDataAnalytics(
         }
 
         case "max": {
-          AnalyticsService.validateNumericOperation(
-            field as keyof HousePriceData
-          );
-          const max = AnalyticsService.max(data, field as keyof HousePriceData);
+          AnalyticsService.validateNumericOperation(field as keyof GenericData);
+          const max = AnalyticsService.max(data, field as keyof GenericData);
           result = {
             type: "value",
             value: max,
@@ -165,13 +157,11 @@ export function useDataAnalytics(
         // RANKING OPERATIONS
         // ==========================================
         case "topN": {
-          RankingService.validateRankingOperation(
-            field as keyof HousePriceData
-          );
+          RankingService.validateRankingOperation(field as keyof GenericData);
           const n = count || 5;
           const topData = RankingService.getTopN(
             data,
-            field as keyof HousePriceData,
+            field as keyof GenericData,
             n
           );
           result = {
@@ -189,13 +179,11 @@ export function useDataAnalytics(
         }
 
         case "bottomN": {
-          RankingService.validateRankingOperation(
-            field as keyof HousePriceData
-          );
+          RankingService.validateRankingOperation(field as keyof GenericData);
           const n = count || 5;
           const bottomData = RankingService.getBottomN(
             data,
-            field as keyof HousePriceData,
+            field as keyof GenericData,
             n
           );
           result = {
@@ -213,13 +201,11 @@ export function useDataAnalytics(
         }
 
         case "percentile": {
-          RankingService.validateRankingOperation(
-            field as keyof HousePriceData
-          );
+          RankingService.validateRankingOperation(field as keyof GenericData);
           const percentile = (value as number) || 50;
           const percentileValue = RankingService.getPercentile(
             data,
-            field as keyof HousePriceData,
+            field as keyof GenericData,
             percentile
           );
           result = {
@@ -242,13 +228,11 @@ export function useDataAnalytics(
               "sumWhere requires secondaryField, operator, and value"
             );
           }
-          AnalyticsService.validateNumericOperation(
-            field as keyof HousePriceData
-          );
+          AnalyticsService.validateNumericOperation(field as keyof GenericData);
           const sum = AnalyticsService.sumWhere(
             data,
-            field as keyof HousePriceData,
-            secondaryField as keyof HousePriceData,
+            field as keyof GenericData,
+            secondaryField as keyof GenericData,
             operator,
             value
           );
@@ -269,13 +253,11 @@ export function useDataAnalytics(
               "averageWhere requires secondaryField, operator, and value"
             );
           }
-          AnalyticsService.validateNumericOperation(
-            field as keyof HousePriceData
-          );
+          AnalyticsService.validateNumericOperation(field as keyof GenericData);
           const avg = AnalyticsService.averageWhere(
             data,
-            field as keyof HousePriceData,
-            secondaryField as keyof HousePriceData,
+            field as keyof GenericData,
+            secondaryField as keyof GenericData,
             operator,
             value
           );

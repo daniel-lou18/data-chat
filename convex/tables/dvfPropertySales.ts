@@ -1,4 +1,4 @@
-import { defineSchema, defineTable } from "convex/server";
+import { defineTable } from "convex/server";
 import { v } from "convex/values";
 import { Doc } from "../_generated/dataModel";
 
@@ -30,4 +30,4 @@ export const dvfPropertySales = defineTable({
   valeurfonc: v.union(v.number(), v.string()),
 });
 
-export type dvfPropertySales = Doc<"mutations_75">;
+export type DvfPropertySales = Doc<"mutations_75">;

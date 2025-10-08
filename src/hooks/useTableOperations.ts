@@ -7,7 +7,6 @@ import {
   type ExpandedState,
   type Table,
 } from "@tanstack/react-table";
-import { type HousePriceData } from "../types";
 import { useNaturalLanguageGrouping } from "./useNaturalLanguageGrouping";
 import { useDataAnalytics, type AnalyticsResult } from "./useDataAnalytics";
 import {
@@ -22,6 +21,7 @@ import type {
   Analytics,
 } from "../services/schemas";
 import type { OperationsResult } from "../services/tools";
+import type { GenericData } from "../components/table/tableColumns";
 
 interface TableOperationHandlers {
   // Unified handler for all operations
@@ -36,8 +36,8 @@ export function useTableOperations(
   setRowSelection: OnChangeFn<RowSelectionState>,
   setGrouping: OnChangeFn<GroupingState>,
   setExpanded: OnChangeFn<ExpandedState>,
-  data: HousePriceData[],
-  table: Table<HousePriceData>
+  data: GenericData[],
+  table: Table<GenericData>
 ): TableOperationHandlers {
   // Natural language grouping hook
   const groupingControls = useNaturalLanguageGrouping(

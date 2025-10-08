@@ -1,4 +1,4 @@
-import { type HousePriceData } from "../types";
+import type { GenericData } from "../components/table/tableColumns";
 
 /**
  * Core Analytics Service - Pure mathematical operations
@@ -9,26 +9,26 @@ export class AnalyticsService {
   // AGGREGATION OPERATIONS
   // ==========================================
 
-  static sum(data: HousePriceData[], field: keyof HousePriceData): number {
+  static sum(data: GenericData[], field: keyof GenericData): number {
     return data.reduce((sum, row) => sum + (row[field] as number), 0);
   }
 
-  static average(data: HousePriceData[], field: keyof HousePriceData): number {
+  static average(data: GenericData[], field: keyof GenericData): number {
     if (data.length === 0) return 0;
     const sum = this.sum(data, field);
     return sum / data.length;
   }
 
-  static count(data: HousePriceData[]): number {
+  static count(data: GenericData[]): number {
     return data.length;
   }
 
-  static min(data: HousePriceData[], field: keyof HousePriceData): number {
+  static min(data: GenericData[], field: keyof GenericData): number {
     if (data.length === 0) return 0;
     return Math.min(...data.map((row) => row[field] as number));
   }
 
-  static max(data: HousePriceData[], field: keyof HousePriceData): number {
+  static max(data: GenericData[], field: keyof GenericData): number {
     if (data.length === 0) return 0;
     return Math.max(...data.map((row) => row[field] as number));
   }
@@ -38,9 +38,9 @@ export class AnalyticsService {
   // ==========================================
 
   static sumWhere(
-    data: HousePriceData[],
-    sumField: keyof HousePriceData,
-    conditionField: keyof HousePriceData,
+    data: GenericData[],
+    sumField: keyof GenericData,
+    conditionField: keyof GenericData,
     operator: "gt" | "lt" | "eq" | "gte" | "lte",
     conditionValue: number | string
   ): number {
@@ -66,9 +66,9 @@ export class AnalyticsService {
   }
 
   static averageWhere(
-    data: HousePriceData[],
-    avgField: keyof HousePriceData,
-    conditionField: keyof HousePriceData,
+    data: GenericData[],
+    avgField: keyof GenericData,
+    conditionField: keyof GenericData,
     operator: "gt" | "lt" | "eq" | "gte" | "lte",
     conditionValue: number | string
   ): number {
@@ -97,13 +97,13 @@ export class AnalyticsService {
   // UTILITY METHODS
   // ==========================================
 
-  static isNumericField(field: keyof HousePriceData): boolean {
+  static isNumericField(field: keyof GenericData): boolean {
     return ["postalCode", "averagePricePerM2", "population"].includes(
       field as string
     );
   }
 
-  static validateNumericOperation(field: keyof HousePriceData): void {
+  static validateNumericOperation(field: keyof GenericData): void {
     if (!this.isNumericField(field)) {
       throw new Error(
         `Cannot perform numeric operation on field: ${String(field)}`

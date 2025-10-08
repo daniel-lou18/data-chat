@@ -9,7 +9,8 @@ export const PropertySales = z.object({
   date: z.iso.date(),
   mutationType: z.string(),
   propertyType: z.string(),
-  price: z.union([z.number(), z.string()]),
+  propertyTypeCode: z.number(),
+  price: z.union([z.number(), z.null()]),
   floorArea: z.number(),
   numberOfStudioApartments: z.int().min(0).max(100),
   numberOf1BedroomApartments: z.int().min(0).max(100),
@@ -26,5 +27,3 @@ export const PropertySales = z.object({
   numberOf3BedroomHouses: z.int().min(0).max(100),
   numberOf4BedroomHouses: z.int().min(0).max(100),
 });
-
-export type PropertySales = z.infer<typeof PropertySales>;
