@@ -1,3 +1,5 @@
+import type { GenericData } from "../components/table/tableColumns";
+
 type QueryResponseMessage = {
   role: "user" | "assistant";
   content: string;
@@ -18,7 +20,7 @@ export async function queryDatabaseService(
   query: string
 ): Promise<QueryResponseMessage> {
   try {
-    const reponse = await fetch("http://localhost:3000/api/chat", {
+    const response = await fetch("http://localhost:3000/api/chat", {
       method: "POST",
       body: JSON.stringify({ messages: [{ role: "user", content: query }] }),
       headers: {
@@ -26,13 +28,13 @@ export async function queryDatabaseService(
       },
     });
 
-    if (!reponse.ok) {
+    if (!response.ok) {
       throw new Error(
-        `HTTP error! status: ${reponse.status}, statusText: ${reponse.statusText}`
+        `HTTP error! status: ${response.status}, statusText: ${response.statusText}`
       );
     }
 
-    const result = await reponse.json();
+    const result = await response.json();
 
     if (isMessages(result.messages)) {
       return {
@@ -52,5 +54,30 @@ export async function queryDatabaseService(
       content: error instanceof Error ? error.message : "Something went wrong",
       data: [],
     };
+  }
+}
+
+export async function apiService(
+  inseeCode: string,
+  section?: string
+): Promise<GenericData[]> {
+  try {
+    const baseUrl = section
+      ? `http://localhost:3000/api/analytics/by-insee-code-section?year=2024&inseeCode=${inseeCode}&section=${section}`
+      : `http://localhost:3000/api/analytics/by-insee-code?year=2024&inseeCode=${inseeCode}`;
+    console.log(baseUrl);
+    const response = await fetch(baseUrl);
+
+    if (!response.ok) {
+      throw new Error(
+        `HTTP error! status: ${response.status}, statusText: ${response.statusText}`
+      );
+    }
+
+    const result = await response.json();
+    return result as GenericData[];
+  } catch (error) {
+    console.error(error);
+    return [];
   }
 }

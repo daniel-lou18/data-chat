@@ -1,6 +1,3 @@
-import { useState } from "react";
-import { queryDatabaseService } from "./services/queryDatabaseService";
-import { type GenericData } from "./components/table/tableColumns";
 import {
   useReactTable,
   getCoreRowModel,
@@ -16,20 +13,25 @@ import {
 } from "./utils/dataTableUtils";
 import { createColumnsFromData } from "./components/table/tableColumns";
 import { useTableState } from "./hooks/useTableState";
-import {
-  ChatInterface,
-  type ChatMessage,
-} from "./components/chat/ChatInterface";
+import { ChatInterface } from "./components/chat/ChatInterface";
 import { DataTable } from "./components/table/DataTable";
+import { ParisMap } from "./components/map";
+import { useMessage } from "./hooks/useMessage";
 
 function App() {
-  const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<GenericData[]>([]);
-
   const tableState = useTableState();
+  const {
+    input,
+    setInput,
+    messages,
+    error,
+    setError,
+    data,
+    setData,
+    handleSendMessage,
+    isProcessing,
+    clearChat,
+  } = useMessage();
 
   // Create the table instance to share between DataTable and ChatInterface
   const table = useReactTable({
@@ -61,63 +63,13 @@ function App() {
     },
   });
 
-  const addMessage = (role: "user" | "assistant", content: string) => {
-    const newMessage: ChatMessage = {
-      id: Date.now().toString(),
-      role,
-      content,
-      timestamp: new Date(),
-    };
-    setMessages((prev) => [...prev, newMessage]);
-    return newMessage;
-  };
-
-  const handleSendMessage = async (message: string) => {
-    if (!message.trim()) return;
-
-    setIsProcessing(true);
-    setError(null);
-
-    // Add user message
-    addMessage("user", message);
-
-    try {
-      const result = await queryDatabaseService(message);
-
-      if (result.data?.length) {
-        // Add assistant response
-        addMessage(
-          "assistant",
-          `Query completed successfully: ${result.data.length} rows returned`
-        );
-
-        setData(result.data);
-      } else {
-        addMessage("assistant", result.content);
-      }
-    } catch (error) {
-      console.error("Error processing message:", error);
-      setError("Something went wrong. Please try again.");
-      addMessage(
-        "assistant",
-        "Sorry, I encountered an error. Please try again."
-      );
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const clearChat = () => {
-    setMessages([]);
-    setError(null);
-  };
-
   return (
     <div className="max-h-screen bg-gray-100 py-8">
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Data Dashboard</h1>
         </div>
+        <ParisMap setData={setData} />
         <div className="max-w-8xl mx-auto flex h-[calc(100vh-10rem)] bg-white shadow-xl rounded-lg overflow-hidden">
           {/* Main Content - Table */}
           <div className="flex-1 flex flex-col overflow-hidden">

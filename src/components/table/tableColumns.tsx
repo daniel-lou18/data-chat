@@ -140,15 +140,17 @@ function getFilterFunction(filterType?: string) {
 }
 
 function formatValue(value: any, type: string): string {
+  if (!value) return "";
+
   if (typeof value === "number") {
     switch (type) {
       case "currency":
-        return value.toLocaleString("en-US", {
+        return value.toLocaleString("fr-FR", {
           style: "currency",
-          currency: "USD",
+          currency: "EUR",
         });
       case "numeric":
-        return value.toLocaleString("en-US");
+        return value.toLocaleString("fr-FR");
       default:
         return value.toString();
     }
