@@ -1,5 +1,5 @@
 import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import arrondissementsData from "../../data/cadastre-75-communes.json";
@@ -34,113 +34,134 @@ type LayerManagerProps = {
 };
 
 function LayerManager({ setData }: LayerManagerProps) {
-  const [activeLayer, setActiveLayer] = useState<
-    "arrondissements" | "sections" | null
-  >(null);
+  const prevLayerRef = useRef<L.Path | null>(null);
+  const arrondissementsRef = useRef<L.GeoJSON | null>(null);
+  const sectionsRef = useRef<L.GeoJSON | null>(null);
   const map = useMap();
+  const [zoomLevel, setZoomLevel] = useState<number>(map.getZoom());
 
+  // Track zoom level changes
   useEffect(() => {
-    const updateLayers = () => {
-      const z = map.getZoom();
-      if (z < 12) {
-        setActiveLayer("arrondissements");
-      } else {
-        setActiveLayer("sections");
-      }
+    const handleZoomEnd = () => {
+      setZoomLevel(map.getZoom());
     };
 
-    map.on("zoomend", updateLayers);
-    updateLayers(); // initial run
-
+    map.on("zoomend", handleZoomEnd);
     return () => {
-      map.off("zoomend", updateLayers);
+      map.off("zoomend", handleZoomEnd);
     };
   }, [map]);
 
-  const handleClick = (
-    e: L.LeafletMouseEvent,
-    defaultStyle: L.PathOptions,
-    activeStyle: L.PathOptions
-  ) => {
-    const clickedLayer = e.target;
-
-    map.eachLayer((mapLayer: L.Layer) => {
-      if (mapLayer instanceof L.GeoJSON) {
-        mapLayer.eachLayer((l: L.Layer) => {
-          if (l instanceof L.Path && l !== clickedLayer) {
-            l.setStyle(defaultStyle);
-          }
-        });
+  const handleClick = useCallback(
+    (
+      layer: L.Path,
+      defaultStyle: L.PathOptions,
+      activeStyle: L.PathOptions
+    ) => {
+      if (prevLayerRef.current) {
+        prevLayerRef.current.setStyle(defaultStyle);
       }
-    });
+      layer.setStyle(activeStyle);
+      prevLayerRef.current = layer;
+    },
+    []
+  );
 
-    clickedLayer.setStyle(activeStyle);
-  };
+  const onEachArrondissement = useCallback(
+    (feature: ArrondissementFeature, layer: L.Path) => {
+      const name = feature.properties.nom;
+      if (name) layer.bindPopup(`<b>${name}</b>`);
 
-  // onEachFeature with direct event binding
-  const onEachArrondissement = (
-    feature: ArrondissementFeature,
-    layer: L.Layer
-  ) => {
-    const name = feature.properties.nom;
-    if (name) layer.bindPopup(`<b>${name}</b>`);
+      layer.on("click", async () => {
+        handleClick(layer, defaultArrondStyle, activeArrondStyle);
+        // const data = await apiService(feature.properties.id);
+        // setData(data ?? []);
+      });
+    },
+    [handleClick, setData]
+  );
 
-    layer.on("click", async (e: L.LeafletMouseEvent) => {
-      handleClick(e, defaultArrondStyle, activeArrondStyle);
+  const onEachSection = useCallback(
+    (feature: SectionFeature, layer: L.Path) => {
+      const sectionInfo = `
+        <b>Section ${feature.properties.id}</b>
+        <p>Commune: ${feature.properties.commune}</p>
+        <p>Code: ${feature.properties.code}</p>
+      `;
+      layer.bindPopup(sectionInfo);
 
-      const data = await apiService(feature.properties.id);
-      setData(data ?? []);
-    });
-  };
+      layer.on("click", async () => {
+        handleClick(layer, defaultSectionStyle, activeSectionStyle);
+        // const data = await apiService(
+        //   feature.properties.commune,
+        //   feature.properties.code
+        // );
+        // setData(data ?? []);
+      });
+    },
+    [handleClick, setData]
+  );
 
-  const onEachSection = (feature: SectionFeature, layer: L.Layer) => {
-    const sectionInfo = `
-      <b>Section ${feature.properties.id}</b>
-      <p>Commune: ${feature.properties.commune}</p>
-      <p>Code: ${feature.properties.code}</p>
-    `;
-    layer.bindPopup(sectionInfo);
+  // Control visibility through refs
+  useEffect(() => {
+    const showArr = zoomLevel < 12;
 
-    layer.on("click", async (e: L.LeafletMouseEvent) => {
-      handleClick(e, defaultSectionStyle, activeSectionStyle);
+    if (prevLayerRef.current) {
+      try {
+        // decide which default style to apply based on currently shown layer
+        // If switching to arr, reset any prev section highlight; vice versa
+        prevLayerRef.current.setStyle(defaultArrondStyle);
+      } catch {}
+      prevLayerRef.current = null;
+    }
 
-      const data = await apiService(
-        feature.properties.commune,
-        feature.properties.code
-      );
-      setData(data ?? []);
-    });
-  };
+    if (arrondissementsRef.current) {
+      if (showArr && !map.hasLayer(arrondissementsRef.current))
+        map.addLayer(arrondissementsRef.current);
+      if (!showArr && map.hasLayer(arrondissementsRef.current))
+        map.removeLayer(arrondissementsRef.current);
+    }
+
+    if (sectionsRef.current) {
+      if (!showArr && !map.hasLayer(sectionsRef.current))
+        map.addLayer(sectionsRef.current);
+      if (showArr && map.hasLayer(sectionsRef.current))
+        map.removeLayer(sectionsRef.current);
+    }
+
+    // cleanup on unmount: remove layers entirely (React-Leaflet will also handle on unmount, but safe)
+    return () => {
+      if (
+        arrondissementsRef.current &&
+        map.hasLayer(arrondissementsRef.current)
+      )
+        map.removeLayer(arrondissementsRef.current);
+      if (sectionsRef.current && map.hasLayer(sectionsRef.current))
+        map.removeLayer(sectionsRef.current);
+    };
+  }, [zoomLevel, map]);
+
+  const arrondissementsGeoData = useMemo(
+    () => arrondissementsData as ArrondissementsGeoJSON,
+    []
+  );
+
+  const sectionsGeoData = useMemo(() => sectionsData as SectionsGeoJSON, []);
 
   return (
     <>
-      {activeLayer === "arrondissements" && (
-        <GeoJSON
-          data={arrondissementsData as ArrondissementsGeoJSON}
-          pathOptions={{
-            color: "#2563eb",
-            weight: 2,
-            opacity: 0.8,
-            fillColor: "#3b82f6",
-            fillOpacity: 0.1,
-          }}
-          onEachFeature={onEachArrondissement}
-        />
-      )}
-
-      {activeLayer === "sections" && (
-        <GeoJSON
-          data={sectionsData as SectionsGeoJSON}
-          pathOptions={{
-            color: "#dc2626",
-            weight: 1,
-            opacity: 0.6,
-            fillColor: "#ef4444",
-            fillOpacity: 0.05,
-          }}
-          onEachFeature={onEachSection}
-        />
-      )}
+      <GeoJSON
+        ref={arrondissementsRef}
+        data={arrondissementsGeoData}
+        pathOptions={defaultArrondStyle}
+        onEachFeature={onEachArrondissement}
+      />
+      <GeoJSON
+        ref={sectionsRef}
+        data={sectionsGeoData}
+        pathOptions={defaultSectionStyle}
+        onEachFeature={onEachSection}
+      />
     </>
   );
 }

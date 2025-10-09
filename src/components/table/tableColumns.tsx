@@ -31,7 +31,13 @@ function detectColumnType(key: string, sampleValue: any): ColumnConfig["type"] {
   if (key.toLowerCase().includes("code") || key.toLowerCase().includes("id")) {
     return "postalCode";
   }
-  if (typeof sampleValue === "number") {
+
+  // Check if it's a number (either actual number or string that can be converted to number)
+  const isNumeric =
+    typeof sampleValue === "number" ||
+    (typeof sampleValue === "string" && !isNaN(Number(sampleValue)));
+
+  if (isNumeric) {
     return "numeric";
   }
   return "text";
@@ -142,19 +148,32 @@ function getFilterFunction(filterType?: string) {
 function formatValue(value: any, type: string): string {
   if (!value) return "";
 
-  if (typeof value === "number") {
-    switch (type) {
-      case "currency":
-        return value.toLocaleString("fr-FR", {
-          style: "currency",
-          currency: "EUR",
-        });
-      case "numeric":
-        return value.toLocaleString("fr-FR");
-      default:
-        return value.toString();
+  // Convert string numbers to actual numbers
+  let numericValue: number | null = null;
+  if (typeof value === "string" && !isNaN(Number(value))) {
+    numericValue = Number(value);
+  } else if (typeof value === "number") {
+    numericValue = value;
+  }
+
+  // If we have a numeric value and it's a currency or numeric type, format it
+  if (numericValue !== null && (type === "currency" || type === "numeric")) {
+    if (type === "currency") {
+      return numericValue.toLocaleString("fr-FR", {
+        style: "currency",
+        currency: "EUR",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
+    } else if (type === "numeric") {
+      return numericValue.toLocaleString("fr-FR", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      });
     }
   }
+
+  // For non-numeric values or other types, return as string
   return value.toString();
 }
 

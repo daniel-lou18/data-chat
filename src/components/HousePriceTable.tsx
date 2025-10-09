@@ -1,6 +1,11 @@
 import { type GenericData } from "./table/tableColumns";
 import { ChatInterface } from "./chat/ChatInterface";
-import { DataTable } from "./table/DataTable";
+import {
+  DataTable,
+  TableHead,
+  TableBody,
+  TableFooter,
+} from "./table/DataTable";
 import type { UseTableStateReturn } from "../hooks/useTableState";
 
 interface HousePriceTableProps {
@@ -128,7 +133,11 @@ export function HousePriceTable({
         </div>
 
         <div className="flex-1 overflow-auto">
-          <DataTable table={table} data={data} />
+          <DataTable data={data}>
+            <TableHead table={table} />
+            <TableBody table={table} />
+          </DataTable>
+          <TableFooter table={table} data={data} />
         </div>
       </div>
 

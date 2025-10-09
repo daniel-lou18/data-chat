@@ -14,7 +14,12 @@ import {
 import { createColumnsFromData } from "./components/table/tableColumns";
 import { useTableState } from "./hooks/useTableState";
 import { ChatInterface } from "./components/chat/ChatInterface";
-import { DataTable } from "./components/table/DataTable";
+import {
+  DataTable,
+  TableHead,
+  TableBody,
+  TableFooter,
+} from "./components/table/DataTable";
 import { ParisMap } from "./components/map";
 import { useMessage } from "./hooks/useMessage";
 
@@ -180,7 +185,11 @@ function App() {
             </div>
 
             <div className="flex-1 overflow-auto">
-              <DataTable table={table} data={data} />
+              <DataTable data={data}>
+                <TableHead table={table} />
+                <TableBody table={table} />
+              </DataTable>
+              <TableFooter table={table} data={data} />
             </div>
           </div>
 
