@@ -1,5 +1,5 @@
 import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, memo } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import arrondissementsData from "../../data/cadastre-75-communes.json";
@@ -33,8 +33,8 @@ type LayerManagerProps = {
   setData: (data: GenericData[]) => void;
 };
 
-function LayerManager({ setData }: LayerManagerProps) {
-  const prevLayerRef = useRef<L.Path | null>(null);
+const LayerManager = memo(function ({ setData }: LayerManagerProps) {
+  const prevPathRef = useRef<L.Path | null>(null);
   const arrondissementsRef = useRef<L.GeoJSON | null>(null);
   const sectionsRef = useRef<L.GeoJSON | null>(null);
   const map = useMap();
@@ -58,11 +58,11 @@ function LayerManager({ setData }: LayerManagerProps) {
       defaultStyle: L.PathOptions,
       activeStyle: L.PathOptions
     ) => {
-      if (prevLayerRef.current) {
-        prevLayerRef.current.setStyle(defaultStyle);
+      if (prevPathRef.current) {
+        prevPathRef.current.setStyle(defaultStyle);
       }
       layer.setStyle(activeStyle);
-      prevLayerRef.current = layer;
+      prevPathRef.current = layer;
     },
     []
   );
@@ -74,8 +74,8 @@ function LayerManager({ setData }: LayerManagerProps) {
 
       layer.on("click", async () => {
         handleClick(layer, defaultArrondStyle, activeArrondStyle);
-        // const data = await apiService(feature.properties.id);
-        // setData(data ?? []);
+        const data = await apiService(feature.properties.id);
+        setData(data ?? []);
       });
     },
     [handleClick, setData]
@@ -92,11 +92,11 @@ function LayerManager({ setData }: LayerManagerProps) {
 
       layer.on("click", async () => {
         handleClick(layer, defaultSectionStyle, activeSectionStyle);
-        // const data = await apiService(
-        //   feature.properties.commune,
-        //   feature.properties.code
-        // );
-        // setData(data ?? []);
+        const data = await apiService(
+          feature.properties.commune,
+          feature.properties.code
+        );
+        setData(data ?? []);
       });
     },
     [handleClick, setData]
@@ -106,27 +106,30 @@ function LayerManager({ setData }: LayerManagerProps) {
   useEffect(() => {
     const showArr = zoomLevel < 12;
 
-    if (prevLayerRef.current) {
-      try {
-        // decide which default style to apply based on currently shown layer
-        // If switching to arr, reset any prev section highlight; vice versa
-        prevLayerRef.current.setStyle(defaultArrondStyle);
-      } catch {}
-      prevLayerRef.current = null;
-    }
-
-    if (arrondissementsRef.current) {
-      if (showArr && !map.hasLayer(arrondissementsRef.current))
-        map.addLayer(arrondissementsRef.current);
-      if (!showArr && map.hasLayer(arrondissementsRef.current))
-        map.removeLayer(arrondissementsRef.current);
-    }
-
-    if (sectionsRef.current) {
-      if (!showArr && !map.hasLayer(sectionsRef.current))
-        map.addLayer(sectionsRef.current);
-      if (showArr && map.hasLayer(sectionsRef.current))
+    if (showArr) {
+      if (sectionsRef.current && map.hasLayer(sectionsRef.current)) {
         map.removeLayer(sectionsRef.current);
+      }
+      if (
+        arrondissementsRef.current &&
+        !map.hasLayer(arrondissementsRef.current)
+      ) {
+        map.addLayer(arrondissementsRef.current);
+        arrondissementsRef.current.setStyle(defaultArrondStyle);
+      }
+    }
+
+    if (!showArr) {
+      if (
+        arrondissementsRef.current &&
+        map.hasLayer(arrondissementsRef.current)
+      ) {
+        map.removeLayer(arrondissementsRef.current);
+      }
+      if (sectionsRef.current && !map.hasLayer(sectionsRef.current)) {
+        map.addLayer(sectionsRef.current);
+        sectionsRef.current.setStyle(defaultSectionStyle);
+      }
     }
 
     // cleanup on unmount: remove layers entirely (React-Leaflet will also handle on unmount, but safe)
@@ -134,10 +137,12 @@ function LayerManager({ setData }: LayerManagerProps) {
       if (
         arrondissementsRef.current &&
         map.hasLayer(arrondissementsRef.current)
-      )
+      ) {
         map.removeLayer(arrondissementsRef.current);
-      if (sectionsRef.current && map.hasLayer(sectionsRef.current))
+      }
+      if (sectionsRef.current && map.hasLayer(sectionsRef.current)) {
         map.removeLayer(sectionsRef.current);
+      }
     };
   }, [zoomLevel, map]);
 
@@ -164,7 +169,7 @@ function LayerManager({ setData }: LayerManagerProps) {
       />
     </>
   );
-}
+});
 
 export default function ParisMap({ setData }: LayerManagerProps) {
   return (

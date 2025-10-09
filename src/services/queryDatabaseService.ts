@@ -65,7 +65,7 @@ export async function apiService(
     const baseUrl = section
       ? `http://localhost:3000/api/analytics/by-insee-code-section?year=2024&inseeCode=${inseeCode}&section=${section}`
       : `http://localhost:3000/api/analytics/by-insee-code?year=2024&inseeCode=${inseeCode}`;
-    console.log(baseUrl);
+
     const response = await fetch(baseUrl);
 
     if (!response.ok) {
