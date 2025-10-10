@@ -1,16 +1,12 @@
-import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
-import { useCallback, useEffect, useMemo, useRef, useState, memo } from "react";
+import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import { useMemo, useRef, memo } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import arrondissementsData from "../../data/cadastre-75-communes.json";
 import sectionsData from "../../data/cadastre-75-sections.json";
 import {
-  type ArrondissementFeature,
   defaultArrondStyle,
-  activeArrondStyle,
-  type SectionFeature,
   defaultSectionStyle,
-  activeSectionStyle,
   type ArrondissementsGeoJSON,
   type SectionsGeoJSON,
 } from "./config";
@@ -20,7 +16,9 @@ import { type GenericData } from "../table/tableColumns";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-import { apiService } from "../../services/queryDatabaseService";
+import { useMapZooom } from "../../hooks/useMapZoom";
+import { useMapZoneHighlighter } from "../../hooks/useMapZoneHighlighter.ts";
+import { useMapFeatures } from "../../hooks/useMapFeatures.ts";
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -31,126 +29,30 @@ L.Icon.Default.mergeOptions({
 
 type LayerManagerProps = {
   setData: (data: GenericData[]) => void;
+  arrs: string[];
+  sectionIds: string[];
 };
 
-const LayerManager = memo(function ({ setData }: LayerManagerProps) {
+const LayerManager = memo(function ({
+  setData,
+  arrs,
+  sectionIds,
+}: LayerManagerProps) {
   const prevPathRef = useRef<L.Path | null>(null);
   const arrondissementsRef = useRef<L.GeoJSON | null>(null);
   const sectionsRef = useRef<L.GeoJSON | null>(null);
-  const map = useMap();
-  const [zoomLevel, setZoomLevel] = useState<number>(map.getZoom());
 
-  // Track zoom level changes
-  useEffect(() => {
-    const handleZoomEnd = () => {
-      setZoomLevel(map.getZoom());
-    };
-
-    map.on("zoomend", handleZoomEnd);
-    return () => {
-      map.off("zoomend", handleZoomEnd);
-    };
-  }, [map]);
-
-  const handleClick = useCallback(
-    (
-      layer: L.Path,
-      defaultStyle: L.PathOptions,
-      activeStyle: L.PathOptions
-    ) => {
-      if (prevPathRef.current) {
-        prevPathRef.current.setStyle(defaultStyle);
-      }
-      layer.setStyle(activeStyle);
-      prevPathRef.current = layer;
-    },
-    []
-  );
-
-  const onEachArrondissement = useCallback(
-    (feature: ArrondissementFeature, layer: L.Path) => {
-      const name = feature.properties.nom;
-      if (name) layer.bindPopup(`<b>${name}</b>`);
-
-      layer.on("click", async () => {
-        handleClick(layer, defaultArrondStyle, activeArrondStyle);
-        const data = await apiService(feature.properties.id);
-        setData(data ?? []);
-      });
-    },
-    [handleClick, setData]
-  );
-
-  const onEachSection = useCallback(
-    (feature: SectionFeature, layer: L.Path) => {
-      const sectionInfo = `
-        <b>Section ${feature.properties.id}</b>
-        <p>Commune: ${feature.properties.commune}</p>
-        <p>Code: ${feature.properties.code}</p>
-      `;
-      layer.bindPopup(sectionInfo);
-
-      layer.on("click", async () => {
-        handleClick(layer, defaultSectionStyle, activeSectionStyle);
-        const data = await apiService(
-          feature.properties.commune,
-          feature.properties.code
-        );
-        setData(data ?? []);
-      });
-    },
-    [handleClick, setData]
-  );
-
-  // Control visibility through refs
-  useEffect(() => {
-    const showArr = zoomLevel < 12;
-
-    if (showArr) {
-      if (sectionsRef.current && map.hasLayer(sectionsRef.current)) {
-        map.removeLayer(sectionsRef.current);
-      }
-      if (
-        arrondissementsRef.current &&
-        !map.hasLayer(arrondissementsRef.current)
-      ) {
-        map.addLayer(arrondissementsRef.current);
-        arrondissementsRef.current.setStyle(defaultArrondStyle);
-      }
-    }
-
-    if (!showArr) {
-      if (
-        arrondissementsRef.current &&
-        map.hasLayer(arrondissementsRef.current)
-      ) {
-        map.removeLayer(arrondissementsRef.current);
-      }
-      if (sectionsRef.current && !map.hasLayer(sectionsRef.current)) {
-        map.addLayer(sectionsRef.current);
-        sectionsRef.current.setStyle(defaultSectionStyle);
-      }
-    }
-
-    // cleanup on unmount: remove layers entirely (React-Leaflet will also handle on unmount, but safe)
-    return () => {
-      if (
-        arrondissementsRef.current &&
-        map.hasLayer(arrondissementsRef.current)
-      ) {
-        map.removeLayer(arrondissementsRef.current);
-      }
-      if (sectionsRef.current && map.hasLayer(sectionsRef.current)) {
-        map.removeLayer(sectionsRef.current);
-      }
-    };
-  }, [zoomLevel, map]);
+  useMapZooom({ sectionsRef, arrondissementsRef });
+  useMapZoneHighlighter({ sectionsRef, arrondissementsRef, arrs, sectionIds });
+  const { onEachArrondissement, onEachSection } = useMapFeatures({
+    prevPathRef,
+    setData,
+  });
 
   const arrondissementsGeoData = useMemo(
     () => arrondissementsData as ArrondissementsGeoJSON,
     []
   );
-
   const sectionsGeoData = useMemo(() => sectionsData as SectionsGeoJSON, []);
 
   return (
@@ -171,15 +73,19 @@ const LayerManager = memo(function ({ setData }: LayerManagerProps) {
   );
 });
 
-export default function ParisMap({ setData }: LayerManagerProps) {
+export default function ParisMap({
+  setData,
+  arrs,
+  sectionIds,
+}: LayerManagerProps) {
   return (
     <MapContainer
       center={[48.8566, 2.3522]}
       zoom={11}
-      style={{ height: "100vh", width: "100%" }}
+      style={{ height: "60vh", width: "100%" }}
     >
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      <LayerManager setData={setData} />
+      <LayerManager setData={setData} arrs={arrs} sectionIds={sectionIds} />
     </MapContainer>
   );
 }
