@@ -19,6 +19,8 @@ import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { useMapZooom } from "@/hooks/map/useMapZoom.ts";
 import { useMapZoneHighlighter } from "@/hooks/map/useMapZoneHighlighter.ts";
 import { useMapFeatures } from "@/hooks/map/useMapFeatures.ts";
+import { useGetAggregates } from "@/hooks/data/useGetAggregates.ts";
+import { useGetDeciles } from "@/hooks/data/useGetDeciles.ts";
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -54,6 +56,11 @@ const LayerManager = memo(function ({
     []
   );
   const sectionsGeoData = useMemo(() => sectionsData as SectionsGeoJSON, []);
+
+  const { data: arrData } = useGetAggregates();
+  const { data: decilesData } = useGetDeciles();
+  console.log("arrData", arrData);
+  console.log("decilesData", decilesData);
 
   return (
     <>

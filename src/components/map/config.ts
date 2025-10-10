@@ -91,6 +91,19 @@ export const hoverSectionStyle = {
   fillOpacity: 0.2,
 } as L.PathOptions;
 
+const priceDecileColors = {
+  1: "#064e3b", // Dark green (lowest prices)
+  2: "#065f46", // Dark green
+  3: "#047857", // Green
+  4: "#059669", // Medium green
+  5: "#10b981", // Light green
+  6: "#34d399", // Lighter green
+  7: "#fbbf24", // Yellow
+  8: "#f59e0b", // Orange
+  9: "#ef4444", // Red
+  10: "#dc2626", // Dark red (highest prices)
+};
+
 export const mapConfig = {
   arrondissement: {
     defaultStyle: defaultArrondStyle,

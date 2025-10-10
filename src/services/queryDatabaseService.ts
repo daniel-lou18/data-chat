@@ -1,4 +1,5 @@
 import type { GenericData } from "../components/table/tableColumns";
+import { chatService, analyticsService } from "./api";
 
 type QueryResponseMessage = {
   role: "user" | "assistant";
@@ -6,47 +7,20 @@ type QueryResponseMessage = {
   data: Record<string, any>[];
 };
 
-function isMessages(messages: any): messages is QueryResponseMessage[] {
-  return (
-    Array.isArray(messages) &&
-    messages.length > 0 &&
-    messages[0].role === "assistant" &&
-    Array.isArray(messages[0].content) &&
-    messages[0].content.length > 0
-  );
-}
-
+/**
+ * @deprecated Use chatService.query() instead
+ * Legacy function for backward compatibility
+ */
 export async function queryDatabaseService(
   query: string
 ): Promise<QueryResponseMessage> {
   try {
-    const response = await fetch("http://localhost:3000/api/chat", {
-      method: "POST",
-      body: JSON.stringify({ messages: [{ role: "user", content: query }] }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(
-        `HTTP error! status: ${response.status}, statusText: ${response.statusText}`
-      );
-    }
-
-    const result = await response.json();
-
-    if (isMessages(result.messages)) {
-      return {
-        role: "assistant",
-        content: `Query completed successfully: ${result.messages[0].content.length} rows returned`,
-        data: result.messages[0].content as Record<string, any>[],
-      };
-    } else {
-      throw new Error(
-        "Unexpected response from the server, result is not an array"
-      );
-    }
+    const result = await chatService.query(query);
+    return {
+      role: "assistant",
+      content: result.content,
+      data: result.data,
+    };
   } catch (error) {
     console.error(error);
     return {
@@ -57,25 +31,25 @@ export async function queryDatabaseService(
   }
 }
 
+/**
+ * @deprecated Use analyticsService methods instead
+ * Legacy function for backward compatibility
+ */
 export async function apiService(
-  inseeCode: string,
+  inseeCode?: string,
   section?: string
 ): Promise<GenericData[]> {
   try {
-    const baseUrl = section
-      ? `http://localhost:3000/api/analytics/by-insee-code-section?year=2024&inseeCode=${inseeCode}&section=${section}`
-      : `http://localhost:3000/api/analytics/by-insee-code?year=2024&inseeCode=${inseeCode}`;
-
-    const response = await fetch(baseUrl);
-
-    if (!response.ok) {
-      throw new Error(
-        `HTTP error! status: ${response.status}, statusText: ${response.statusText}`
+    if (inseeCode && section) {
+      return await analyticsService.getByInseeCodeAndSection(
+        inseeCode,
+        section
       );
+    } else if (inseeCode) {
+      return await analyticsService.getByInseeCode(inseeCode);
+    } else {
+      return await analyticsService.getAll();
     }
-
-    const result = await response.json();
-    return result as GenericData[];
   } catch (error) {
     console.error(error);
     return [];

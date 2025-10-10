@@ -39,7 +39,7 @@ export function useMapFeatures({ prevPathRef, setData }: UseMapFeaturesProps) {
       }
       layer.setStyle(activeStyle);
       prevPathRef.current = layer;
-      map.fitBounds((layer as L.Polygon).getBounds());
+      // map.fitBounds((layer as L.Polygon).getBounds());
     },
     []
   );
