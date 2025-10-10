@@ -4,7 +4,7 @@ import {
   activeSectionStyle,
   defaultArrondStyle,
   defaultSectionStyle,
-} from "../components/map/config";
+} from "@/components/map/config";
 import L from "leaflet";
 
 type UseMapZoneHighlighterProps = {

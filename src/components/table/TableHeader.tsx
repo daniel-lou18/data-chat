@@ -1,4 +1,4 @@
-import type { UseTableStateReturn } from "../../hooks/useTableState";
+import type { UseTableStateReturn } from "../../hooks/table/useTableState";
 
 type TableHeaderProps = {
   tableState: UseTableStateReturn;

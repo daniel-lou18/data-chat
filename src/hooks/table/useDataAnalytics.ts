@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { type Table } from "@tanstack/react-table";
-import { AnalyticsService } from "../services/analyticsService";
-import { RankingService } from "../services/rankingService";
-import { DataScopeService, type DataScope } from "../services/dataScopeService";
-import type { GenericData } from "../components/table/tableColumns";
+import { AnalyticsService } from "@/services/analyticsService";
+import { RankingService } from "@/services/rankingService";
+import { DataScopeService, type DataScope } from "@/services/dataScopeService";
+import type { GenericData } from "@/components/table/tableColumns";
 
 export interface AnalyticsResult {
   type: "value" | "data" | "comparison";

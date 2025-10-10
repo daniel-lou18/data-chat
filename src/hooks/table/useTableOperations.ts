@@ -12,16 +12,16 @@ import { useDataAnalytics, type AnalyticsResult } from "./useDataAnalytics";
 import {
   convertFiltersToTanStack,
   applySelectionAction,
-} from "../utils/tableOperationUtils";
+} from "@/utils/tableOperationUtils";
 import type {
   Sorting,
   Filter,
   Selection,
   Grouping,
   Analytics,
-} from "../services/schemas";
-import type { OperationsResult } from "../services/tools";
-import type { GenericData } from "../components/table/tableColumns";
+} from "@/services/schemas";
+import type { OperationsResult } from "@/services/tools";
+import type { GenericData } from "@/components/table/tableColumns";
 
 interface TableOperationHandlers {
   // Unified handler for all operations

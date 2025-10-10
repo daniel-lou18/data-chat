@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { queryDatabaseService } from "../services/queryDatabaseService";
-import { type ChatMessage } from "../components/chat/ChatInterface";
-import { type GenericData } from "../components/table/tableColumns";
+import { queryDatabaseService } from "@/services/queryDatabaseService";
+import { type ChatMessage } from "@/components/chat/ChatInterface";
+import { type GenericData } from "@/components/table/tableColumns";
 
 export function useMessage() {
   const [input, setInput] = useState("");

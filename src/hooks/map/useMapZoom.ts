@@ -4,7 +4,7 @@ import L from "leaflet";
 import {
   defaultArrondStyle,
   defaultSectionStyle,
-} from "../components/map/config";
+} from "@/components/map/config";
 
 type UseMapZoomProps = {
   sectionsRef: React.RefObject<L.GeoJSON | null>;

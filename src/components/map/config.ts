@@ -61,6 +61,13 @@ export const activeArrondStyle = {
   fillOpacity: 0.3,
 } as L.PathOptions;
 
+export const hoverArrondStyle = {
+  color: "#1d4ed8",
+  weight: 3,
+  opacity: 1,
+  fillOpacity: 0.3,
+} as L.PathOptions;
+
 export const defaultSectionStyle = {
   color: "#dc2626",
   weight: 1,
@@ -76,3 +83,43 @@ export const activeSectionStyle = {
   fillColor: "#ef4444",
   fillOpacity: 0.2,
 } as L.PathOptions;
+
+export const hoverSectionStyle = {
+  color: "#b91c1c",
+  weight: 2,
+  opacity: 1,
+  fillOpacity: 0.2,
+} as L.PathOptions;
+
+export const mapConfig = {
+  arrondissement: {
+    defaultStyle: defaultArrondStyle,
+    activeStyle: activeArrondStyle,
+    hoverStyle: hoverArrondStyle,
+  },
+  section: {
+    defaultStyle: defaultSectionStyle,
+    activeStyle: activeSectionStyle,
+    hoverStyle: hoverSectionStyle,
+  },
+};
+
+export function createPopup<T extends SectionFeature | ArrondissementFeature>(
+  feature: T,
+  layer: L.Path
+) {
+  let popup = "";
+  if ("nom" in feature.properties) {
+    popup = `
+      <b>${feature.properties.nom}</b>
+    `;
+  } else {
+    popup = `
+      <b>${feature.properties.commune}</b>
+      <p>Section: ${feature.properties.code}</p>
+    `;
+  }
+  layer.bindPopup(popup).openPopup();
+}
+
+export type MapConfig = typeof mapConfig;

@@ -4,9 +4,9 @@ import {
   type GroupingState,
   type ExpandedState,
 } from "@tanstack/react-table";
-import { generateCommandService } from "../services/generateCommandService";
-import { type HousePriceData } from "../types";
-import type { GenericData } from "../components/table/tableColumns";
+import { generateCommandService } from "@/services/generateCommandService";
+import { type HousePriceData } from "@/types";
+import type { GenericData } from "@/components/table/tableColumns";
 
 export interface UseNaturalLanguageGroupingReturn {
   prompt: string;

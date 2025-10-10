@@ -6,7 +6,7 @@ import {
   TableBody,
   TableFooter,
 } from "./table/DataTable";
-import type { UseTableStateReturn } from "../hooks/useTableState";
+import type { UseTableStateReturn } from "../hooks/table/useTableState";
 
 interface HousePriceTableProps {
   data: GenericData[];

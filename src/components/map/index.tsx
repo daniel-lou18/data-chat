@@ -1,1 +1,1 @@
-export { default as ParisMap } from "./ParisMap";
+export { default as ParisMap } from "./Map";
