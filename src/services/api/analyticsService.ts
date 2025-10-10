@@ -1,5 +1,10 @@
 import { apiService } from "./baseApiService";
 import type { GenericData } from "@/components/table/tableColumns";
+import type {
+  PricePerM2Deciles,
+  SalesByInseeCode,
+  SalesByInseeCodeAndSection,
+} from "./schemas";
 
 /**
  * Analytics API service for handling analytics-related requests
@@ -21,9 +26,9 @@ export class AnalyticsService {
   async getByInseeCode(
     inseeCode: string,
     year: number = 2024
-  ): Promise<GenericData[]> {
+  ): Promise<SalesByInseeCode[]> {
     try {
-      const response = await this.api.get<GenericData[]>(
+      const response = await this.api.get<SalesByInseeCode[]>(
         "/analytics/by-insee-code",
         {
           year,
@@ -49,9 +54,9 @@ export class AnalyticsService {
     inseeCode: string,
     section: string,
     year: number = 2024
-  ): Promise<GenericData[]> {
+  ): Promise<SalesByInseeCodeAndSection[]> {
     try {
-      const response = await this.api.get<GenericData[]>(
+      const response = await this.api.get<SalesByInseeCodeAndSection[]>(
         "/analytics/by-insee-code-section",
         {
           year,
@@ -75,9 +80,9 @@ export class AnalyticsService {
    * @param year - The year for the data (defaults to 2024)
    * @returns Promise<GenericData[]> - All analytics data
    */
-  async getAll(year: number = 2024): Promise<GenericData[]> {
+  async getAll(year: number = 2024): Promise<SalesByInseeCode[]> {
     try {
-      const response = await this.api.get<GenericData[]>(
+      const response = await this.api.get<SalesByInseeCode[]>(
         "/analytics/by-insee-code",
         {
           year,
@@ -100,9 +105,9 @@ export class AnalyticsService {
   async getSectionsByInseeCode(
     inseeCode: string,
     year: number = 2024
-  ): Promise<GenericData[]> {
+  ): Promise<SalesByInseeCodeAndSection[]> {
     try {
-      const response = await this.api.get<GenericData[]>(
+      const response = await this.api.get<SalesByInseeCodeAndSection[]>(
         "/analytics/by-insee-code-section",
         {
           year,
@@ -122,9 +127,11 @@ export class AnalyticsService {
    * @param year - The year for the data (defaults to 2024)
    * @returns Promise<GenericData[]> - Price per m² deciles data
    */
-  async getPricePerM2Deciles(year: number = 2024): Promise<GenericData[]> {
+  async getPricePerM2Deciles(
+    year: number = 2024
+  ): Promise<PricePerM2Deciles[]> {
     try {
-      const response = await this.api.get<GenericData[]>(
+      const response = await this.api.get<PricePerM2Deciles[]>(
         "/analytics/price-per-m2-deciles",
         {
           year,

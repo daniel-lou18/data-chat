@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { analyticsService } from "@/services/api";
 import type { GenericData } from "@/components/table/tableColumns";
+import type { PricePerM2Deciles } from "@/services/api/schemas";
 
 // Query keys for deciles
 export const decilesQueryKeys = {
@@ -50,7 +51,7 @@ export function useGetDeciles(
 ) {
   return useQuery({
     queryKey: decilesQueryKeys.list(`year-${year}`),
-    queryFn: async (): Promise<GenericData[]> => {
+    queryFn: async (): Promise<PricePerM2Deciles[]> => {
       const result = await analyticsService.getPricePerM2Deciles(year);
       return result;
     },
