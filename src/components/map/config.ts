@@ -48,7 +48,7 @@ export interface SectionsGeoJSON {
 export const defaultArrondStyle = {
   color: "#ffffff",
   weight: 1,
-  opacity: 0.8,
+  opacity: 1,
   fillOpacity: 0.5,
 } as L.PathOptions;
 
@@ -68,11 +68,16 @@ export const hoverArrondStyle = {
 } as L.PathOptions;
 
 export const defaultSectionStyle = {
-  // color: "#dc2626",
+  color: "#ffffff",
   weight: 1,
   opacity: 0.6,
-  // fillColor: "#ef4444",
-  fillOpacity: 0.05,
+  fillColor: "#ef4444",
+  fillOpacity: 0.5,
+} as L.PathOptions;
+
+export const hiddenSectionStyle = {
+  opacity: 0,
+  fillOpacity: 0,
 } as L.PathOptions;
 
 export const activeSectionStyle = {
@@ -91,16 +96,16 @@ export const hoverSectionStyle = {
 } as L.PathOptions;
 
 export const priceDecileColors = {
-  1: "#064e3b", // Dark green (lowest prices)
-  2: "#065f46", // Dark green
-  3: "#047857", // Green
-  4: "#059669", // Medium green
-  5: "#10b981", // Light green
-  6: "#34d399", // Lighter green
-  7: "#fbbf24", // Yellow
-  8: "#f59e0b", // Orange
-  9: "#ef4444", // Red
-  10: "#dc2626", // Dark red (highest prices)
+  1: "#166534", // Green-800 (darkest - lowest prices)
+  2: "#15803d", // Green-700
+  3: "#16a34a", // Green-600
+  4: "#22c55e", // Green-500
+  5: "#eab308", // Yellow-500 (median - yellow)
+  6: "#f59e0b", // Amber-500
+  7: "#f97316", // Orange-500
+  8: "#ea580c", // Orange-600
+  9: "#dc2626", // Red-600
+  10: "#b91c1c", // Red-700 (highest prices)
 };
 
 export const mapConfig = {

@@ -20,7 +20,7 @@ import {
   TableBody,
   TableFooter,
 } from "@/components/table/DataTable";
-import { ParisMap } from "@/components/map";
+import ParisMap from "@/components/mapLibre/Map";
 import { useMessage } from "@/hooks/chat/useMessage";
 import { useMemo } from "react";
 import { extractInseeCodesAndCreateSectionIds } from "@/utils/inseeCodeUtils";

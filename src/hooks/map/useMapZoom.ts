@@ -11,7 +11,7 @@ type UseMapZoomProps = {
   arrondissementsRef: React.RefObject<L.GeoJSON | null>;
 };
 
-export function useMapZooom({
+export function useMapZoom({
   sectionsRef,
   arrondissementsRef,
 }: UseMapZoomProps) {

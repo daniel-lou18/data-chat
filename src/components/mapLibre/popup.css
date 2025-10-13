@@ -1,0 +1,23 @@
+/* Custom popup styles */
+.custom-popup .maplibregl-popup-content {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+  padding: 0;
+}
+
+.custom-popup .maplibregl-popup-tip {
+  border-top-color: #e5e7eb;
+}
+
+.custom-popup .maplibregl-popup-close-button {
+  font-size: 18px;
+  color: #6b7280;
+  padding: 8px;
+}
+
+.custom-popup .maplibregl-popup-close-button:hover {
+  color: #374151;
+  background-color: #f3f4f6;
+  border-radius: 4px;
+}

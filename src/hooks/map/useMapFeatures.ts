@@ -7,14 +7,16 @@ import {
   createPopup,
   defaultArrondStyle,
   priceDecileColors,
+  defaultSectionStyle,
+  hiddenSectionStyle,
 } from "@/components/map/config";
 import L from "leaflet";
 import type { GenericData } from "@/components/table/tableColumns";
-import { useNavigate } from "react-router";
 import { createSlug } from "@/utils/urlUtils";
 import { useMap } from "react-leaflet";
 import { apiService } from "@/services/queryDatabaseService";
 import { useDecileLookupTable } from "../data/useGetDeciles";
+import { useNavigate } from "react-router";
 
 type UseMapFeaturesProps = {
   prevPathRef: React.RefObject<L.Path | null>;
@@ -31,8 +33,8 @@ type HandleMouseOverOptions = HandlerOptions & {
 };
 
 export function useMapFeatures({ prevPathRef, setData }: UseMapFeaturesProps) {
-  const map = useMap();
   const navigate = useNavigate();
+  const map = useMap();
   // Get the lookup table for dynamic styling
   const { lookupTable } = useDecileLookupTable();
 
@@ -52,15 +54,21 @@ export function useMapFeatures({ prevPathRef, setData }: UseMapFeaturesProps) {
     };
   }, [lookupTable]);
 
+  const getSectionStyle = useMemo(() => {
+    return {
+      ...hiddenSectionStyle,
+    };
+  }, [lookupTable]);
+
   const handleClick = useCallback(
     ({ level, layer }: HandlerOptions, config: MapConfig = mapConfig) => {
-      const { defaultStyle, activeStyle } = config[level];
-      if (prevPathRef.current) {
-        prevPathRef.current.setStyle(defaultStyle);
-      }
-      layer.setStyle(activeStyle);
-      prevPathRef.current = layer;
-      // map.fitBounds((layer as L.Polygon).getBounds());
+      // const { defaultStyle, activeStyle } = config[level];
+      // if (prevPathRef.current) {
+      //   prevPathRef.current.setStyle(defaultStyle);
+      // }
+      // layer.setStyle(activeStyle);
+      // prevPathRef.current = layer;
+      map.fitBounds((layer as L.Polygon).getBounds());
     },
     []
   );
@@ -70,11 +78,11 @@ export function useMapFeatures({ prevPathRef, setData }: UseMapFeaturesProps) {
       { level, layer, feature }: HandleMouseOverOptions,
       config: MapConfig = mapConfig
     ) => {
-      layer.setStyle({ weight: 3, color: "#1d4ed8" });
+      layer.setStyle({ weight: 3, color: "#3b82f6" });
       layer.bringToFront();
       createPopup(feature, layer);
     },
-    []
+    [lookupTable]
   );
 
   const handleMouseOut = useCallback(
@@ -132,5 +140,10 @@ export function useMapFeatures({ prevPathRef, setData }: UseMapFeaturesProps) {
     [handleClick, handleMouseOver, handleMouseOut, navigate]
   );
 
-  return { onEachArrondissement, onEachSection, getArrondissementStyle };
+  return {
+    onEachArrondissement,
+    onEachSection,
+    getArrondissementStyle,
+    getSectionStyle,
+  };
 }
