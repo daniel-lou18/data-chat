@@ -10,7 +10,7 @@ export default function Map({ setData, arrs, sectionIds }: MapProps) {
       zoom={11}
       style={{ height: "60vh", width: "100%" }}
     >
-      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+      <TileLayer url="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png" />
       <LayerManager setData={setData} arrs={arrs} sectionIds={sectionIds} />
     </MapContainer>
   );

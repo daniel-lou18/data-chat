@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { queryDatabaseService } from "@/services/queryDatabaseService";
 import { type ChatMessage } from "@/components/chat/ChatInterface";
 import { type GenericData } from "@/components/table/tableColumns";
+import { chatService } from "@/services/api";
 
 export function useMessage() {
   const [input, setInput] = useState("");
@@ -31,7 +31,7 @@ export function useMessage() {
     addMessage("user", message);
 
     try {
-      const result = await queryDatabaseService(message);
+      const result = await chatService.query(message);
 
       if (result.data?.length) {
         // Add assistant response

@@ -1,10 +1,12 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import {
   type ArrondissementFeature,
   type SectionFeature,
   type MapConfig,
   mapConfig,
   createPopup,
+  defaultArrondStyle,
+  priceDecileColors,
 } from "@/components/map/config";
 import L from "leaflet";
 import type { GenericData } from "@/components/table/tableColumns";
@@ -12,6 +14,7 @@ import { useNavigate } from "react-router";
 import { createSlug } from "@/utils/urlUtils";
 import { useMap } from "react-leaflet";
 import { apiService } from "@/services/queryDatabaseService";
+import { useDecileLookupTable } from "../data/useGetDeciles";
 
 type UseMapFeaturesProps = {
   prevPathRef: React.RefObject<L.Path | null>;
@@ -30,6 +33,24 @@ type HandleMouseOverOptions = HandlerOptions & {
 export function useMapFeatures({ prevPathRef, setData }: UseMapFeaturesProps) {
   const map = useMap();
   const navigate = useNavigate();
+  // Get the lookup table for dynamic styling
+  const { lookupTable } = useDecileLookupTable();
+
+  // Dynamic style function for arrondissements based on decile data
+  const getArrondissementStyle = useMemo(() => {
+    return (feature: ArrondissementFeature) => {
+      const entry = lookupTable[feature.properties.id];
+      if (entry && entry.decile) {
+        return {
+          ...defaultArrondStyle,
+          fillColor:
+            priceDecileColors[entry.decile as keyof typeof priceDecileColors] ||
+            defaultArrondStyle.fillColor,
+        };
+      }
+      return defaultArrondStyle;
+    };
+  }, [lookupTable]);
 
   const handleClick = useCallback(
     ({ level, layer }: HandlerOptions, config: MapConfig = mapConfig) => {
@@ -49,8 +70,8 @@ export function useMapFeatures({ prevPathRef, setData }: UseMapFeaturesProps) {
       { level, layer, feature }: HandleMouseOverOptions,
       config: MapConfig = mapConfig
     ) => {
-      const { hoverStyle } = config[level];
-      layer.setStyle(hoverStyle);
+      layer.setStyle({ weight: 3, color: "#1d4ed8" });
+      layer.bringToFront();
       createPopup(feature, layer);
     },
     []
@@ -58,8 +79,8 @@ export function useMapFeatures({ prevPathRef, setData }: UseMapFeaturesProps) {
 
   const handleMouseOut = useCallback(
     ({ level, layer }: HandlerOptions, config: MapConfig = mapConfig) => {
-      const { defaultStyle } = config[level];
-      layer.setStyle(defaultStyle);
+      layer.setStyle({ weight: 1, color: "#ffffff" });
+      layer.bringToBack();
     },
     []
   );
@@ -83,7 +104,7 @@ export function useMapFeatures({ prevPathRef, setData }: UseMapFeaturesProps) {
         handleMouseOut({ level, layer });
       });
     },
-    [handleClick, setData]
+    [handleClick, handleMouseOver, handleMouseOut, navigate]
   );
 
   const onEachSection = useCallback(
@@ -108,8 +129,8 @@ export function useMapFeatures({ prevPathRef, setData }: UseMapFeaturesProps) {
         handleMouseOut({ level, layer });
       });
     },
-    [handleClick, setData]
+    [handleClick, handleMouseOver, handleMouseOut, navigate]
   );
 
-  return { onEachArrondissement, onEachSection };
+  return { onEachArrondissement, onEachSection, getArrondissementStyle };
 }

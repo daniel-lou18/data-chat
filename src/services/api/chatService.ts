@@ -43,7 +43,7 @@ export class ChatService {
         return {
           role: "assistant",
           content: `Query completed successfully: ${message.content.length} rows returned`,
-          data: message.content as Record<string, any>[],
+          data: message.content as unknown as Record<string, any>[],
         };
       } else {
         throw new Error(
@@ -67,7 +67,4 @@ export class ChatService {
   }
 }
 
-/**
- * Default chat service instance
- */
 export const chatService = new ChatService();

@@ -313,20 +313,27 @@ export const AnalyticsQueryParamsSchema = z.object({
 // ============================================================================
 
 /**
+ * Schema for a single decile value
+ */
+const DecileValueSchema = z.object({
+  percentile: z
+    .number()
+    .int()
+    .min(1)
+    .max(100)
+    .describe("Percentile value (10, 20, 30, etc.)"),
+  value: z.number().nullable().describe("The decile value (price per m²)"),
+});
+
+/**
  * Schema for price per m² deciles across the whole dataset
  * Each decile represents the price per m² value that divides the dataset into 10 equal groups
  */
 export const PricePerM2DecilesSchema = z.object({
-  1: z.number().nullable().describe("10th percentile (lowest 10%)"),
-  2: z.number().nullable().describe("20th percentile"),
-  3: z.number().nullable().describe("30th percentile"),
-  4: z.number().nullable().describe("40th percentile"),
-  5: z.number().nullable().describe("50th percentile (median)"),
-  6: z.number().nullable().describe("60th percentile"),
-  7: z.number().nullable().describe("70th percentile"),
-  8: z.number().nullable().describe("80th percentile"),
-  9: z.number().nullable().describe("90th percentile"),
-  10: z.number().nullable().describe("100th percentile (highest)"),
+  deciles: z
+    .array(DecileValueSchema)
+    .length(10)
+    .describe("Array of 10 decile values from 10th to 100th percentile"),
   totalTransactions: z
     .number()
     .int()
@@ -338,16 +345,10 @@ export const PricePerM2DecilesSchema = z.object({
  * Each decile represents the price per m² value that divides INSEE codes into 10 equal groups
  */
 export const PricePerM2DecilesByInseeCodeSchema = z.object({
-  1: z.number().nullable().describe("10th percentile (lowest 10%)"),
-  2: z.number().nullable().describe("20th percentile"),
-  3: z.number().nullable().describe("30th percentile"),
-  4: z.number().nullable().describe("40th percentile"),
-  5: z.number().nullable().describe("50th percentile (median)"),
-  6: z.number().nullable().describe("60th percentile"),
-  7: z.number().nullable().describe("70th percentile"),
-  8: z.number().nullable().describe("80th percentile"),
-  9: z.number().nullable().describe("90th percentile"),
-  10: z.number().nullable().describe("100th percentile (highest)"),
+  deciles: z
+    .array(DecileValueSchema)
+    .length(10)
+    .describe("Array of 10 decile values from 10th to 100th percentile"),
   totalInseeCodes: z
     .number()
     .int()
@@ -359,16 +360,10 @@ export const PricePerM2DecilesByInseeCodeSchema = z.object({
  * Each decile represents the price per m² value that divides sections into 10 equal groups
  */
 export const PricePerM2DecilesByInseeCodeAndSectionSchema = z.object({
-  1: z.number().nullable().describe("10th percentile (lowest 10%)"),
-  2: z.number().nullable().describe("20th percentile"),
-  3: z.number().nullable().describe("30th percentile"),
-  4: z.number().nullable().describe("40th percentile"),
-  5: z.number().nullable().describe("50th percentile (median)"),
-  6: z.number().nullable().describe("60th percentile"),
-  7: z.number().nullable().describe("70th percentile"),
-  8: z.number().nullable().describe("80th percentile"),
-  9: z.number().nullable().describe("90th percentile"),
-  10: z.number().nullable().describe("100th percentile (highest)"),
+  deciles: z
+    .array(DecileValueSchema)
+    .length(10)
+    .describe("Array of 10 decile values from 10th to 100th percentile"),
   totalSections: z.number().int().describe("Total number of sections analyzed"),
 });
 

@@ -125,13 +125,11 @@ export class AnalyticsService {
    * Get price per m² deciles for the whole city of Paris
    *
    * @param year - The year for the data (defaults to 2024)
-   * @returns Promise<GenericData[]> - Price per m² deciles data
+   * @returns Promise<PricePerM2Deciles> - Price per m² deciles data
    */
-  async getPricePerM2Deciles(
-    year: number = 2024
-  ): Promise<PricePerM2Deciles[]> {
+  async getPricePerM2Deciles(year: number = 2024): Promise<PricePerM2Deciles> {
     try {
-      const response = await this.api.get<PricePerM2Deciles[]>(
+      const response = await this.api.get<PricePerM2Deciles>(
         "/analytics/price-per-m2-deciles",
         {
           year,
@@ -178,7 +176,4 @@ export class AnalyticsService {
   }
 }
 
-/**
- * Default analytics service instance
- */
 export const analyticsService = new AnalyticsService();

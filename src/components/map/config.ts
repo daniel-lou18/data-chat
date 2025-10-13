@@ -46,11 +46,10 @@ export interface SectionsGeoJSON {
 }
 
 export const defaultArrondStyle = {
-  color: "#2563eb",
-  weight: 2,
+  color: "#ffffff",
+  weight: 1,
   opacity: 0.8,
-  fillColor: "#3b82f6",
-  fillOpacity: 0.1,
+  fillOpacity: 0.5,
 } as L.PathOptions;
 
 export const activeArrondStyle = {
@@ -69,29 +68,29 @@ export const hoverArrondStyle = {
 } as L.PathOptions;
 
 export const defaultSectionStyle = {
-  color: "#dc2626",
+  // color: "#dc2626",
   weight: 1,
   opacity: 0.6,
-  fillColor: "#ef4444",
+  // fillColor: "#ef4444",
   fillOpacity: 0.05,
 } as L.PathOptions;
 
 export const activeSectionStyle = {
-  color: "#b91c1c",
+  // color: "#b91c1c",
   weight: 2,
   opacity: 1,
-  fillColor: "#ef4444",
+  // fillColor: "#ef4444",
   fillOpacity: 0.2,
 } as L.PathOptions;
 
 export const hoverSectionStyle = {
-  color: "#b91c1c",
+  // color: "#b91c1c",
   weight: 2,
   opacity: 1,
   fillOpacity: 0.2,
 } as L.PathOptions;
 
-const priceDecileColors = {
+export const priceDecileColors = {
   1: "#064e3b", // Dark green (lowest prices)
   2: "#065f46", // Dark green
   3: "#047857", // Green
@@ -103,94 +102,6 @@ const priceDecileColors = {
   9: "#ef4444", // Red
   10: "#dc2626", // Dark red (highest prices)
 };
-
-/**
- * Decile thresholds interface
- */
-export interface DecileThresholds {
-  1: number;
-  2: number;
-  3: number;
-  4: number;
-  5: number;
-  6: number;
-  7: number;
-  8: number;
-  9: number;
-  10: number;
-}
-
-/**
- * Determines which decile a price per m² belongs to
- * @param pricePerM2 - The average price per m² value
- * @param thresholds - The decile thresholds to use
- * @returns The decile number (1-10)
- */
-export function getDecileFromPrice(
-  pricePerM2: number,
-  thresholds: DecileThresholds
-): number {
-  if (pricePerM2 <= thresholds[1]) return 1;
-  if (pricePerM2 <= thresholds[2]) return 2;
-  if (pricePerM2 <= thresholds[3]) return 3;
-  if (pricePerM2 <= thresholds[4]) return 4;
-  if (pricePerM2 <= thresholds[5]) return 5;
-  if (pricePerM2 <= thresholds[6]) return 6;
-  if (pricePerM2 <= thresholds[7]) return 7;
-  if (pricePerM2 <= thresholds[8]) return 8;
-  if (pricePerM2 <= thresholds[9]) return 9;
-  return 10; // Highest decile
-}
-
-/**
- * Gets the color for a given price per m² based on its decile
- * @param pricePerM2 - The average price per m² value
- * @param thresholds - The decile thresholds to use
- * @returns The hex color code for the decile
- */
-export function getColorFromPrice(
-  pricePerM2: number,
-  thresholds: DecileThresholds
-): string {
-  const decile = getDecileFromPrice(pricePerM2, thresholds);
-  return priceDecileColors[decile as keyof typeof priceDecileColors];
-}
-
-/**
- * Creates a lookup table for styling based on deciles
- * @param data - Array of data with avgPricePerM2 property
- * @param thresholds - The decile thresholds to use
- * @returns Object with inseeCode as key and color as value
- */
-export function createDecileLookupTable(
-  data: Array<{ inseeCode: string; avgPricePerM2: number }>,
-  thresholds: DecileThresholds
-): Record<string, string> {
-  const lookup: Record<string, string> = {};
-
-  data.forEach((item) => {
-    lookup[item.inseeCode] = getColorFromPrice(item.avgPricePerM2, thresholds);
-  });
-
-  return lookup;
-}
-
-/**
- * Creates a decile lookup service with injected thresholds
- * @param thresholds - The decile thresholds to use
- * @returns Object with lookup methods
- */
-export function createDecileLookupService(thresholds: DecileThresholds) {
-  return {
-    getDecileFromPrice: (pricePerM2: number) =>
-      getDecileFromPrice(pricePerM2, thresholds),
-    getColorFromPrice: (pricePerM2: number) =>
-      getColorFromPrice(pricePerM2, thresholds),
-    createLookupTable: (
-      data: Array<{ inseeCode: string; avgPricePerM2: number }>
-    ) => createDecileLookupTable(data, thresholds),
-  };
-}
 
 export const mapConfig = {
   arrondissement: {
