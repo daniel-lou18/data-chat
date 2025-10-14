@@ -115,17 +115,21 @@ export const sectionLayerStyles = {
 };
 
 export const priceDecileColors = {
-  1: "#166534", // Green-800 (darkest - lowest prices)
-  2: "#15803d", // Green-700
-  3: "#16a34a", // Green-600
-  4: "#22c55e", // Green-500
-  5: "#eab308", // Yellow-500 (median - yellow)
+  1: "#16a34a", // Green-600 (darkest - lowest prices)
+  2: "#22c55e", // Green-500
+  3: "#a3e635", // Lime-400
+  4: "#fde047", // Yellow-300
+  5: "#facc15", // Yellow-400 (median - yellow)
   6: "#f59e0b", // Amber-500
   7: "#f97316", // Orange-500
-  8: "#ea580c", // Orange-600
+  8: "#f43f5e", // Rose-500
   9: "#dc2626", // Red-600
-  10: "#b91c1c", // Red-700 (highest prices)
-};
+  10: "#991b1b", // Red-800 (highest prices)
+} as const;
+
+export type PriceDecileColors = typeof priceDecileColors;
+export type PriceDecile = keyof PriceDecileColors;
+export type PriceDecileColor = PriceDecileColors[PriceDecile];
 
 export const mapConfig = {
   arrondissement: {

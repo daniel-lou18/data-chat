@@ -4,6 +4,7 @@ import LayerManager, { type LayerManagerProps } from "./LayerManager";
 import FeaturePopup from "./FeaturePopup";
 import { type GenericData } from "@/components/table/tableColumns.tsx";
 import { useMapLibreFeatures } from "@/hooks/mapLibre/useMapLibreFeatures";
+import MapLegend from "./MapLegend";
 
 type MapProps = LayerManagerProps;
 
@@ -24,7 +25,12 @@ export default function Map({ setData, arrs, sectionIds }: MapProps) {
   } | null>(null);
 
   // Get dynamic styling data
-  const { isLoading: isDataLoading, error: dataError } = useMapLibreFeatures();
+  const {
+    isLoading: isDataLoading,
+    error: dataError,
+    arrondissementLookupTable,
+    sectionLookupTable,
+  } = useMapLibreFeatures(2024, selectedArrondissementId);
 
   const onMouseMove = useCallback((event: any) => {
     const { features } = event;
@@ -148,6 +154,14 @@ export default function Map({ setData, arrs, sectionIds }: MapProps) {
           Error loading data
         </div>
       )}
+
+      {/* Dynamic Legend Overlay */}
+      <MapLegend
+        selectedArrondissementId={selectedArrondissementId}
+        sectionLookupTable={sectionLookupTable}
+        arrondissementLookupTable={arrondissementLookupTable}
+      />
+
       <MapLibreMap
         {...viewState}
         onMove={(evt) => setViewState(evt.viewState)}
