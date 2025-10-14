@@ -340,33 +340,6 @@ export const PricePerM2DecilesSchema = z.object({
     .describe("Total number of transactions analyzed"),
 });
 
-/**
- * Schema for price per m² deciles grouped by INSEE code
- * Each decile represents the price per m² value that divides INSEE codes into 10 equal groups
- */
-export const PricePerM2DecilesByInseeCodeSchema = z.object({
-  deciles: z
-    .array(DecileValueSchema)
-    .length(10)
-    .describe("Array of 10 decile values from 10th to 100th percentile"),
-  totalInseeCodes: z
-    .number()
-    .int()
-    .describe("Total number of INSEE codes analyzed"),
-});
-
-/**
- * Schema for price per m² deciles grouped by INSEE code and section
- * Each decile represents the price per m² value that divides sections into 10 equal groups
- */
-export const PricePerM2DecilesByInseeCodeAndSectionSchema = z.object({
-  deciles: z
-    .array(DecileValueSchema)
-    .length(10)
-    .describe("Array of 10 decile values from 10th to 100th percentile"),
-  totalSections: z.number().int().describe("Total number of sections analyzed"),
-});
-
 export type SalesByInseeCode = z.infer<typeof SalesByInseeCodeSchema>;
 export type SalesByInseeCodeAndSection = z.infer<
   typeof SalesByInseeCodeAndSectionSchema
@@ -377,9 +350,3 @@ export type SalesByMonth = z.infer<typeof SalesByMonthSchema>;
 export type SalesSummary = z.infer<typeof SalesSummarySchema>;
 export type AnalyticsQueryParams = z.infer<typeof AnalyticsQueryParamsSchema>;
 export type PricePerM2Deciles = z.infer<typeof PricePerM2DecilesSchema>;
-export type PricePerM2DecilesByInseeCode = z.infer<
-  typeof PricePerM2DecilesByInseeCodeSchema
->;
-export type PricePerM2DecilesByInseeCodeAndSection = z.infer<
-  typeof PricePerM2DecilesByInseeCodeAndSectionSchema
->;

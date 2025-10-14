@@ -122,18 +122,26 @@ export class AnalyticsService {
   }
 
   /**
-   * Get price per m² deciles for the whole city of Paris
+   * Get price per m² deciles with flexible filtering
    *
    * @param year - The year for the data (defaults to 2024)
+   * @param inseeCode - Optional INSEE code to filter by commune
+   * @param section - Optional section code to filter by section
    * @returns Promise<PricePerM2Deciles> - Price per m² deciles data
    */
-  async getPricePerM2Deciles(year: number = 2024): Promise<PricePerM2Deciles> {
+  async getPricePerM2Deciles(
+    year: number = 2024,
+    inseeCode?: string,
+    section?: string
+  ): Promise<PricePerM2Deciles> {
     try {
+      const params: Record<string, any> = { year };
+      if (inseeCode) params.inseeCode = inseeCode;
+      if (section) params.section = section;
+
       const response = await this.api.get<PricePerM2Deciles>(
         "/analytics/price-per-m2-deciles",
-        {
-          year,
-        }
+        params
       );
       return response.data;
     } catch (error) {

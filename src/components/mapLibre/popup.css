@@ -4,6 +4,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   border: 1px solid #e5e7eb;
   padding: 0;
+  position: absolute;
 }
 
 .custom-popup .maplibregl-popup-tip {

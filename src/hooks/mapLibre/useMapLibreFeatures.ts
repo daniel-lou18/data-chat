@@ -1,15 +1,22 @@
 import { useMemo } from "react";
-import { useDecileLookupTable } from "../data/useGetDeciles";
+import {
+  useDecileLookupTable,
+  useSectionDecileLookupTable,
+} from "../data/useGetDeciles";
 import { priceDecileColors } from "@/components/mapLibre/config";
 
 /**
  * Custom hook for MapLibre dynamic styling based on decile data
  *
  * @param year - The year for the data (defaults to 2024)
+ * @param inseeCode - Optional INSEE code for section-level styling within an arrondissement
  * @returns Object with dynamic style expressions and lookup table
  */
-export function useMapLibreFeatures(year: number = 2024) {
-  const { lookupTable, isLoading, error } = useDecileLookupTable(year);
+export function useMapLibreFeatures(year: number = 2024, inseeCode?: string) {
+  // Use section lookup table if inseeCode is provided, otherwise use city-wide lookup
+  const { lookupTable, isLoading, error } = inseeCode
+    ? useSectionDecileLookupTable(inseeCode, year)
+    : useDecileLookupTable(year);
 
   // Create dynamic fill color expression for arrondissements
   const arrondissementFillColor = useMemo(() => {
@@ -40,11 +47,11 @@ export function useMapLibreFeatures(year: number = 2024) {
       return "#ef4444"; // Default red color
     }
 
-    // For sections, we need to match by commune (arrondissement) ID
+    // For sections, match by section code (not commune ID)
     const cases = Object.entries(lookupTable)
       .filter(([_, entry]) => entry.decile)
-      .map(([id, entry]) => [
-        ["==", ["get", "commune"], id],
+      .map(([sectionCode, entry]) => [
+        ["==", ["get", "code"], sectionCode],
         priceDecileColors[entry.decile as keyof typeof priceDecileColors] ||
           "#ef4444",
       ])
@@ -85,8 +92,8 @@ export function useMapLibreFeatures(year: number = 2024) {
 
     const cases = Object.entries(lookupTable)
       .filter(([_, entry]) => entry.decile)
-      .map(([id, _]) => [
-        ["==", ["get", "commune"], id],
+      .map(([sectionCode, _]) => [
+        ["==", ["get", "code"], sectionCode],
         0.6, // Higher opacity for data-rich areas
       ])
       .flat();

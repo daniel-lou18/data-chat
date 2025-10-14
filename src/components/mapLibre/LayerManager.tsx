@@ -39,7 +39,9 @@ const LayerManager = memo(function ({
     arrondissementFillOpacity,
     sectionFillColor,
     sectionFillOpacity,
-  } = useMapLibreFeatures();
+  } = useMapLibreFeatures(2024, selectedArrondissementId ?? undefined);
+
+  console.log("sectionFillColor", sectionFillColor);
 
   return (
     <>

@@ -24,8 +24,8 @@ const FeaturePopup = ({
       closeButton={true}
       closeOnClick={false}
       className="custom-popup"
-      offset={[0, -10]}
-      anchor="bottom"
+      // offset={[0, -10]}
+      // anchor="bottom"
     >
       <div className="p-2">
         {isArrondissement ? (

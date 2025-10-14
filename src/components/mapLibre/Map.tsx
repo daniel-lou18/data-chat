@@ -151,7 +151,7 @@ export default function Map({ setData, arrs, sectionIds }: MapProps) {
       <MapLibreMap
         {...viewState}
         onMove={(evt) => setViewState(evt.viewState)}
-        style={{ height: "100%", width: "100%" }}
+        style={{ height: "50vh", width: "100%" }}
         mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
         interactiveLayerIds={[
           "arrondissements-fill",
