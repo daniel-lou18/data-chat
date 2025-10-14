@@ -8,12 +8,10 @@ import {
   arrondissementLayerStyles,
   sectionLayerStyles,
 } from "./config";
-import { type GenericData } from "@/components/table/tableColumns.tsx";
 import { useMapLibreZoom } from "@/hooks/mapLibre/useMapLibreZoom";
 import { useMapLibreFeatures } from "@/hooks/mapLibre/useMapLibreFeatures";
 
 export type LayerManagerProps = {
-  setData: (data: GenericData[]) => void;
   arrs: string[];
   sectionIds: string[];
   hoveredFeatureId?: string | null;

@@ -145,3 +145,15 @@ export const mapConfig = {
 };
 
 export type MapConfig = typeof mapConfig;
+
+export const DEFAULT_MAP_VIEW_STATE = {
+  latitude: 48.8566,
+  longitude: 2.3522,
+  zoom: 11,
+};
+
+export type PopupInfo = {
+  longitude: number;
+  latitude: number;
+  feature: ArrondissementFeature | SectionFeature;
+};

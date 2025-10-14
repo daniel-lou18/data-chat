@@ -5,7 +5,7 @@ import {
   useGetAggregatesByInseeCode,
   useGetAggregatesByInseeCodeAndSection,
 } from "@/hooks/data/useGetAggregates";
-import type { SectionProperties } from "../map/config";
+import { isArrondissementFeature } from "@/utils/mapUtils";
 
 interface FeaturePopupProps {
   longitude: number;
@@ -20,15 +20,13 @@ const FeaturePopup = ({
   feature,
   onClose,
 }: FeaturePopupProps) => {
-  const isArrondissement = "nom" in feature.properties;
-
-  const { data: aggregates } = isArrondissement
+  const { data: aggregates } = isArrondissementFeature(feature)
     ? useGetAggregatesByInseeCode(feature.properties.id)
     : useGetAggregatesByInseeCodeAndSection(
-        feature.properties.id,
-        (feature.properties as SectionProperties).code
+        feature.properties.commune,
+        feature.properties.code
       );
-  console.log("aggregates", aggregates);
+
   return (
     <Popup
       longitude={longitude}
@@ -41,10 +39,10 @@ const FeaturePopup = ({
       anchor="bottom"
     >
       <div className="p-2">
-        {isArrondissement ? (
-          <ArrondissementContent feature={feature as ArrondissementFeature} />
+        {isArrondissementFeature(feature) ? (
+          <ArrondissementContent feature={feature} aggregates={aggregates} />
         ) : (
-          <SectionContent feature={feature as SectionFeature} />
+          <SectionContent feature={feature} aggregates={aggregates} />
         )}
       </div>
     </Popup>
@@ -53,8 +51,10 @@ const FeaturePopup = ({
 
 const ArrondissementContent = ({
   feature,
+  aggregates,
 }: {
   feature: ArrondissementFeature;
+  aggregates?: any; // You can type this properly based on your API response
 }) => (
   <>
     <h3 className="font-bold text-lg mb-2">{feature.properties.nom}</h3>
@@ -66,12 +66,18 @@ const ArrondissementContent = ({
     </p>
     <p className="text-sm text-gray-600">
       <strong>Price per m²:</strong>{" "}
-      {/* {aggregates.data?.avgPricePerM2?.toLocaleString()} */}
+      {aggregates?.[0]?.avgPricePerM2?.toLocaleString() || "N/A"}
     </p>
   </>
 );
 
-const SectionContent = ({ feature }: { feature: SectionFeature }) => (
+const SectionContent = ({
+  feature,
+  aggregates,
+}: {
+  feature: SectionFeature;
+  aggregates?: any; // You can type this properly based on your API response
+}) => (
   <>
     <h3 className="font-bold text-lg mb-2">
       Section {feature.properties.code}
@@ -85,8 +91,12 @@ const SectionContent = ({ feature }: { feature: SectionFeature }) => (
     <p className="text-sm text-gray-600 mb-1">
       <strong>Type:</strong> Section
     </p>
-    <p className="text-sm text-gray-600">
+    <p className="text-sm text-gray-600 mb-1">
       <strong>Code:</strong> {feature.properties.code}
+    </p>
+    <p className="text-sm text-gray-600 mb-1">
+      <strong>Price per m²:</strong>{" "}
+      {aggregates?.[0]?.avgPricePerM2?.toLocaleString() || "N/A"}
     </p>
     <p className="text-sm text-gray-600">
       <strong>Created:</strong>{" "}

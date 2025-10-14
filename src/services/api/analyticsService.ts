@@ -112,6 +112,7 @@ export class AnalyticsService {
         {
           year,
           inseeCode,
+          limit: 500,
         }
       );
       return response.data;

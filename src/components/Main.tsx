@@ -36,7 +36,6 @@ function App() {
     error,
     setError,
     data,
-    setData,
     handleSendMessage,
     isProcessing,
     clearChat,
@@ -90,7 +89,7 @@ function App() {
           </div>
         )}
       </div>
-      <ParisMap setData={setData} arrs={inseeCodes} sectionIds={sectionIds} />
+      <ParisMap arrs={inseeCodes} sectionIds={sectionIds} />
       <div className="max-w-8xl mx-auto flex h-[calc(100vh-10rem)] bg-white shadow-xl rounded-lg overflow-hidden">
         {/* Main Content - Table */}
         <div className="flex-1 flex flex-col overflow-hidden">

@@ -68,7 +68,7 @@ export function useMapLibreFeatures(
   // Create dynamic fill color expression for sections
   const sectionFillColor = useMemo(() => {
     if (!sectionLookupTable || Object.keys(sectionLookupTable).length === 0) {
-      return "#ef4444"; // Default red color
+      return "#3b82f6"; // Default blue color for missing data
     }
 
     // For sections, match by section code (not commune ID)
@@ -76,14 +76,14 @@ export function useMapLibreFeatures(
       .filter(([_, entry]) => entry.decile)
       .map(([sectionCode, entry]) => [
         ["==", ["get", "code"], sectionCode],
-        priceDecileColors[entry.decile as PriceDecile] || "#ef4444",
+        priceDecileColors[entry.decile as PriceDecile] || "#3b82f6",
       ])
       .flat();
 
     return [
       "case",
       ...cases,
-      "#ef4444", // Default fallback color
+      "#3b82f6", // Default blue color for missing data
     ] as any; // Type assertion for MapLibre expressions
   }, [sectionLookupTable]);
 
