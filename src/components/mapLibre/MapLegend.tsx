@@ -61,20 +61,7 @@ export default function MapLegend({
   }
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        top: "20px",
-        right: "20px",
-        width: "420px",
-        zIndex: 1000,
-        background: "rgba(255, 255, 255, 0.95)",
-        padding: "16px",
-        borderRadius: "8px",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-        backdropFilter: "blur(8px)",
-      }}
-    >
+    <div className="absolute top-5 left-5 w-[420px] z-[1000] bg-white/95 p-4 rounded-lg shadow-lg backdrop-blur-md">
       <div className="mb-2 text-sm font-medium text-gray-700">
         {legendValues.title}
       </div>

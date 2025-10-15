@@ -25,7 +25,7 @@ import { useMessage } from "@/hooks/chat/useMessage";
 import { useMemo } from "react";
 import { extractInseeCodesAndCreateSectionIds } from "@/utils/inseeCodeUtils";
 import TableHeader from "@/components/table/TableHeader";
-import { useMapNavigation } from "@/hooks/map/useMapNavigation";
+import { MessageInput } from "./chat/MessageInput";
 
 function App() {
   const tableState = useTableState();
@@ -44,8 +44,6 @@ function App() {
   const { inseeCodes, sectionIds } = useMemo(() => {
     return extractInseeCodesAndCreateSectionIds(data);
   }, [data]);
-
-  const { currentLevel, pageTitle } = useMapNavigation();
 
   // Create the table instance to share between DataTable and ChatInterface
   const table = useReactTable({
@@ -78,45 +76,40 @@ function App() {
   });
 
   return (
-    <div className="max-h-screen max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-100 rounded-sm">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">{pageTitle}</h1>
-        {currentLevel !== "top" && (
-          <div className="mt-2 text-sm text-gray-600">
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-              {currentLevel.toUpperCase()} VIEW
-            </span>
-          </div>
-        )}
-      </div>
-      <ParisMap arrs={inseeCodes} sectionIds={sectionIds} />
-      <div className="max-w-8xl mx-auto flex h-[calc(100vh-10rem)] bg-white shadow-xl rounded-lg overflow-hidden">
-        {/* Main Content - Table */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <TableHeader tableState={tableState} />
-
-          <div className="flex-1 overflow-auto">
-            <DataTable data={data}>
-              <TableHead table={table} />
-              <TableBody table={table} />
-            </DataTable>
-            <TableFooter table={table} data={data} />
-          </div>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">Data chat</h1>
         </div>
 
-        {/* Right Sidebar - Chat Interface */}
-        <ChatInterface
-          messages={messages}
-          error={error}
-          setError={setError}
-          input={input}
-          setInput={setInput}
-          onSubmit={handleSendMessage}
-          isProcessing={isProcessing}
-          onClear={clearChat}
-          data={data}
-          table={table}
-        />
+        {/* Grid Layout: Map (1/3) + Table (2/3) */}
+        <div className="grid grid-cols-12 gap-6 h-[calc(100vh-12rem)]">
+          {/* Map - Takes 1/3 of the space (4 columns) */}
+          <div className="col-span-5 bg-white shadow-lg rounded-lg overflow-hidden">
+            <ParisMap arrs={inseeCodes} sectionIds={sectionIds} />
+          </div>
+
+          {/* Table - Takes 2/3 of the space (8 columns) */}
+          <div className="col-span-7 bg-white shadow-lg rounded-lg overflow-hidden flex flex-col">
+            <TableHeader tableState={tableState} />
+            <div className="flex-1 overflow-auto">
+              <DataTable data={data}>
+                <TableHead table={table} />
+                <TableBody table={table} />
+              </DataTable>
+              <TableFooter table={table} data={data} />
+            </div>
+          </div>
+        </div>
+        {/* Input Bar at the bottom with sticky and higher z-index */}
+        <div className="sticky bottom-0 z-50 bg-gray-50 pt-4">
+          <MessageInput
+            input={input}
+            setInput={setInput}
+            onSubmit={handleSendMessage}
+            isProcessing={isProcessing}
+          />
+        </div>
       </div>
     </div>
   );

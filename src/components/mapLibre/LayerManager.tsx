@@ -51,6 +51,11 @@ const LayerManager = memo(function ({
             "fill-color": arrondissementFillColor,
             "fill-opacity": arrondissementFillOpacity,
           }}
+          filter={
+            selectedArrondissementId
+              ? ["!=", ["get", "id"], selectedArrondissementId]
+              : ["!=", ["get", "id"], ""]
+          }
           layout={{
             visibility: "visible",
           }}

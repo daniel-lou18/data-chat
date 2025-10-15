@@ -8,8 +8,10 @@ import { useMapLibreFeatures } from "@/hooks/mapLibre/useMapLibreFeatures";
 import MapLegend from "./MapLegend";
 import { DEFAULT_MAP_VIEW_STATE, type PopupInfo } from "./config";
 import { getCenterFromCoordinates } from "@/utils/mapUtils";
+import { useMapNavigate } from "@/hooks/mapLibre/useMapNavigate";
 
 export default function Map({ arrs, sectionIds }: LayerManagerProps) {
+  const { navigateToArrondissement, navigateToSection } = useMapNavigate();
   const [viewState, setViewState] = useState(DEFAULT_MAP_VIEW_STATE);
   const [hoveredFeatureId, setHoveredFeatureId] = useState<string | null>(null);
   const [selectedArrondissementId, setSelectedArrondissementId] = useState<
@@ -25,41 +27,40 @@ export default function Map({ arrs, sectionIds }: LayerManagerProps) {
   } = useMapLibreFeatures(2024, selectedArrondissementId);
 
   const onMouseMove = useCallback((event: any) => {
-    const { features } = event;
+    const { features, lngLat } = event;
     if (features && features.length > 0) {
       const feature = features[0];
       setHoveredFeatureId(feature.properties.id);
+
+      // Show popup on hover
+      setPopupInfo({
+        longitude: lngLat.lng,
+        latitude: lngLat.lat,
+        feature: feature,
+      });
     } else {
-      // No features under cursor, clear hover state
+      // No features under cursor, clear hover state and hide popup
       setHoveredFeatureId(null);
+      setPopupInfo(null);
     }
   }, []);
 
   const onMouseLeave = useCallback(() => {
     setHoveredFeatureId(null);
+    setPopupInfo(null);
   }, []);
 
   const onClick = useCallback((event: any) => {
-    const { features, lngLat } = event;
+    const { features } = event;
     if (!features || features.length === 0) return;
 
     const feature = features[0];
 
-    // Show popup
-    setPopupInfo({
-      longitude: lngLat.lng,
-      latitude: lngLat.lat,
-      feature: feature,
-    });
-
-    // Determine if it's an arrondissement or section based on properties
     const isArrondissement = feature.properties && feature.properties.nom;
-    console.log("Feature properties:", feature.properties);
 
     if (isArrondissement) {
-      // Set selected arrondissement and zoom in
       setSelectedArrondissementId(feature.properties.id);
-
+      navigateToArrondissement(feature);
       // Calculate bounds for the feature and zoom in
       if (feature.geometry && feature.geometry.coordinates) {
         const coordinates = feature.geometry.coordinates[0];
@@ -72,15 +73,12 @@ export default function Map({ arrs, sectionIds }: LayerManagerProps) {
         });
       }
     } else {
-      // Handle section click - keep the current view and don't change selectedArrondissementId
-      // This prevents the map from reverting to arrondissements view
-      console.log("Section clicked:", feature.properties);
-      // You can add any section-specific logic here if needed
+      navigateToSection(feature);
     }
   }, []);
 
   return (
-    <div style={{ position: "relative", height: "60vh", width: "100%" }}>
+    <div style={{ position: "relative", height: "100%", width: "100%" }}>
       {isDataLoading && <LoadingOverlay message="Loading price data..." />}
       {dataError && <ErrorOverlay message="Error loading data" />}
 
@@ -93,7 +91,6 @@ export default function Map({ arrs, sectionIds }: LayerManagerProps) {
       <MapLibreMap
         {...viewState}
         onMove={(evt) => setViewState(evt.viewState)}
-        style={{ height: "50vh", width: "100%" }}
         mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
         interactiveLayerIds={[
           "arrondissements-fill",

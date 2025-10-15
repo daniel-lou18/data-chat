@@ -9,6 +9,8 @@ import {
 } from "@/utils/mapUtils";
 import { useGetAggregates } from "./useGetAggregates";
 import { useGetSectionsByInseeCode } from "./useGetAggregates";
+import { GC_TIME } from "./constants";
+import { STALE_TIME } from "./constants";
 
 // Query keys for deciles
 export const decilesQueryKeys = {
@@ -22,8 +24,8 @@ export const decilesQueryKeys = {
 
 // Query options for reusability and consistency
 const defaultQueryOptions = {
-  staleTime: 5 * 60 * 1000, // 5 minutes
-  gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+  staleTime: STALE_TIME,
+  gcTime: GC_TIME,
   retry: 3,
   retryDelay: (attemptIndex: number) =>
     Math.min(1000 * 2 ** attemptIndex, 30000),

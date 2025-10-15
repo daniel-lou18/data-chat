@@ -5,6 +5,7 @@ import type {
   SalesByInseeCode,
   SalesByInseeCodeAndSection,
 } from "@/services/api/schemas";
+import { GC_TIME, STALE_TIME } from "./constants";
 
 // Query keys for better cache management and invalidation
 export const communeQueryKeys = {
@@ -16,8 +17,8 @@ export const communeQueryKeys = {
 
 // Query options for reusability and consistency
 const defaultQueryOptions = {
-  staleTime: 5 * 60 * 1000, // 5 minutes
-  gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+  staleTime: STALE_TIME,
+  gcTime: GC_TIME,
   retry: 3,
   retryDelay: (attemptIndex: number) =>
     Math.min(1000 * 2 ** attemptIndex, 30000),
@@ -67,7 +68,7 @@ export function useGetAggregates(options?: {
  * @param options - Optional query configuration
  */
 export function useGetAggregatesByInseeCode(
-  inseeCode: string,
+  inseeCode: string | undefined | null,
   options?: {
     enabled?: boolean;
     staleTime?: number;
@@ -80,7 +81,7 @@ export function useGetAggregatesByInseeCode(
   return useQuery({
     queryKey: communeQueryKeys.list(`insee-${inseeCode}`),
     queryFn: async (): Promise<SalesByInseeCode[]> => {
-      const result = await analyticsService.getByInseeCode(inseeCode);
+      const result = await analyticsService.getByInseeCode(inseeCode!);
       return result;
     },
     enabled: !!inseeCode && options?.enabled !== false,
@@ -96,7 +97,7 @@ export function useGetAggregatesByInseeCode(
  * @param options - Optional query configuration
  */
 export function useGetSectionsByInseeCode(
-  inseeCode: string,
+  inseeCode: string | undefined | null,
   options?: {
     enabled?: boolean;
     staleTime?: number;
@@ -109,7 +110,7 @@ export function useGetSectionsByInseeCode(
   return useQuery({
     queryKey: communeQueryKeys.list(`sections-insee-${inseeCode}`),
     queryFn: async (): Promise<SalesByInseeCodeAndSection[]> => {
-      const result = await analyticsService.getSectionsByInseeCode(inseeCode);
+      const result = await analyticsService.getSectionsByInseeCode(inseeCode!);
       return result;
     },
     enabled: !!inseeCode && options?.enabled !== false,
@@ -126,8 +127,8 @@ export function useGetSectionsByInseeCode(
  * @param options - Optional query configuration
  */
 export function useGetAggregatesByInseeCodeAndSection(
-  inseeCode: string,
-  section: string,
+  inseeCode: string | undefined | null,
+  section: string | undefined | null,
   options?: {
     enabled?: boolean;
     staleTime?: number;
@@ -141,8 +142,8 @@ export function useGetAggregatesByInseeCodeAndSection(
     queryKey: communeQueryKeys.list(`insee-${inseeCode}-section-${section}`),
     queryFn: async (): Promise<SalesByInseeCodeAndSection[]> => {
       const result = await analyticsService.getByInseeCodeAndSection(
-        inseeCode,
-        section
+        inseeCode!,
+        section!
       );
       return result;
     },

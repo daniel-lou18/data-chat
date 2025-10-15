@@ -1,65 +1,75 @@
-import { useState } from "react";
-import { type ChatMessage } from "@/components/chat/ChatInterface";
-import { type GenericData } from "@/components/table/tableColumns";
-import { chatService } from "@/services/api";
+import { useState, useCallback } from "react";
+import { useChatQuery } from "./useChatQuery";
+import { useChatMessages } from "./useChatMessages";
 
 export function useMessage() {
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [currentMessage, setCurrentMessage] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<GenericData[]>([]);
 
-  const addMessage = (role: "user" | "assistant", content: string) => {
-    const newMessage: ChatMessage = {
-      id: Date.now().toString(),
-      role,
-      content,
-      timestamp: new Date(),
-    };
-    setMessages((prev) => [...prev, newMessage]);
-    return newMessage;
-  };
+  // Use the new chat messages hook for state management
+  const {
+    messages,
+    data,
+    addMessage,
+    clearChat: clearChatMessages,
+    setData,
+  } = useChatMessages();
 
-  const handleSendMessage = async (message: string) => {
-    if (!message.trim()) return;
-
-    setIsProcessing(true);
-    setError(null);
-
-    // Add user message
-    addMessage("user", message);
-
-    try {
-      const result = await chatService.query(message);
-
-      if (result.data?.length) {
-        // Add assistant response
+  // Use TanStack Query for the actual chat query
+  const { isLoading: isProcessing, error: queryError } = useChatQuery(
+    currentMessage,
+    !!currentMessage.trim(),
+    {
+      onSuccess: (result) => {
+        if (result.data?.length) {
+          // Add assistant response with data
+          addMessage(
+            "assistant",
+            `Query completed successfully: ${result.data.length} rows returned`
+          );
+          setData(result.data);
+        } else {
+          // Add assistant response without data
+          addMessage("assistant", result.content);
+        }
+        setCurrentMessage(""); // Clear the current message after successful query
+      },
+      onError: (error) => {
+        console.error("Error processing message:", error);
+        setError("Something went wrong. Please try again.");
         addMessage(
           "assistant",
-          `Query completed successfully: ${result.data.length} rows returned`
+          "Sorry, I encountered an error. Please try again."
         );
-
-        setData(result.data);
-      } else {
-        addMessage("assistant", result.content);
-      }
-    } catch (error) {
-      console.error("Error processing message:", error);
-      setError("Something went wrong. Please try again.");
-      addMessage(
-        "assistant",
-        "Sorry, I encountered an error. Please try again."
-      );
-    } finally {
-      setIsProcessing(false);
+      },
     }
-  };
+  );
 
-  const clearChat = () => {
-    setMessages([]);
+  const handleSendMessage = useCallback(
+    async (message: string) => {
+      if (!message.trim()) return;
+
+      setError(null);
+
+      // Add user message immediately
+      addMessage("user", message);
+
+      // Set the current message to trigger the query
+      setCurrentMessage(message);
+    },
+    [addMessage]
+  );
+
+  const clearChat = useCallback(() => {
+    clearChatMessages();
     setError(null);
-  };
+    setCurrentMessage("");
+  }, [clearChatMessages]);
+
+  // Handle query errors
+  const displayError =
+    error || (queryError ? "Something went wrong. Please try again." : null);
 
   return {
     addMessage,
@@ -69,7 +79,7 @@ export function useMessage() {
     setInput,
     messages,
     isProcessing,
-    error,
+    error: displayError,
     setError,
     data,
     setData,

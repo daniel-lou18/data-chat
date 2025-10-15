@@ -24,8 +24,9 @@ export function DataTable<T>({ data, children }: DataTableProps<T>) {
   return (
     <div className="h-full flex flex-col">
       <div className="flex-1 overflow-auto">
-        <table className="w-full">{children}</table>
-        {data.length === 0 && (
+        {data?.length ? (
+          <table className="w-full">{children}</table>
+        ) : (
           <div className="text-center py-8 text-gray-500">
             <p>No data available</p>
           </div>
