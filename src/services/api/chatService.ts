@@ -1,15 +1,10 @@
+import type { GenericData } from "@/components/table/tableColumns";
 import { apiService } from "./baseApiService";
+import type { ModelMessage } from "ai";
 
-export interface ChatMessage {
-  role: "user" | "assistant";
-  content: string;
-}
-
-export interface ChatResponse {
-  role: "assistant";
-  content: string;
-  data: Record<string, any>[];
-}
+export type DataMessage = ModelMessage & {
+  data?: GenericData[];
+};
 
 /**
  * Chat API service for handling chat-related requests
@@ -25,11 +20,11 @@ export class ChatService {
    * Send a chat message and get AI response
    *
    * @param messages - Array of chat messages
-   * @returns Promise<ChatResponse> - AI response with data
+   * @returns Promise<DataMessage> - AI response with data
    */
-  async sendMessage(messages: ChatMessage[]): Promise<ChatResponse> {
+  async sendMessage(messages: ModelMessage[]): Promise<DataMessage> {
     try {
-      const response = await this.api.post<{ messages: ChatResponse[] }>(
+      const response = await this.api.post<{ messages: ModelMessage[] }>(
         "/chat",
         {
           messages,
@@ -54,16 +49,6 @@ export class ChatService {
       console.error("Error sending chat message:", error);
       throw error;
     }
-  }
-
-  /**
-   * Send a single query message
-   *
-   * @param query - The query string
-   * @returns Promise<ChatResponse> - AI response with data
-   */
-  async query(query: string): Promise<ChatResponse> {
-    return this.sendMessage([{ role: "user", content: query }]);
   }
 }
 

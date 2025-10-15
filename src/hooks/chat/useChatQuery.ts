@@ -2,8 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { chatService } from "@/services/api";
 import { chatQueryKeys } from "./queryKeys";
 import { CHAT_STALE_TIME, CHAT_GC_TIME } from "../data/constants";
-import { type ChatMessage } from "@/components/chat/ChatInterface";
 import { type GenericData } from "@/components/table/tableColumns";
+import type { ModelMessage } from "ai";
 
 export interface ChatQueryResult {
   content: string;
@@ -81,7 +81,7 @@ export function useChatQuery(
  * ```
  */
 export function useChatMessagesQuery(
-  messages: ChatMessage[],
+  messages: ModelMessage[],
   enabled: boolean = true,
   options?: {
     staleTime?: number;

@@ -13,7 +13,6 @@ import {
 } from "@/utils/dataTableUtils";
 import { createColumnsFromData } from "@/components/table/tableColumns";
 import { useTableState } from "@/hooks/table/useTableState";
-import { ChatInterface } from "@/components/chat/ChatInterface";
 import {
   DataTable,
   TableHead,
@@ -29,17 +28,8 @@ import { MessageInput } from "./chat/MessageInput";
 
 function App() {
   const tableState = useTableState();
-  const {
-    input,
-    setInput,
-    messages,
-    error,
-    setError,
-    data,
-    handleSendMessage,
-    isProcessing,
-    clearChat,
-  } = useMessage();
+  const { input, setInput, handleSendMessage, isProcessing, data } =
+    useMessage();
 
   const { inseeCodes, sectionIds } = useMemo(() => {
     return extractInseeCodesAndCreateSectionIds(data);

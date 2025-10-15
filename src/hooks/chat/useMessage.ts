@@ -10,41 +10,38 @@ export function useMessage() {
   // Use the new chat messages hook for state management
   const {
     messages,
-    data,
     addMessage,
     clearChat: clearChatMessages,
-    setData,
   } = useChatMessages();
 
   // Use TanStack Query for the actual chat query
-  const { isLoading: isProcessing, error: queryError } = useChatQuery(
-    currentMessage,
-    !!currentMessage.trim(),
-    {
-      onSuccess: (result) => {
-        if (result.data?.length) {
-          // Add assistant response with data
-          addMessage(
-            "assistant",
-            `Query completed successfully: ${result.data.length} rows returned`
-          );
-          setData(result.data);
-        } else {
-          // Add assistant response without data
-          addMessage("assistant", result.content);
-        }
-        setCurrentMessage(""); // Clear the current message after successful query
-      },
-      onError: (error) => {
-        console.error("Error processing message:", error);
-        setError("Something went wrong. Please try again.");
+  const {
+    data,
+    isLoading: isProcessing,
+    error: queryError,
+  } = useChatQuery(currentMessage, !!currentMessage.trim(), {
+    onSuccess: (result) => {
+      if (result.data?.length) {
+        // Add assistant response with data
         addMessage(
           "assistant",
-          "Sorry, I encountered an error. Please try again."
+          `Query completed successfully: ${result.data.length} rows returned`
         );
-      },
-    }
-  );
+      } else {
+        // Add assistant response without data
+        addMessage("assistant", result.content);
+      }
+      setCurrentMessage(""); // Clear the current message after successful query
+    },
+    onError: (error) => {
+      console.error("Error processing message:", error);
+      setError("Something went wrong. Please try again.");
+      addMessage(
+        "assistant",
+        "Sorry, I encountered an error. Please try again."
+      );
+    },
+  });
 
   const handleSendMessage = useCallback(
     async (message: string) => {
@@ -81,7 +78,6 @@ export function useMessage() {
     isProcessing,
     error: displayError,
     setError,
-    data,
-    setData,
+    data: data?.data || [],
   };
 }

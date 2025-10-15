@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
 import { type ChatMessage } from "@/components/chat/ChatInterface";
-import { type GenericData } from "@/components/table/tableColumns";
 
 /**
  * Custom hook for managing chat messages state
@@ -21,7 +20,6 @@ import { type GenericData } from "@/components/table/tableColumns";
  */
 export function useChatMessages() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [data, setData] = useState<GenericData[]>([]);
 
   /**
    * Add a new message to the chat
@@ -48,15 +46,6 @@ export function useChatMessages() {
    */
   const clearChat = useCallback(() => {
     setMessages([]);
-    setData([]);
-  }, []);
-
-  /**
-   * Update the data state
-   * @param newData - The new data to set
-   */
-  const updateData = useCallback((newData: GenericData[]) => {
-    setData(newData);
   }, []);
 
   /**
@@ -91,12 +80,10 @@ export function useChatMessages() {
 
   return {
     messages,
-    data,
     addMessage,
     addMessages,
     removeMessage,
     updateMessage,
     clearChat,
-    setData: updateData,
   };
 }
