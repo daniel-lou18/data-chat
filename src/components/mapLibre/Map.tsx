@@ -10,7 +10,11 @@ import { DEFAULT_MAP_VIEW_STATE, type PopupInfo } from "./config";
 import { getCenterFromCoordinates } from "@/utils/mapUtils";
 import { useMapNavigate } from "@/hooks/mapLibre/useMapNavigate";
 
-export default function Map({ arrs, sectionIds }: LayerManagerProps) {
+type MapProps = LayerManagerProps & {
+  onMapClick?: () => void;
+};
+
+export default function Map({ arrs, sectionIds, onMapClick }: MapProps) {
   const { navigateToArrondissement, navigateToSection } = useMapNavigate();
   const [viewState, setViewState] = useState(DEFAULT_MAP_VIEW_STATE);
   const [hoveredFeatureId, setHoveredFeatureId] = useState<string | null>(null);
@@ -50,32 +54,41 @@ export default function Map({ arrs, sectionIds }: LayerManagerProps) {
     setPopupInfo(null);
   }, []);
 
-  const onClick = useCallback((event: any) => {
-    const { features } = event;
-    if (!features || features.length === 0) return;
+  const onClick = useCallback(
+    (event: any) => {
+      const { features } = event;
+      if (!features || features.length === 0) return;
 
-    const feature = features[0];
+      const feature = features[0];
 
-    const isArrondissement = feature.properties && feature.properties.nom;
+      const isArrondissement = feature.properties && feature.properties.nom;
 
-    if (isArrondissement) {
-      setSelectedArrondissementId(feature.properties.id);
-      navigateToArrondissement(feature);
-      // Calculate bounds for the feature and zoom in
-      if (feature.geometry && feature.geometry.coordinates) {
-        const coordinates = feature.geometry.coordinates[0];
-        const { centerLat, centerLng } = getCenterFromCoordinates(coordinates);
+      if (isArrondissement) {
+        setSelectedArrondissementId(feature.properties.id);
+        navigateToArrondissement(feature);
 
-        setViewState({
-          latitude: centerLat,
-          longitude: centerLng,
-          zoom: 13, // Zoom level to show sections
-        });
+        // Notify parent component that map was clicked
+        onMapClick?.();
+        // Calculate bounds for the feature and zoom in
+        if (feature.geometry && feature.geometry.coordinates) {
+          const coordinates = feature.geometry.coordinates[0];
+          const { centerLat, centerLng } =
+            getCenterFromCoordinates(coordinates);
+
+          setViewState({
+            latitude: centerLat,
+            longitude: centerLng,
+            zoom: 13, // Zoom level to show sections
+          });
+        }
+      } else {
+        navigateToSection(feature);
+        // Notify parent component that map was clicked
+        onMapClick?.();
       }
-    } else {
-      navigateToSection(feature);
-    }
-  }, []);
+    },
+    [onMapClick]
+  );
 
   return (
     <div style={{ position: "relative", height: "100%", width: "100%" }}>

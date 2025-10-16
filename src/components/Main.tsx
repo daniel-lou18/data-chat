@@ -24,11 +24,19 @@ import { useMemo } from "react";
 import { extractInseeCodesAndCreateSectionIds } from "@/utils/inseeCodeUtils";
 import TableHeader from "@/components/table/TableHeader";
 import { MessageInput } from "./chat/MessageInput";
-import { useChat } from "@/hooks/chat";
+import { useDataOrchestrator } from "@/hooks/data/useDataOrchestrator";
 
 function App() {
   const tableState = useTableState();
-  const { handleSendMessage, isProcessing, data } = useChat();
+  const {
+    data,
+    dataSource,
+    isProcessing,
+    handleSendMessage,
+    lastUpdateTime,
+    handleDataSourceToggle,
+    handleMapClick,
+  } = useDataOrchestrator();
 
   const { inseeCodes, sectionIds } = useMemo(() => {
     return extractInseeCodesAndCreateSectionIds(data);
@@ -75,12 +83,22 @@ function App() {
         <div className="grid grid-cols-12 gap-6 h-[calc(100vh-12rem)]">
           {/* Map - Takes 1/3 of the space (4 columns) */}
           <div className="col-span-5 bg-white shadow-lg rounded-lg overflow-hidden">
-            <ParisMap arrs={inseeCodes} sectionIds={sectionIds} />
+            <ParisMap
+              arrs={inseeCodes}
+              sectionIds={sectionIds}
+              onMapClick={handleMapClick}
+            />
           </div>
 
           {/* Table - Takes 2/3 of the space (8 columns) */}
           <div className="col-span-7 bg-white shadow-lg rounded-lg overflow-hidden flex flex-col">
-            <TableHeader tableState={tableState} />
+            <TableHeader
+              tableState={tableState}
+              dataSource={dataSource}
+              lastUpdateTime={lastUpdateTime}
+              isProcessing={isProcessing}
+              onDataSourceToggle={handleDataSourceToggle}
+            />
             <div className="flex-1 overflow-auto">
               <DataTable data={data}>
                 <TableHead table={table} />
