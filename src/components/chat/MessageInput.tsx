@@ -1,16 +1,13 @@
+import { useState } from "react";
+
 interface MessageInputProps {
-  input: string;
-  setInput: (value: string) => void;
   onSubmit: (message: string) => void;
   isProcessing: boolean;
 }
 
-export function MessageInput({
-  input,
-  setInput,
-  onSubmit,
-  isProcessing,
-}: MessageInputProps) {
+export function MessageInput({ onSubmit, isProcessing }: MessageInputProps) {
+  const [input, setInput] = useState("");
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim() && !isProcessing) {

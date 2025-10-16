@@ -11,4 +11,7 @@ export const chatQueryKeys = {
   detail: (id: string) => [...chatQueryKeys.details(), id] as const,
   messages: (conversationId: string) =>
     [...chatQueryKeys.all, "messages", conversationId] as const,
+  // New keys for cache-based state management
+  conversation: () => [...chatQueryKeys.all, "conversation"] as const,
+  data: () => [...chatQueryKeys.all, "data"] as const,
 } as const;

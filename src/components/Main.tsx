@@ -20,16 +20,15 @@ import {
   TableFooter,
 } from "@/components/table/DataTable";
 import ParisMap from "@/components/mapLibre/Map";
-import { useMessage } from "@/hooks/chat/useMessage";
 import { useMemo } from "react";
 import { extractInseeCodesAndCreateSectionIds } from "@/utils/inseeCodeUtils";
 import TableHeader from "@/components/table/TableHeader";
 import { MessageInput } from "./chat/MessageInput";
+import { useChat } from "@/hooks/chat";
 
 function App() {
   const tableState = useTableState();
-  const { input, setInput, handleSendMessage, isProcessing, data } =
-    useMessage();
+  const { handleSendMessage, isProcessing, data } = useChat();
 
   const { inseeCodes, sectionIds } = useMemo(() => {
     return extractInseeCodesAndCreateSectionIds(data);
@@ -94,8 +93,6 @@ function App() {
         {/* Input Bar at the bottom with sticky and higher z-index */}
         <div className="sticky bottom-0 z-50 bg-gray-50 pt-4">
           <MessageInput
-            input={input}
-            setInput={setInput}
             onSubmit={handleSendMessage}
             isProcessing={isProcessing}
           />
