@@ -1,49 +1,4 @@
-// TypeScript interfaces for the GeoJSON data
-export interface ArrondissementProperties {
-  id: string;
-  nom: string;
-  created: string;
-  updated: string;
-}
-
-export interface SectionProperties {
-  id: string;
-  commune: string;
-  prefixe: string;
-  code: string;
-  created: string;
-  updated: string;
-}
-
-export interface ArrondissementFeature {
-  type: "Feature";
-  id: string;
-  geometry: {
-    type: "MultiPolygon";
-    coordinates: number[][][][];
-  };
-  properties: ArrondissementProperties;
-}
-
-export interface SectionFeature {
-  type: "Feature";
-  id: string;
-  geometry: {
-    type: "MultiPolygon";
-    coordinates: number[][][][];
-  };
-  properties: SectionProperties;
-}
-
-export interface ArrondissementsGeoJSON {
-  type: "FeatureCollection";
-  features: ArrondissementFeature[];
-}
-
-export interface SectionsGeoJSON {
-  type: "FeatureCollection";
-  features: SectionFeature[];
-}
+import type { MapFeature } from "@/services/api";
 
 // MapLibre layer styles
 export const arrondissementLayerStyles = {
@@ -155,5 +110,5 @@ export const DEFAULT_MAP_VIEW_STATE = {
 export type PopupInfo = {
   longitude: number;
   latitude: number;
-  feature: ArrondissementFeature | SectionFeature;
+  feature: MapFeature;
 };

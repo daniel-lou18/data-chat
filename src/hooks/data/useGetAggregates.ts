@@ -24,23 +24,6 @@ const defaultQueryOptions = {
     Math.min(1000 * 2 ** attemptIndex, 30000),
 } as const;
 
-/**
- * Custom hook to fetch all arrondissements (communes) using TanStack Query
- *
- * @param options - Optional query configuration
- * @returns Query result with data, loading state, error handling, and refetch capabilities
- *
- * @example
- * ```tsx
- * const { data: communes, isLoading, error, refetch } = useGetAggregatess();
- *
- * // With custom options
- * const { data } = useGetAggregatess({
- *   enabled: shouldFetch,
- *   staleTime: 10 * 60 * 1000, // 10 minutes
- * });
- * ```
- */
 export function useGetAggregates(options?: {
   enabled?: boolean;
   staleTime?: number;

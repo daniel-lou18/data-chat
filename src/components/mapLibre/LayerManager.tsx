@@ -1,15 +1,16 @@
-import { useMemo, memo } from "react";
+import { memo } from "react";
 import { Source, Layer } from "react-map-gl/maplibre";
-import arrondissementsData from "@/data/cadastre-75-communes.json";
-import sectionsData from "@/data/cadastre-75-sections.json";
-import {
-  type ArrondissementsGeoJSON,
-  type SectionsGeoJSON,
-  arrondissementLayerStyles,
-  sectionLayerStyles,
-} from "./config";
+
+import { useMapFeatureCollection } from "@/hooks/mapLibre/useMapData";
+import type { MapFeatureCollection } from "@/services/api";
+import { arrondissementLayerStyles, sectionLayerStyles } from "./config";
 import { useMapLibreZoom } from "@/hooks/mapLibre/useMapLibreZoom";
 import { useMapLibreFeatures } from "@/hooks/mapLibre/useMapLibreFeatures";
+
+const EMPTY_FEATURE_COLLECTION: MapFeatureCollection = {
+  type: "FeatureCollection",
+  features: [],
+};
 
 export type LayerManagerProps = {
   arrs: string[];
@@ -22,11 +23,17 @@ const LayerManager = memo(function ({
   hoveredFeatureId,
   selectedArrondissementId,
 }: LayerManagerProps) {
-  const arrondissementsGeoData = useMemo(
-    () => arrondissementsData as ArrondissementsGeoJSON,
-    []
-  );
-  const sectionsGeoData = useMemo(() => sectionsData as SectionsGeoJSON, []);
+  const { data: communeFeatures } = useMapFeatureCollection({
+    level: "commune",
+  });
+  const { data: sectionFeatures } = useMapFeatureCollection({
+    level: "section",
+  });
+
+  const arrondissementsGeoData = (communeFeatures ??
+    EMPTY_FEATURE_COLLECTION) as MapFeatureCollection;
+  const sectionsGeoData = (sectionFeatures ??
+    EMPTY_FEATURE_COLLECTION) as MapFeatureCollection;
 
   // Use zoom hook to get current zoom level
   const { zoomLevel } = useMapLibreZoom();
@@ -116,8 +123,8 @@ const LayerManager = memo(function ({
           }}
           filter={
             selectedArrondissementId
-              ? ["==", ["get", "commune"], selectedArrondissementId]
-              : ["==", ["get", "commune"], ""]
+              ? ["==", ["get", "inseeCode"], selectedArrondissementId]
+              : ["==", ["get", "inseeCode"], ""]
           }
           layout={{
             visibility:
@@ -130,8 +137,8 @@ const LayerManager = memo(function ({
           paint={sectionLayerStyles.stroke}
           filter={
             selectedArrondissementId
-              ? ["==", ["get", "commune"], selectedArrondissementId]
-              : ["==", ["get", "commune"], ""]
+              ? ["==", ["get", "inseeCode"], selectedArrondissementId]
+              : ["==", ["get", "inseeCode"], ""]
           }
           layout={{
             visibility:

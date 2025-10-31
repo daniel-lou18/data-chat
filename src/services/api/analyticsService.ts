@@ -6,6 +6,8 @@ import type {
   SalesByInseeCodeAndSection,
 } from "./schemas";
 
+const analyticsUrl = "sales/analytics";
+
 /**
  * Analytics API service for handling analytics-related requests
  */
@@ -29,7 +31,7 @@ export class AnalyticsService {
   ): Promise<SalesByInseeCode[]> {
     try {
       const response = await this.api.get<SalesByInseeCode[]>(
-        "/analytics/by-insee-code",
+        `/${analyticsUrl}/by-insee-code`,
         {
           year,
           inseeCode,
@@ -57,7 +59,7 @@ export class AnalyticsService {
   ): Promise<SalesByInseeCodeAndSection[]> {
     try {
       const response = await this.api.get<SalesByInseeCodeAndSection[]>(
-        "/analytics/by-insee-code-section",
+        `/${analyticsUrl}/by-insee-code-section`,
         {
           year,
           inseeCode,
@@ -83,7 +85,7 @@ export class AnalyticsService {
   async getAll(year: number = 2024): Promise<SalesByInseeCode[]> {
     try {
       const response = await this.api.get<SalesByInseeCode[]>(
-        "/analytics/by-insee-code",
+        `/${analyticsUrl}/by-insee-code`,
         {
           year,
         }
@@ -108,7 +110,7 @@ export class AnalyticsService {
   ): Promise<SalesByInseeCodeAndSection[]> {
     try {
       const response = await this.api.get<SalesByInseeCodeAndSection[]>(
-        "/analytics/by-insee-code-section",
+        `/${analyticsUrl}/by-insee-code-section`,
         {
           year,
           inseeCode,
@@ -141,7 +143,7 @@ export class AnalyticsService {
       if (section) params.section = section;
 
       const response = await this.api.get<PricePerM2Deciles>(
-        "/analytics/price-per-m2-deciles",
+        `/${analyticsUrl}/price-per-m2-deciles`,
         params
       );
       return response.data;
@@ -166,9 +168,9 @@ export class AnalyticsService {
     try {
       const { year = 2024, inseeCode, section, ...otherFilters } = filters;
 
-      let endpoint = "/analytics/by-insee-code";
+      let endpoint = `/${analyticsUrl}/by-insee-code`;
       if (inseeCode && section) {
-        endpoint = "/analytics/by-insee-code-section";
+        endpoint = `/${analyticsUrl}/by-insee-code-section`;
       }
 
       const response = await this.api.get<GenericData[]>(endpoint, {

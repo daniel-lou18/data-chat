@@ -1,21 +1,16 @@
 import { Popup } from "react-map-gl/maplibre";
 import "./popup.css";
-import type { ArrondissementFeature, SectionFeature } from "./config";
-import {
-  useGetAggregatesByInseeCode,
-  useGetAggregatesByInseeCodeAndSection,
-} from "@/hooks/data/useGetAggregates";
-import { isArrondissementFeature } from "@/utils/mapUtils";
-import { formatPrice } from "@/utils/formatters";
 import type {
-  SalesByInseeCode,
-  SalesByInseeCodeAndSection,
-} from "@/services/api/schemas";
+  MapFeature,
+  CommuneFeatureProperties,
+  SectionFeatureProperties,
+} from "@/services/api";
+import { formatMetricValue, humanizeMetricName } from "./mapLegendUtils";
 
 interface FeaturePopupProps {
   longitude: number;
   latitude: number;
-  feature: ArrondissementFeature | SectionFeature;
+  feature: MapFeature;
   onClose: () => void;
 }
 
@@ -25,15 +20,8 @@ const FeaturePopup = ({
   feature,
   onClose,
 }: FeaturePopupProps) => {
-  const { data: aggregates } = isArrondissementFeature(feature)
-    ? useGetAggregatesByInseeCode(feature.properties.id)
-    : useGetAggregatesByInseeCodeAndSection(
-        feature.properties.commune,
-        feature.properties.code
-      );
-  const metrics = aggregates?.[0];
-
-  if (!metrics) return null;
+  const metricValue = feature.properties.metricValue;
+  const metricName = humanizeMetricName(feature.properties.metricName ?? "");
 
   return (
     <Popup
@@ -47,17 +35,19 @@ const FeaturePopup = ({
       anchor="bottom"
     >
       <div className="p-2">
-        {isArrondissementFeature(feature) ? (
+        {isCommuneFeature(feature) ? (
           <ArrondissementContent
             feature={feature}
-            metrics={metrics as SalesByInseeCode}
+            metricName={metricName}
+            metricValue={metricValue}
           />
-        ) : (
+        ) : isSectionFeature(feature) ? (
           <SectionContent
             feature={feature}
-            metrics={metrics as SalesByInseeCodeAndSection}
+            metricName={metricName}
+            metricValue={metricValue}
           />
-        )}
+        ) : null}
       </div>
     </Popup>
   );
@@ -65,49 +55,62 @@ const FeaturePopup = ({
 
 const ArrondissementContent = ({
   feature,
-  metrics,
+  metricName,
+  metricValue,
 }: {
-  feature: ArrondissementFeature;
-  metrics: SalesByInseeCode;
+  feature: CommuneFeature;
+  metricName: string;
+  metricValue: number | null;
 }) => (
   <>
-    <h3 className="font-bold text-lg mb-2">{feature.properties.nom}</h3>
-    <MetricsContent metrics={metrics} />
+    <h3 className="font-bold text-lg mb-2">{feature.properties.name}</h3>
+    <MetricValue name={metricName} value={metricValue} />
   </>
 );
 
 const SectionContent = ({
   feature,
-  metrics,
+  metricName,
+  metricValue,
 }: {
-  feature: SectionFeature;
-  metrics: SalesByInseeCodeAndSection;
+  feature: SectionMapFeature;
+  metricName: string;
+  metricValue: number | null;
 }) => (
   <>
     <h3 className="font-semibold mb-2">
-      {`Section ${feature.properties.commune}-${feature.properties.code}`}
+      {`Section ${feature.properties.section} (${feature.properties.inseeCode})`}
     </h3>
-    <MetricsContent metrics={metrics} />
+    <MetricValue name={metricName} value={metricValue} />
   </>
 );
 
-const MetricsContent = ({
-  metrics,
+const MetricValue = ({
+  name,
+  value,
 }: {
-  metrics: SalesByInseeCode | SalesByInseeCodeAndSection;
+  name: string;
+  value: number | null;
 }) => (
-  <>
-    <p className="text-sm text-gray-600">
-      <strong>Price per m²:</strong>{" "}
-      {formatPrice(metrics.apartmentAvgPricePerM2)}
-    </p>
-    <p className="text-sm text-gray-600">
-      <strong>Total transactions:</strong> {metrics.count}
-    </p>
-    <p className="text-sm text-gray-600">
-      <strong>Total apartments:</strong> {metrics.totalApartments}
-    </p>
-  </>
+  <p className="text-sm text-gray-600">
+    <strong>{name}:</strong> {` ${formatMetricValue(value)}`}
+  </p>
 );
 
 export default FeaturePopup;
+
+type CommuneFeature = MapFeature & {
+  properties: CommuneFeatureProperties;
+};
+
+type SectionMapFeature = MapFeature & {
+  properties: SectionFeatureProperties;
+};
+
+function isCommuneFeature(feature: MapFeature): feature is CommuneFeature {
+  return "name" in feature.properties;
+}
+
+function isSectionFeature(feature: MapFeature): feature is SectionMapFeature {
+  return "section" in feature.properties;
+}

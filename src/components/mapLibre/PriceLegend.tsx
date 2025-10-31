@@ -1,24 +1,4 @@
-/**
- * PriceLegend
- * A modular, reusable React component that renders a horizontal legend bar
- * with decile-colored segments for price/m² ranges. Built with Tailwind CSS
- * utility classes for styling.
- *
- * Features:
- * - Accepts number of segments (default 10 / deciles)
- * - Accepts explicit color classes or uses a sensible default Tailwind palette
- * - Accessible (aria labels, semantic structure)
- * - Customizable min/max values and label formatting
- * - Small, focused API so it can be composed into larger UIs
- *
- * Usage:
- * <PriceLegend
- *   min={7800}
- *   max={10950}
- *   colors={["bg-green-400","bg-green-300", ...]}
- *   showExtremes={true}
- * />
- */
+import { MAP_BUCKET_COLORS } from "./colors";
 
 type PriceLegendProps = {
   /** Minimum value (used to calculate thresholds and left label) */
@@ -41,23 +21,10 @@ type PriceLegendProps = {
   size?: "sm" | "md" | "lg";
 };
 
-const DEFAULT_TAILWIND_COLORS = [
-  "bg-green-600",
-  "bg-green-500",
-  "bg-lime-400",
-  "bg-yellow-300",
-  "bg-yellow-400",
-  "bg-amber-500",
-  "bg-orange-500",
-  "bg-rose-500",
-  "bg-red-600",
-  "bg-red-800",
-];
-
 export default function PriceLegend({
   min,
   max,
-  colors = DEFAULT_TAILWIND_COLORS,
+  colors = MAP_BUCKET_COLORS,
   segments = 10,
   showExtremes = true,
   format = (v: number) => `${Math.round(v).toLocaleString()} €`,
@@ -130,7 +97,7 @@ export default function PriceLegend({
  */
 function expandColors(colors: string[], target: number) {
   if (!colors || colors.length === 0)
-    return DEFAULT_TAILWIND_COLORS.slice(0, target);
+    return DEFAULT_BUCKET_COLORS.slice(0, target);
   const out: string[] = [];
   for (let i = 0; i < target; i++) {
     // pick from existing colors cycling through

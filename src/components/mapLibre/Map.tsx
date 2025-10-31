@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import MapLibreMap from "react-map-gl/maplibre";
 import LayerManager, { type LayerManagerProps } from "./LayerManager";
 import FeaturePopup from "./FeaturePopup";
@@ -9,12 +9,24 @@ import MapLegend from "./MapLegend";
 import { DEFAULT_MAP_VIEW_STATE, type PopupInfo } from "./config";
 import { getCenterFromCoordinates } from "@/utils/mapUtils";
 import { useMapNavigate } from "@/hooks/mapLibre/useMapNavigate";
+import {
+  MapFilterProvider,
+  useMapFilters,
+} from "@/hooks/mapLibre/useMapFilters";
 
 type MapProps = LayerManagerProps & {
   onMapClick?: () => void;
 };
 
-export default function Map({ arrs, sectionIds, onMapClick }: MapProps) {
+export default function Map(props: MapProps) {
+  return (
+    <MapFilterProvider>
+      <MapContent {...props} />
+    </MapFilterProvider>
+  );
+}
+
+function MapContent({ arrs, sectionIds, onMapClick }: MapProps) {
   const { navigateToArrondissement, navigateToSection } = useMapNavigate();
   const [viewState, setViewState] = useState(DEFAULT_MAP_VIEW_STATE);
   const [hoveredFeatureId, setHoveredFeatureId] = useState<string | null>(null);
@@ -22,13 +34,12 @@ export default function Map({ arrs, sectionIds, onMapClick }: MapProps) {
     string | null
   >(null);
   const [popupInfo, setPopupInfo] = useState<PopupInfo | null>(null);
+  const { state: filterState, setLevel } = useMapFilters();
 
-  const {
-    isLoading: isDataLoading,
-    error: dataError,
-    arrondissementLookupTable,
-    sectionLookupTable,
-  } = useMapLibreFeatures(2024, selectedArrondissementId);
+  const { isLoading: isDataLoading, error: dataError } = useMapLibreFeatures(
+    2024,
+    selectedArrondissementId
+  );
 
   const onMouseMove = useCallback((event: any) => {
     const { features, lngLat } = event;
@@ -61,7 +72,7 @@ export default function Map({ arrs, sectionIds, onMapClick }: MapProps) {
 
       const feature = features[0];
 
-      const isArrondissement = feature.properties && feature.properties.nom;
+      const isArrondissement = feature.properties && feature.properties.name;
 
       if (isArrondissement) {
         setSelectedArrondissementId(feature.properties.id);
@@ -90,16 +101,22 @@ export default function Map({ arrs, sectionIds, onMapClick }: MapProps) {
     [onMapClick]
   );
 
+  useEffect(() => {
+    if (selectedArrondissementId) {
+      if (filterState.level !== "section") {
+        setLevel("section");
+      }
+    } else if (filterState.level !== "commune") {
+      setLevel("commune");
+    }
+  }, [filterState.level, selectedArrondissementId, setLevel]);
+
   return (
     <div style={{ position: "relative", height: "100%", width: "100%" }}>
       {isDataLoading && <LoadingOverlay message="Loading price data..." />}
       {dataError && <ErrorOverlay message="Error loading data" />}
 
-      <MapLegend
-        selectedArrondissementId={selectedArrondissementId}
-        sectionLookupTable={sectionLookupTable}
-        arrondissementLookupTable={arrondissementLookupTable}
-      />
+      <MapLegend selectedArrondissementId={selectedArrondissementId} />
 
       <MapLibreMap
         {...viewState}

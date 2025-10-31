@@ -1,7 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { useChat } from "@/hooks/chat";
 import { useAggregatesFromParams } from "./useAggregatesFromParams";
-import { createDynamicMapData } from "@/hooks/mapLibre/createDynamicMapData";
 
 export type DataSource = "chat" | "map" | null;
 
@@ -23,11 +22,6 @@ export function useDataOrchestrator() {
   const [manualOverride, setManualOverride] = useState<DataSource | null>(null);
 
   // Generate dynamic map data from chat results
-  const dynamicMapConfig = useMemo(
-    () => createDynamicMapData(chatData),
-    [chatData]
-  );
-
   // Determine which data to show based on recency
   const { currentData, currentSource } = useMemo(() => {
     // Manual override takes precedence
@@ -122,7 +116,6 @@ export function useDataOrchestrator() {
     // Individual data sources (for debugging/advanced usage)
     chatData,
     mapData,
-    dynamicMapConfig,
 
     // Loading states
     isProcessing: chatProcessing || mapLoading,
