@@ -1,3 +1,4 @@
+import { useState } from "react";
 import PriceLegend from "./PriceLegend";
 import { useMapLegend } from "@/hooks/mapLibre/useMapData";
 import { useMapFilters } from "@/hooks/mapLibre/useMapFilters";
@@ -13,7 +14,14 @@ export default function MapLegend({
   selectedArrondissementId,
 }: MapLegendProps) {
   const { state: filters } = useMapFilters();
-  const { data: legend, isLoading, error } = useMapLegend();
+  const [isExpanded, setIsExpanded] = useState(true);
+  const {
+    data: legend,
+    isLoading,
+    error,
+  } = useMapLegend({
+    inseeCode: filters.selectedInseeCode,
+  });
 
   if (isLoading) {
     return (
@@ -46,7 +54,21 @@ export default function MapLegend({
 
   return (
     <div className="absolute top-5 left-5 w-[420px] z-[1000] bg-white/95 p-4 rounded-lg shadow-lg backdrop-blur-md">
-      <div className="mb-2 text-sm font-medium text-gray-700">{title}</div>
+      <div className="mb-2 flex items-start justify-between gap-3">
+        <div className="text-sm font-medium text-gray-700">{title}</div>
+        <button
+          type="button"
+          onClick={() => setIsExpanded((value) => !value)}
+          aria-label={
+            isExpanded ? "Réduire les détails" : "Afficher les détails"
+          }
+          aria-expanded={isExpanded}
+          title={isExpanded ? "Masquer les détails" : "Afficher les détails"}
+          className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-gray-200 text-gray-500 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:text-gray-700"
+        >
+          <ChevronIcon isOpen={isExpanded} />
+        </button>
+      </div>
 
       <PriceLegend
         min={minValue}
@@ -57,15 +79,17 @@ export default function MapLegend({
         format={(value) => formatMetricValue(value)}
       />
 
-      <div className="mt-4 space-y-2 max-h-48 overflow-y-auto pr-1">
-        {legend.buckets.map((bucket, index) => (
-          <LegendBucketRow
-            key={`${bucket.label}-${index}`}
-            bucket={bucket}
-            index={index}
-          />
-        ))}
-      </div>
+      {isExpanded && (
+        <div className="mt-4 space-y-2 max-h-48 overflow-y-auto pr-1">
+          {legend.buckets.map((bucket, index) => (
+            <LegendBucketRow
+              key={`${bucket.label}-${index}`}
+              bucket={bucket}
+              index={index}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-gray-500">
         <StatItem label="Min" value={legend.stats.min} />
@@ -138,4 +162,24 @@ function coalesceNumber(
     }
   }
   return null;
+}
+
+function ChevronIcon({ isOpen }: { isOpen: boolean }) {
+  return (
+    <svg
+      className={`h-3 w-3 transform transition-transform ${isOpen ? "rotate-180" : "rotate-0"}`}
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <path
+        d="M5.5 7.5L10 12.5L14.5 7.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
 }

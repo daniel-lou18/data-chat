@@ -90,7 +90,9 @@ export interface MapFeatureParams {
   offset?: number;
 }
 
-export interface MapLegendParams extends MapFeatureParams {}
+export interface MapLegendParams extends MapFeatureParams {
+  inseeCode?: string;
+}
 
 function createQueryString(params: MapFeatureParams | MapLegendParams): string {
   const searchParams = new URLSearchParams();

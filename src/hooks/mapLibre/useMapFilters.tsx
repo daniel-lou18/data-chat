@@ -22,6 +22,7 @@ export interface MapFilterState {
   bbox?: [number, number, number, number];
   limit?: number;
   offset?: number;
+  selectedInseeCode?: string;
 }
 
 export interface MapFilterContextValue {
@@ -34,6 +35,7 @@ export interface MapFilterContextValue {
   setYear: (year: number) => void;
   setMonth: (month?: number) => void;
   setBoundingBox: (bbox?: [number, number, number, number]) => void;
+  setSelectedInseeCode: (inseeCode?: string) => void;
 }
 
 export const DEFAULT_MAP_FILTERS: MapFilterState = {
@@ -117,6 +119,23 @@ export function MapFilterProvider({
     [setFilters]
   );
 
+  const setSelectedInseeCode = useCallback((inseeCode?: string) => {
+    setState((prev) => {
+      const next = {
+        ...prev,
+        selectedInseeCode: inseeCode,
+      };
+
+      if (inseeCode && prev.level !== "section") {
+        next.level = "section";
+      } else if (!inseeCode && prev.level === "section") {
+        next.level = "commune";
+      }
+
+      return next;
+    });
+  }, []);
+
   const value = useMemo<MapFilterContextValue>(
     () => ({
       state,
@@ -128,6 +147,7 @@ export function MapFilterProvider({
       setYear,
       setMonth,
       setBoundingBox,
+      setSelectedInseeCode,
     }),
     [
       state,
@@ -139,6 +159,7 @@ export function MapFilterProvider({
       setYear,
       setMonth,
       setBoundingBox,
+      setSelectedInseeCode,
     ]
   );
 

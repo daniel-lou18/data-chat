@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import MapLibreMap from "react-map-gl/maplibre";
 import LayerManager, { type LayerManagerProps } from "./LayerManager";
 import FeaturePopup from "./FeaturePopup";
@@ -30,16 +30,10 @@ function MapContent({ arrs, sectionIds, onMapClick }: MapProps) {
   const { navigateToArrondissement, navigateToSection } = useMapNavigate();
   const [viewState, setViewState] = useState(DEFAULT_MAP_VIEW_STATE);
   const [hoveredFeatureId, setHoveredFeatureId] = useState<string | null>(null);
-  const [selectedArrondissementId, setSelectedArrondissementId] = useState<
-    string | null
-  >(null);
   const [popupInfo, setPopupInfo] = useState<PopupInfo | null>(null);
-  const { state: filterState, setLevel } = useMapFilters();
 
-  const { isLoading: isDataLoading, error: dataError } = useMapLibreFeatures(
-    2024,
-    selectedArrondissementId
-  );
+  const { state: filterState, setSelectedInseeCode } = useMapFilters();
+  const { isLoading: isDataLoading, error: dataError } = useMapLibreFeatures();
 
   const onMouseMove = useCallback((event: any) => {
     const { features, lngLat } = event;
@@ -75,7 +69,7 @@ function MapContent({ arrs, sectionIds, onMapClick }: MapProps) {
       const isArrondissement = feature.properties && feature.properties.name;
 
       if (isArrondissement) {
-        setSelectedArrondissementId(feature.properties.id);
+        setSelectedInseeCode(feature.properties.id);
         navigateToArrondissement(feature);
 
         // Notify parent component that map was clicked
@@ -101,22 +95,14 @@ function MapContent({ arrs, sectionIds, onMapClick }: MapProps) {
     [onMapClick]
   );
 
-  useEffect(() => {
-    if (selectedArrondissementId) {
-      if (filterState.level !== "section") {
-        setLevel("section");
-      }
-    } else if (filterState.level !== "commune") {
-      setLevel("commune");
-    }
-  }, [filterState.level, selectedArrondissementId, setLevel]);
-
   return (
     <div style={{ position: "relative", height: "100%", width: "100%" }}>
       {isDataLoading && <LoadingOverlay message="Loading price data..." />}
       {dataError && <ErrorOverlay message="Error loading data" />}
 
-      <MapLegend selectedArrondissementId={selectedArrondissementId} />
+      <MapLegend
+        selectedArrondissementId={filterState.selectedInseeCode ?? null}
+      />
 
       <MapLibreMap
         {...viewState}
@@ -139,7 +125,7 @@ function MapContent({ arrs, sectionIds, onMapClick }: MapProps) {
           arrs={arrs}
           sectionIds={sectionIds}
           hoveredFeatureId={hoveredFeatureId}
-          selectedArrondissementId={selectedArrondissementId}
+          selectedArrondissementId={filterState.selectedInseeCode ?? null}
         />
 
         {popupInfo && (

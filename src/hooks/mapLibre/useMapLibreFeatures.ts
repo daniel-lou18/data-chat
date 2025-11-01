@@ -4,21 +4,25 @@ import { useMapLegend } from "./useMapData";
 import { MAP_BUCKET_COLOR_HEX } from "@/components/mapLibre/colors";
 import type { MapLegendResponse } from "@/services/api";
 import type { ExpressionSpecification } from "maplibre-gl";
+import { useMapFilters } from "./useMapFilters";
 
 /**
  * Custom hook for MapLibre dynamic styling based on backend legend data
  *
- * @param year - The year for the data (defaults to 2024)
- * @param inseeCode - Optional INSEE code for section-level styling within an arrondissement
- * @returns Object with dynamic style expressions and lookup table
  */
-export function useMapLibreFeatures(
-  year: number = 2024,
-  _inseeCode?: string | null
-) {
+export function useMapLibreFeatures() {
+  const { state: filterState } = useMapFilters();
+
   // Fetch legends for commune and section levels
-  const communeLegend = useMapLegend({ level: "commune", year });
-  const sectionLegend = useMapLegend({ level: "section", year });
+  const communeLegend = useMapLegend({
+    level: "commune",
+    year: filterState.year,
+  });
+  const sectionLegend = useMapLegend({
+    level: "section",
+    year: filterState.year,
+    inseeCode: filterState.selectedInseeCode,
+  });
 
   const arrondissementFillColor = useMemo(
     () => buildColorExpression(communeLegend.data, "#e5e7eb"),
