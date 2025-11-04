@@ -6,12 +6,14 @@ export function useMapNavigate() {
   const navigate = useNavigate();
 
   const navigateToArrondissement = (feature: CommuneFeature) => {
-    navigate(`/${createSlug(feature.properties.name)}-${feature.properties.id}`);
+    navigate(
+      `/${createSlug(feature.properties.name)}-${feature.properties.id}`
+    );
   };
 
   const navigateToSection = (feature: SectionFeature) => {
     navigate(
-      `/commune-${createSlug(feature.properties.inseeCode)}/${feature.properties.code}`
+      `/commune-${createSlug(feature.properties.inseeCode)}/${feature.properties.section}`
     );
   };
 

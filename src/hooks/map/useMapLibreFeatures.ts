@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import { useMapLegend } from "./useMapData";
-import { MAP_BUCKET_COLOR_HEX } from "@/components/mapLibre/colors";
+import { MAP_BUCKET_COLOR_HEX } from "@/components/map/colors";
 import type { MapLegendResponse } from "@/services/api";
 import type { ExpressionSpecification } from "maplibre-gl";
 import { useMapFilters } from "./useMapFilters";

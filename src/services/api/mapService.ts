@@ -2,28 +2,7 @@ import type { Feature, FeatureCollection, MultiPolygon } from "geojson";
 
 import { apiService } from "./baseApiService";
 
-export type MapFeatureLevel = "commune" | "section";
-
-export type MapPropertyType = "house" | "apartment";
-
-export type MapMetricField =
-  | "total_sales"
-  | "total_price"
-  | "avg_price"
-  | "total_area"
-  | "avg_area"
-  | "avg_price_m2"
-  | "min_price"
-  | "max_price"
-  | "median_price"
-  | "median_area"
-  | "min_price_m2"
-  | "max_price_m2"
-  | "price_m2_p25"
-  | "price_m2_p75"
-  | "price_m2_iqr"
-  | "price_m2_stddev"
-  | "price_m2_deciles";
+import type { MapFeatureLevel, MapMetricField, MapPropertyType } from "@/types";
 
 export type BaseFeatureProperties = {
   metricName: MapMetricField;

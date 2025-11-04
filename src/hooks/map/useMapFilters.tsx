@@ -7,11 +7,7 @@ import {
   type ReactNode,
 } from "react";
 
-import type {
-  MapFeatureLevel,
-  MapMetricField,
-  MapPropertyType,
-} from "@/services/api";
+import type { MapFeatureLevel, MapMetricField, MapPropertyType } from "@/types";
 
 export interface MapFilterState {
   level: MapFeatureLevel;

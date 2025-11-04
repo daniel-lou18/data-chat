@@ -6,6 +6,7 @@ import type {
   SalesByInseeCodeAndSection,
 } from "@/services/api/schemas";
 import { GC_TIME, STALE_TIME } from "./constants";
+import type { ApartmentsByInseeYear, ApartmentsBySectionYear } from "@/types";
 
 // Query keys for better cache management and invalidation
 export const communeQueryKeys = {
@@ -34,9 +35,9 @@ export function useGetAggregates(options?: {
 }) {
   return useQuery({
     queryKey: communeQueryKeys.lists(),
-    queryFn: async (): Promise<SalesByInseeCode[]> => {
+    queryFn: async (): Promise<ApartmentsByInseeYear[]> => {
       // Use analyticsService to get all arrondissements
-      const result = await analyticsService.getAll();
+      const result = await analyticsService.getApartmentsByInseeYear();
       return result;
     },
     ...defaultQueryOptions,
@@ -63,11 +64,13 @@ export function useGetAggregatesByInseeCode(
 ) {
   return useQuery({
     queryKey: communeQueryKeys.list(`insee-${inseeCode}`),
-    queryFn: async (): Promise<SalesByInseeCode[]> => {
-      const result = await analyticsService.getByInseeCode(inseeCode!);
+    queryFn: async (): Promise<ApartmentsByInseeYear[]> => {
+      const result = await analyticsService.getApartmentsByInseeYear({
+        ...(inseeCode && { inseeCode }),
+      });
       return result;
     },
-    enabled: !!inseeCode && options?.enabled !== false,
+    enabled: options?.enabled !== false,
     ...defaultQueryOptions,
     ...options,
   });
@@ -92,11 +95,13 @@ export function useGetSectionsByInseeCode(
 ) {
   return useQuery({
     queryKey: communeQueryKeys.list(`sections-insee-${inseeCode}`),
-    queryFn: async (): Promise<SalesByInseeCodeAndSection[]> => {
-      const result = await analyticsService.getSectionsByInseeCode(inseeCode!);
+    queryFn: async (): Promise<ApartmentsBySectionYear[]> => {
+      const result = await analyticsService.getApartmentsBySectionYear({
+        ...(inseeCode && { inseeCode }),
+      });
       return result;
     },
-    enabled: !!inseeCode && options?.enabled !== false,
+    enabled: options?.enabled !== false,
     ...defaultQueryOptions,
     ...options,
   });
@@ -117,20 +122,20 @@ export function useGetAggregatesByInseeCodeAndSection(
     staleTime?: number;
     gcTime?: number;
     retry?: number | boolean;
-    onSuccess?: (data: SalesByInseeCodeAndSection[]) => void;
+    onSuccess?: (data: ApartmentsBySectionYear[]) => void;
     onError?: (error: Error) => void;
   }
 ) {
   return useQuery({
     queryKey: communeQueryKeys.list(`insee-${inseeCode}-section-${section}`),
-    queryFn: async (): Promise<SalesByInseeCodeAndSection[]> => {
-      const result = await analyticsService.getByInseeCodeAndSection(
-        inseeCode!,
-        section!
-      );
+    queryFn: async (): Promise<ApartmentsBySectionYear[]> => {
+      const result = await analyticsService.getApartmentsBySectionYear({
+        ...(inseeCode && { inseeCode: inseeCode }),
+        ...(section && { section: section }),
+      });
       return result;
     },
-    enabled: !!inseeCode && !!section && options?.enabled !== false,
+    enabled: options?.enabled !== false,
     ...defaultQueryOptions,
     ...options,
   });

@@ -15,6 +15,7 @@ export function useDataOrchestrator() {
     ...chatRest
   } = useChat();
   const { data: mapData, isLoading: mapLoading } = useAggregatesFromParams();
+  console.log("mapData", mapData);
 
   // Track the most recent data source
   const [lastDataSource, setLastDataSource] = useState<DataSource>(null);

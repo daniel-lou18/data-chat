@@ -1,3 +1,5 @@
+export * from "./map";
+
 export interface HousePriceData {
   postalCode: number;
   city: string;

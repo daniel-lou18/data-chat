@@ -13,12 +13,9 @@ export type { ApiRequestConfig, ApiResponse, ApiError } from "./baseApiService";
 export type {
   MapFeature,
   MapFeatureCollection,
-  MapFeatureLevel,
   MapLegendBucket,
   MapLegendResponse,
   MapLegendStats,
-  MapMetricField,
-  MapPropertyType,
   SectionFeatureProperties,
   CommuneFeatureProperties,
 } from "./mapService";

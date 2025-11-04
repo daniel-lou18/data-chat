@@ -1,189 +1,175 @@
-import { apiService } from "./baseApiService";
-import type { GenericData } from "@/components/table/tableColumns";
+import { apiService, BaseApiService } from "./baseApiService";
 import type {
-  PricePerM2Deciles,
-  SalesByInseeCode,
-  SalesByInseeCodeAndSection,
-} from "./schemas";
+  ApartmentsByInseeMonth,
+  ApartmentsByInseeWeek,
+  ApartmentsByInseeYear,
+  ApartmentsBySectionMonth,
+  ApartmentsBySectionYear,
+  HousesByInseeMonth,
+  HousesByInseeWeek,
+  HousesByInseeYear,
+  HousesBySectionMonth,
+  HousesBySectionYear,
+  InseeMonthParams,
+  InseeWeekParams,
+  InseeYearParams,
+  SectionMonthParams,
+  SectionYearParams,
+} from "./mvSchemas";
 
-const analyticsUrl = "sales/analytics";
+type QueryParams = Record<string, string | number | boolean>;
+
+const toQueryParams = (
+  params?: Record<string, unknown>
+): QueryParams | undefined => {
+  if (!params) {
+    return undefined;
+  }
+
+  const queryParams: QueryParams = {};
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null) {
+      return;
+    }
+
+    if (Array.isArray(value)) {
+      value
+        .filter(
+          (item): item is string | number | boolean =>
+            typeof item === "string" ||
+            typeof item === "number" ||
+            typeof item === "boolean"
+        )
+        .forEach((item) => {
+          queryParams[key] = item;
+        });
+      return;
+    }
+
+    if (
+      typeof value === "string" ||
+      typeof value === "number" ||
+      typeof value === "boolean"
+    ) {
+      queryParams[key] = value;
+    }
+  });
+
+  return queryParams;
+};
 
 /**
- * Analytics API service for handling analytics-related requests
+ * Analytics API service backed by materialized views.
  */
 export class AnalyticsService {
-  private api: typeof apiService;
+  private readonly api: BaseApiService;
+  private readonly baseUrl = "/sales/analytics/mv";
 
-  constructor(api = apiService) {
+  constructor(api: BaseApiService = apiService) {
     this.api = api;
   }
 
-  /**
-   * Get aggregated analytics data by INSEE code (commune level)
-   *
-   * @param inseeCode - The INSEE code of the commune
-   * @param year - The year for the data (defaults to 2024)
-   * @returns Promise<GenericData[]> - Aggregated data grouped by commune
-   */
-  async getByInseeCode(
-    inseeCode: string,
-    year: number = 2024
-  ): Promise<SalesByInseeCode[]> {
-    try {
-      const response = await this.api.get<SalesByInseeCode[]>(
-        `/${analyticsUrl}/by-insee-code`,
-        {
-          year,
-          inseeCode,
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching analytics by INSEE code:", error);
-      throw error;
-    }
+  private async fetchCollection<T>(
+    path: string,
+    params?: Record<string, unknown>
+  ): Promise<T> {
+    const response = await this.api.get<T>(
+      `${this.baseUrl}${path}`,
+      toQueryParams(params)
+    );
+
+    return response.data;
   }
 
-  /**
-   * Get aggregated analytics data by INSEE code and section
-   *
-   * @param inseeCode - The INSEE code of the commune
-   * @param section - The section code
-   * @param year - The year for the data (defaults to 2024)
-   * @returns Promise<GenericData[]> - Aggregated data grouped by commune and section
-   */
-  async getByInseeCodeAndSection(
-    inseeCode: string,
-    section: string,
-    year: number = 2024
-  ): Promise<SalesByInseeCodeAndSection[]> {
-    try {
-      const response = await this.api.get<SalesByInseeCodeAndSection[]>(
-        `/${analyticsUrl}/by-insee-code-section`,
-        {
-          year,
-          inseeCode,
-          section,
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error(
-        "Error fetching analytics by INSEE code and section:",
-        error
-      );
-      throw error;
-    }
+  async getApartmentsByInseeYear(
+    params: Partial<InseeYearParams> = {}
+  ): Promise<ApartmentsByInseeYear[]> {
+    return this.fetchCollection<ApartmentsByInseeYear[]>(
+      "/apartments/by-insee-code/year",
+      params
+    );
   }
 
-  /**
-   * Get all analytics data (all communes)
-   *
-   * @param year - The year for the data (defaults to 2024)
-   * @returns Promise<GenericData[]> - All analytics data
-   */
-  async getAll(year: number = 2024): Promise<SalesByInseeCode[]> {
-    try {
-      const response = await this.api.get<SalesByInseeCode[]>(
-        `/${analyticsUrl}/by-insee-code`,
-        {
-          year,
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching all analytics data:", error);
-      throw error;
-    }
+  async getHousesByInseeYear(
+    params: Partial<InseeYearParams> = {}
+  ): Promise<HousesByInseeYear[]> {
+    return this.fetchCollection<HousesByInseeYear[]>(
+      "/houses/by-insee-code/year",
+      params
+    );
   }
 
-  /**
-   * Get all sections for a specific INSEE code (commune)
-   *
-   * @param inseeCode - The INSEE code of the commune
-   * @param year - The year for the data (defaults to 2024)
-   * @returns Promise<GenericData[]> - All sections data for the commune
-   */
-  async getSectionsByInseeCode(
-    inseeCode: string,
-    year: number = 2024
-  ): Promise<SalesByInseeCodeAndSection[]> {
-    try {
-      const response = await this.api.get<SalesByInseeCodeAndSection[]>(
-        `/${analyticsUrl}/by-insee-code-section`,
-        {
-          year,
-          inseeCode,
-          limit: 500,
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching sections by INSEE code:", error);
-      throw error;
-    }
+  async getApartmentsByInseeMonth(
+    params: Partial<InseeMonthParams> = {}
+  ): Promise<ApartmentsByInseeMonth[]> {
+    return this.fetchCollection<ApartmentsByInseeMonth[]>(
+      "/apartments/by-insee-code/month",
+      params
+    );
   }
 
-  /**
-   * Get price per m² deciles with flexible filtering
-   *
-   * @param year - The year for the data (defaults to 2024)
-   * @param inseeCode - Optional INSEE code to filter by commune
-   * @param section - Optional section code to filter by section
-   * @returns Promise<PricePerM2Deciles> - Price per m² deciles data
-   */
-  async getPricePerM2Deciles(
-    year: number = 2024,
-    inseeCode?: string,
-    section?: string
-  ): Promise<PricePerM2Deciles> {
-    try {
-      const params: Record<string, any> = { year };
-      if (inseeCode) params.inseeCode = inseeCode;
-      if (section) params.section = section;
-
-      const response = await this.api.get<PricePerM2Deciles>(
-        `/${analyticsUrl}/price-per-m2-deciles`,
-        params
-      );
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching price per m² deciles:", error);
-      throw error;
-    }
+  async getHousesByInseeMonth(
+    params: Partial<InseeMonthParams> = {}
+  ): Promise<HousesByInseeMonth[]> {
+    return this.fetchCollection<HousesByInseeMonth[]>(
+      "/houses/by-insee-code/month",
+      params
+    );
   }
 
-  /**
-   * Get analytics data with custom filters
-   *
-   * @param filters - Custom filter parameters
-   * @returns Promise<GenericData[]> - Filtered analytics data
-   */
-  async getWithFilters(filters: {
-    year?: number;
-    inseeCode?: string;
-    section?: string;
-    [key: string]: string | number | boolean | undefined;
-  }): Promise<GenericData[]> {
-    try {
-      const { year = 2024, inseeCode, section, ...otherFilters } = filters;
+  async getApartmentsByInseeWeek(
+    params: Partial<InseeWeekParams> = {}
+  ): Promise<ApartmentsByInseeWeek[]> {
+    return this.fetchCollection<ApartmentsByInseeWeek[]>(
+      "/apartments/by-insee-code/week",
+      params
+    );
+  }
 
-      let endpoint = `/${analyticsUrl}/by-insee-code`;
-      if (inseeCode && section) {
-        endpoint = `/${analyticsUrl}/by-insee-code-section`;
-      }
+  async getHousesByInseeWeek(
+    params: Partial<InseeWeekParams> = {}
+  ): Promise<HousesByInseeWeek[]> {
+    return this.fetchCollection<HousesByInseeWeek[]>(
+      "/houses/by-insee-code/week",
+      params
+    );
+  }
 
-      const response = await this.api.get<GenericData[]>(endpoint, {
-        year,
-        ...(inseeCode && { inseeCode }),
-        ...(section && { section }),
-        ...otherFilters,
-      });
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching analytics with filters:", error);
-      throw error;
-    }
+  async getApartmentsBySectionYear(
+    params: Partial<SectionYearParams> = {}
+  ): Promise<ApartmentsBySectionYear[]> {
+    return this.fetchCollection<ApartmentsBySectionYear[]>(
+      "/apartments/by-section/year",
+      params
+    );
+  }
+
+  async getHousesBySectionYear(
+    params: Partial<SectionYearParams> = {}
+  ): Promise<HousesBySectionYear[]> {
+    return this.fetchCollection<HousesBySectionYear[]>(
+      "/houses/by-section/year",
+      params
+    );
+  }
+
+  async getApartmentsBySectionMonth(
+    params: Partial<SectionMonthParams> = {}
+  ): Promise<ApartmentsBySectionMonth[]> {
+    return this.fetchCollection<ApartmentsBySectionMonth[]>(
+      "/apartments/by-section/month",
+      params
+    );
+  }
+
+  async getHousesBySectionMonth(
+    params: Partial<SectionMonthParams> = {}
+  ): Promise<HousesBySectionMonth[]> {
+    return this.fetchCollection<HousesBySectionMonth[]>(
+      "/houses/by-section/month",
+      params
+    );
   }
 }
 

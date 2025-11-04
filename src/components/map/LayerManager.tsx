@@ -1,11 +1,11 @@
 import { memo } from "react";
 import { Source, Layer } from "react-map-gl/maplibre";
 
-import { useMapFeatureCollection } from "@/hooks/mapLibre/useMapData";
+import { useMapFeatureCollection } from "@/hooks/map/useMapData";
 import type { MapFeatureCollection } from "@/services/api";
 import { arrondissementLayerStyles, sectionLayerStyles } from "./config";
-import { useMapLibreZoom } from "@/hooks/mapLibre/useMapLibreZoom";
-import { useMapLibreFeatures } from "@/hooks/mapLibre/useMapLibreFeatures";
+import { useMapLibreZoom } from "@/hooks/map/useMapLibreZoom";
+import { useMapLibreFeatures } from "@/hooks/map/useMapLibreFeatures";
 
 const EMPTY_FEATURE_COLLECTION: MapFeatureCollection = {
   type: "FeatureCollection",
