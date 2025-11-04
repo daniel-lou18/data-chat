@@ -15,7 +15,7 @@ import type {
   InseeYearParams,
   SectionMonthParams,
   SectionYearParams,
-} from "./mvSchemas";
+} from "@/types";
 
 type QueryParams = Record<string, string | number | boolean>;
 

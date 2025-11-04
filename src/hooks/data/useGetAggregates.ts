@@ -1,12 +1,17 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
 import { analyticsService } from "@/services/api";
-import type { GenericData } from "@/components/table/tableColumns";
-import type {
-  SalesByInseeCode,
-  SalesByInseeCodeAndSection,
-} from "@/services/api/schemas";
 import { GC_TIME, STALE_TIME } from "./constants";
-import type { ApartmentsByInseeYear, ApartmentsBySectionYear } from "@/types";
+import type {
+  ApartmentsByInseeYear,
+  ApartmentsBySectionYear,
+  InseeYearParams,
+  SectionYearParams,
+} from "@/types";
+
+export type QueryOptions<TQueryFnData, TData = TQueryFnData> = Omit<
+  UseQueryOptions<TQueryFnData, Error, TData>,
+  "queryKey" | "queryFn"
+>;
 
 // Query keys for better cache management and invalidation
 export const communeQueryKeys = {
@@ -25,15 +30,10 @@ const defaultQueryOptions = {
     Math.min(1000 * 2 ** attemptIndex, 30000),
 } as const;
 
-export function useGetAggregates(options?: {
-  enabled?: boolean;
-  staleTime?: number;
-  gcTime?: number;
-  retry?: number | boolean;
-  onSuccess?: (data: GenericData[]) => void;
-  onError?: (error: Error) => void;
-}) {
-  return useQuery({
+export function useGetAggregates<TData = ApartmentsByInseeYear[]>(
+  options?: QueryOptions<ApartmentsByInseeYear[], TData>
+) {
+  return useQuery<ApartmentsByInseeYear[], Error, TData>({
     queryKey: communeQueryKeys.lists(),
     queryFn: async (): Promise<ApartmentsByInseeYear[]> => {
       // Use analyticsService to get all arrondissements
@@ -51,22 +51,15 @@ export function useGetAggregates(options?: {
  * @param inseeCode - The INSEE code of the commune
  * @param options - Optional query configuration
  */
-export function useGetAggregatesByInseeCode(
-  inseeCode: string | undefined | null,
-  options?: {
-    enabled?: boolean;
-    staleTime?: number;
-    gcTime?: number;
-    retry?: number | boolean;
-    onSuccess?: (data: SalesByInseeCode[]) => void;
-    onError?: (error: Error) => void;
-  }
+export function useGetAggregatesByInseeCode<TData = ApartmentsByInseeYear[]>(
+  params: Partial<InseeYearParams> = {},
+  options?: QueryOptions<ApartmentsByInseeYear[], TData>
 ) {
-  return useQuery({
-    queryKey: communeQueryKeys.list(`insee-${inseeCode}`),
-    queryFn: async (): Promise<ApartmentsByInseeYear[]> => {
+  return useQuery<ApartmentsByInseeYear[], Error, TData>({
+    queryKey: communeQueryKeys.list(`insee-${params.year}-${params.inseeCode}`),
+    queryFn: async () => {
       const result = await analyticsService.getApartmentsByInseeYear({
-        ...(inseeCode && { inseeCode }),
+        ...params,
       });
       return result;
     },
@@ -82,22 +75,17 @@ export function useGetAggregatesByInseeCode(
  * @param inseeCode - The INSEE code of the commune
  * @param options - Optional query configuration
  */
-export function useGetSectionsByInseeCode(
-  inseeCode: string | undefined | null,
-  options?: {
-    enabled?: boolean;
-    staleTime?: number;
-    gcTime?: number;
-    retry?: number | boolean;
-    onSuccess?: (data: SalesByInseeCodeAndSection[]) => void;
-    onError?: (error: Error) => void;
-  }
+export function useGetSectionsByInseeCode<TData = ApartmentsBySectionYear[]>(
+  params: Partial<SectionYearParams> = {},
+  options?: QueryOptions<ApartmentsBySectionYear[], TData>
 ) {
-  return useQuery({
-    queryKey: communeQueryKeys.list(`sections-insee-${inseeCode}`),
+  return useQuery<ApartmentsBySectionYear[], Error, TData>({
+    queryKey: communeQueryKeys.list(
+      `sections-insee-${params.year}-${params.inseeCode}`
+    ),
     queryFn: async (): Promise<ApartmentsBySectionYear[]> => {
       const result = await analyticsService.getApartmentsBySectionYear({
-        ...(inseeCode && { inseeCode }),
+        ...params,
       });
       return result;
     },
@@ -114,24 +102,19 @@ export function useGetSectionsByInseeCode(
  * @param section - The section code
  * @param options - Optional query configuration
  */
-export function useGetAggregatesByInseeCodeAndSection(
-  inseeCode: string | undefined | null,
-  section: string | undefined | null,
-  options?: {
-    enabled?: boolean;
-    staleTime?: number;
-    gcTime?: number;
-    retry?: number | boolean;
-    onSuccess?: (data: ApartmentsBySectionYear[]) => void;
-    onError?: (error: Error) => void;
-  }
+export function useGetAggregatesByInseeCodeAndSection<
+  TData = ApartmentsBySectionYear[],
+>(
+  params: Partial<SectionYearParams> = {},
+  options?: QueryOptions<ApartmentsBySectionYear[], TData>
 ) {
-  return useQuery({
-    queryKey: communeQueryKeys.list(`insee-${inseeCode}-section-${section}`),
+  return useQuery<ApartmentsBySectionYear[], Error, TData>({
+    queryKey: communeQueryKeys.list(
+      `insee-${params.year}-${params.inseeCode}-section-${params.section}`
+    ),
     queryFn: async (): Promise<ApartmentsBySectionYear[]> => {
       const result = await analyticsService.getApartmentsBySectionYear({
-        ...(inseeCode && { inseeCode: inseeCode }),
-        ...(section && { section: section }),
+        ...params,
       });
       return result;
     },

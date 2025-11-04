@@ -1,5 +1,10 @@
+import { MapFilterProvider } from "@/hooks/map/useMapFilters";
 import Main from "../components/Main";
 
 export default function MainPage() {
-  return <Main />;
+  return (
+    <MapFilterProvider>
+      <Main />
+    </MapFilterProvider>
+  );
 }

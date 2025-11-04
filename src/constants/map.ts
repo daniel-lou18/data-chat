@@ -1,6 +1,15 @@
 import { AggregateMetricsMVSchema } from "@/services/api/mvSchemas";
 import type { MapFeatureLevel, MapMetricField, MapPropertyType } from "@/types";
 
+export const MAP_FEATURE_YEARS = [
+  2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024,
+] as const;
+
+export const MAP_FEATURE_YEAR_OPTIONS = MAP_FEATURE_YEARS.map((year) => ({
+  value: year,
+  label: year.toString(),
+}));
+
 export const MAP_FEATURE_LEVELS = [
   "commune",
   "section",

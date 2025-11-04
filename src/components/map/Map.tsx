@@ -10,8 +10,6 @@ import { DEFAULT_MAP_VIEW_STATE, type PopupInfo } from "./config";
 import { getCenterFromCoordinates } from "@/utils/mapUtils";
 import { useMapNavigate } from "@/hooks/map/useMapNavigate";
 import { useMapFilters } from "@/hooks/map/useMapFilters";
-import { MapFilterSelect } from "@/components/ui/map-filters";
-import { MAP_FEATURE_LEVEL_OPTIONS } from "@/constants/map";
 
 type MapProps = LayerManagerProps & {
   onMapClick?: () => void;
@@ -88,16 +86,6 @@ export default function Map({ arrs, sectionIds, onMapClick }: MapProps) {
 
   return (
     <div style={{ position: "relative", height: "100%", width: "100%" }}>
-      <div className="pointer-events-auto absolute left-1/2 top-4 z-10 -translate-x-1/2 transform">
-        <MapFilterSelect
-          filterKey="level"
-          options={MAP_FEATURE_LEVEL_OPTIONS}
-          placeholder="Select level"
-          label="Level"
-          size="sm"
-          className="min-w-[200px]"
-        />
-      </div>
       {isDataLoading && <LoadingOverlay message="Loading price data..." />}
       {dataError && <ErrorOverlay message="Error loading data" />}
 
