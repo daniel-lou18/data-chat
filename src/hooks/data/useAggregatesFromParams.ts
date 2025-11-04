@@ -67,5 +67,5 @@ export function useAggregatesFromParams() {
   );
 
   // Return the appropriate query based on whether we have a section
-  return section ? sectionQuery : arrondissementQuery;
+  return filterState.level === "section" ? sectionQuery : arrondissementQuery;
 }

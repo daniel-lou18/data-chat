@@ -59,6 +59,8 @@ export function MapFilterProvider({
     ...initialState,
   });
 
+  console.log("state", state);
+
   const setFilters = useCallback((updates: Partial<MapFilterState>) => {
     setState((prev) => ({
       ...prev,
