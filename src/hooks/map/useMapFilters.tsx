@@ -14,11 +14,12 @@ export interface MapFilterState {
   propertyType: MapPropertyType;
   field: MapMetricField;
   year: number;
+  selectedInseeCode: string | null;
+  selectedSection: string | null;
   month?: number;
   bbox?: [number, number, number, number];
   limit?: number;
   offset?: number;
-  selectedInseeCode?: string;
 }
 
 export interface MapFilterContextValue {
@@ -31,7 +32,8 @@ export interface MapFilterContextValue {
   setYear: (year: number) => void;
   setMonth: (month?: number) => void;
   setBoundingBox: (bbox?: [number, number, number, number]) => void;
-  setSelectedInseeCode: (inseeCode?: string) => void;
+  setSelectedInseeCode: (inseeCode: string | null) => void;
+  setSelectedSection: (section: string | null) => void;
 }
 
 export const DEFAULT_MAP_FILTERS: MapFilterState = {
@@ -39,6 +41,8 @@ export const DEFAULT_MAP_FILTERS: MapFilterState = {
   propertyType: "apartment",
   field: "avg_price_m2",
   year: 2024,
+  selectedInseeCode: null,
+  selectedSection: null,
 };
 
 const MapFilterContext = createContext<MapFilterContextValue | undefined>(
@@ -58,8 +62,6 @@ export function MapFilterProvider({
     ...DEFAULT_MAP_FILTERS,
     ...initialState,
   });
-
-  console.log("state", state);
 
   const setFilters = useCallback((updates: Partial<MapFilterState>) => {
     setState((prev) => ({
@@ -117,7 +119,7 @@ export function MapFilterProvider({
     [setFilters]
   );
 
-  const setSelectedInseeCode = useCallback((inseeCode?: string) => {
+  const setSelectedInseeCode = useCallback((inseeCode: string | null) => {
     setState((prev) => {
       const next = {
         ...prev,
@@ -128,6 +130,23 @@ export function MapFilterProvider({
         next.level = "section";
       } else if (!inseeCode && prev.level === "section") {
         next.level = "commune";
+      }
+
+      return next;
+    });
+  }, []);
+
+  const setSelectedSection = useCallback((section: string | null) => {
+    setState((prev) => {
+      const next = {
+        ...prev,
+        selectedSection: section,
+      };
+
+      if (section && prev.level !== "commune") {
+        next.level = "commune";
+      } else if (!section && prev.level === "commune") {
+        next.level = "section";
       }
 
       return next;
@@ -146,6 +165,7 @@ export function MapFilterProvider({
       setMonth,
       setBoundingBox,
       setSelectedInseeCode,
+      setSelectedSection,
     }),
     [
       state,
@@ -158,6 +178,7 @@ export function MapFilterProvider({
       setMonth,
       setBoundingBox,
       setSelectedInseeCode,
+      setSelectedSection,
     ]
   );
 

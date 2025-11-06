@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, type Dispatch, type SetStateAction } from "react";
 import {
   createColumnHelper,
   getCoreRowModel,
   getExpandedRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 
@@ -14,17 +15,13 @@ import {
   MetricTableHeader,
 } from "./MetricTableShared";
 import type {
-  MetricRowBase,
+  SectionMetricRow,
   NumericMapMetricField,
   TableStatus,
   YearBreakdownRow,
 } from "./MetricTableShared";
 import { MAP_METRIC_FIELD_METADATA } from "@/constants/map";
 import type { ApartmentsBySectionYear } from "@/types";
-
-interface SectionMetricRow extends MetricRowBase {
-  section: string;
-}
 
 const columnHelper = createColumnHelper<SectionMetricRow>();
 
@@ -35,6 +32,8 @@ interface SectionMetricTableProps {
   error: unknown;
   metric: NumericMapMetricField;
   selectedYear?: number;
+  hoveredRowId: string | null;
+  setHoveredRowId: Dispatch<SetStateAction<string | null>>;
 }
 
 export function SectionMetricTable({
@@ -44,6 +43,8 @@ export function SectionMetricTable({
   error,
   metric,
   selectedYear,
+  hoveredRowId,
+  setHoveredRowId,
 }: SectionMetricTableProps) {
   const breakdownBySection = useMemo(() => {
     const map = new Map<string, YearBreakdownRow[]>();
@@ -144,8 +145,10 @@ export function SectionMetricTable({
     data: tableData,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
     getRowCanExpand: (row) => row.original.yearlyBreakdown.length > 1,
+    enableRowSelection: true,
   });
 
   const rows = table.getRowModel().rows;
@@ -158,14 +161,18 @@ export function SectionMetricTable({
         : "ready";
 
   return (
-    <MetricTableContainer status={status} error={error}>
+    <MetricTableContainer
+      status={status}
+      error={error}
+      table={table}
+      metric={metric}
+      metricLabel={metricLabel}
+      hoveredRowId={hoveredRowId}
+      setHoveredRowId={setHoveredRowId}
+    >
       <table className="w-full">
-        <MetricTableHeader table={table} />
-        <MetricTableBody
-          table={table}
-          metric={metric}
-          metricLabel={metricLabel}
-        />
+        <MetricTableHeader />
+        <MetricTableBody />
       </table>
     </MetricTableContainer>
   );

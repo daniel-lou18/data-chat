@@ -14,7 +14,7 @@ import {
 import { createColumnsFromData } from "@/components/table/tableColumns";
 import { useTableState } from "@/hooks/table/useTableState";
 import ParisMap from "@/components/map/Map";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { extractInseeCodesAndCreateSectionIds } from "@/utils/inseeCodeUtils";
 import TableHeader from "@/components/table/TableHeader";
 import { MessageInput } from "./chat/MessageInput";
@@ -32,7 +32,7 @@ import {
 function App() {
   const tableState = useTableState();
   const {
-    state: { field, level, selectedInseeCode },
+    state: { field, level, selectedInseeCode, selectedSection },
   } = useMapFilters();
   const {
     data,
@@ -50,7 +50,7 @@ function App() {
     isError: isCommuneError,
     error: communeError,
   } = useGetAggregatesByInseeCode({
-    inseeCode: selectedInseeCode,
+    inseeCode: selectedInseeCode ?? undefined,
   });
 
   const {
@@ -59,8 +59,11 @@ function App() {
     isError: isSectionError,
     error: sectionError,
   } = useGetAggregatesByInseeCodeAndSection({
-    inseeCode: selectedInseeCode,
+    inseeCode: selectedInseeCode ?? undefined,
+    section: selectedSection ?? undefined,
   });
+
+  const [hoveredFeatureId, setHoveredFeatureId] = useState<string | null>(null);
 
   const { inseeCodes, sectionIds } = useMemo(() => {
     return extractInseeCodesAndCreateSectionIds(data);
@@ -106,6 +109,8 @@ function App() {
               arrs={inseeCodes}
               sectionIds={sectionIds}
               onMapClick={handleMapClick}
+              hoveredFeatureId={hoveredFeatureId}
+              setHoveredFeatureId={setHoveredFeatureId}
             />
           </div>
 
@@ -132,6 +137,8 @@ function App() {
                   isLoading={communeLoading}
                   isError={isCommuneError}
                   error={communeError}
+                  hoveredRowId={hoveredFeatureId}
+                  setHoveredRowId={setHoveredFeatureId}
                 />
               ) : (
                 <SectionMetricTable
@@ -140,6 +147,8 @@ function App() {
                   isLoading={sectionLoading}
                   isError={isSectionError}
                   error={sectionError}
+                  hoveredRowId={hoveredFeatureId}
+                  setHoveredRowId={setHoveredFeatureId}
                 />
               )}
             </div>

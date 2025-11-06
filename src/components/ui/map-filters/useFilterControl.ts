@@ -1,7 +1,10 @@
 import { useCallback, useMemo } from "react";
-
-import type { SelectOption } from "@/hooks/map/useMapFilterOptions";
 import { useMapFilters, type MapFilterState } from "@/hooks/map/useMapFilters";
+
+export type SelectOption<Value extends string | number> = {
+  value: Value;
+  label: string;
+};
 
 export const CLEAR_VALUE = "__clear__";
 

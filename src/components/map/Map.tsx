@@ -1,4 +1,9 @@
-import { useState, useCallback } from "react";
+import {
+  useState,
+  useCallback,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import MapLibreMap from "react-map-gl/maplibre";
 import LayerManager, { type LayerManagerProps } from "./LayerManager";
 import FeaturePopup from "./FeaturePopup";
@@ -13,12 +18,18 @@ import { useMapFilters } from "@/hooks/map/useMapFilters";
 
 type MapProps = LayerManagerProps & {
   onMapClick?: () => void;
+  setHoveredFeatureId: Dispatch<SetStateAction<string | null>>;
 };
 
-export default function Map({ arrs, sectionIds, onMapClick }: MapProps) {
+export default function Map({
+  arrs,
+  sectionIds,
+  onMapClick,
+  hoveredFeatureId,
+  setHoveredFeatureId,
+}: MapProps) {
   const { navigateToArrondissement, navigateToSection } = useMapNavigate();
   const [viewState, setViewState] = useState(DEFAULT_MAP_VIEW_STATE);
-  const [hoveredFeatureId, setHoveredFeatureId] = useState<string | null>(null);
   const [popupInfo, setPopupInfo] = useState<PopupInfo | null>(null);
 
   const { state: filterState, setSelectedInseeCode } = useMapFilters();

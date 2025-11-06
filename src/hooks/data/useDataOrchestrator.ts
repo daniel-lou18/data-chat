@@ -14,7 +14,12 @@ export function useDataOrchestrator() {
     isProcessing: chatProcessing,
     ...chatRest
   } = useChat();
-  const { data: mapData, isLoading: mapLoading } = useAggregatesFromParams();
+  const {
+    data: mapData,
+    isLoading: mapLoading,
+    isError: isMapError,
+    error: mapError,
+  } = useAggregatesFromParams();
 
   // Track the most recent data source
   const [lastDataSource, setLastDataSource] = useState<DataSource>(null);
@@ -117,10 +122,12 @@ export function useDataOrchestrator() {
     chatData,
     mapData,
 
-    // Loading states
+    // Loading and error states
     isProcessing: chatProcessing || mapLoading,
     chatProcessing,
     mapLoading,
+    isMapError,
+    mapError,
 
     // Metadata
     lastUpdateTime,
