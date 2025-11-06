@@ -1,21 +1,6 @@
-import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
-  getGroupedRowModel,
-  getExpandedRowModel,
-} from "@tanstack/react-table";
-import {
-  textSearch,
-  numericComparison,
-  numericWithText,
-} from "@/utils/dataTableUtils";
-import { createColumnsFromData } from "@/components/table/tableColumns";
 import { useTableState } from "@/hooks/table/useTableState";
 import ParisMap from "@/components/map/Map";
-import { useMemo, useState } from "react";
-import { extractInseeCodesAndCreateSectionIds } from "@/utils/inseeCodeUtils";
+import { useState } from "react";
 import TableHeader from "@/components/table/TableHeader";
 import { MessageInput } from "./chat/MessageInput";
 import { useDataOrchestrator } from "@/hooks/data/useDataOrchestrator";
@@ -24,18 +9,14 @@ import DataSource from "./table/DataSource";
 import Topbar from "./topbar";
 import { useMapFilters } from "@/hooks/map/useMapFilters";
 import { SectionMetricTable, CommuneMetricTable } from "./table";
-import {
-  useGetAggregatesByInseeCode,
-  useGetAggregatesByInseeCodeAndSection,
-} from "@/hooks/data/useGetAggregates";
+import { useAggregatesFromParams } from "@/hooks/data/useAggregatesFromParams";
 
 function App() {
   const tableState = useTableState();
   const {
-    state: { field, level, selectedInseeCode, selectedSection },
+    state: { field, level },
   } = useMapFilters();
   const {
-    data,
     dataSource,
     isProcessing,
     handleSendMessage,
@@ -49,55 +30,46 @@ function App() {
     isLoading: communeLoading,
     isError: isCommuneError,
     error: communeError,
-  } = useGetAggregatesByInseeCode({
-    inseeCode: selectedInseeCode ?? undefined,
-  });
+  } = useAggregatesFromParams().communeQuery;
 
   const {
     data: sectionData,
     isLoading: sectionLoading,
     isError: isSectionError,
     error: sectionError,
-  } = useGetAggregatesByInseeCodeAndSection({
-    inseeCode: selectedInseeCode ?? undefined,
-    section: selectedSection ?? undefined,
-  });
+  } = useAggregatesFromParams().sectionQuery;
 
   const [hoveredFeatureId, setHoveredFeatureId] = useState<string | null>(null);
 
-  const { inseeCodes, sectionIds } = useMemo(() => {
-    return extractInseeCodesAndCreateSectionIds(data);
-  }, [data]);
-
   // Create the table instance to share between DataTable and ChatInterface
-  const table = useReactTable({
-    data,
-    columns: createColumnsFromData(data),
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getGroupedRowModel: getGroupedRowModel(),
-    getExpandedRowModel: getExpandedRowModel(),
-    enableRowSelection: true,
-    enableGrouping: true,
-    state: {
-      sorting: tableState.sorting,
-      columnFilters: tableState.columnFilters,
-      rowSelection: tableState.rowSelection,
-      grouping: tableState.grouping,
-      expanded: tableState.expanded,
-    },
-    onSortingChange: tableState.setSorting,
-    onColumnFiltersChange: tableState.setColumnFilters,
-    onRowSelectionChange: tableState.setRowSelection,
-    onGroupingChange: tableState.setGrouping,
-    onExpandedChange: tableState.setExpanded,
-    filterFns: {
-      textSearch,
-      numericComparison,
-      numericWithText,
-    },
-  });
+  // const table = useReactTable({
+  //   data,
+  //   columns: createColumnsFromData(data),
+  //   getCoreRowModel: getCoreRowModel(),
+  //   getSortedRowModel: getSortedRowModel(),
+  //   getFilteredRowModel: getFilteredRowModel(),
+  //   getGroupedRowModel: getGroupedRowModel(),
+  //   getExpandedRowModel: getExpandedRowModel(),
+  //   enableRowSelection: true,
+  //   enableGrouping: true,
+  //   state: {
+  //     sorting: tableState.sorting,
+  //     columnFilters: tableState.columnFilters,
+  //     rowSelection: tableState.rowSelection,
+  //     grouping: tableState.grouping,
+  //     expanded: tableState.expanded,
+  //   },
+  //   onSortingChange: tableState.setSorting,
+  //   onColumnFiltersChange: tableState.setColumnFilters,
+  //   onRowSelectionChange: tableState.setRowSelection,
+  //   onGroupingChange: tableState.setGrouping,
+  //   onExpandedChange: tableState.setExpanded,
+  //   filterFns: {
+  //     textSearch,
+  //     numericComparison,
+  //     numericWithText,
+  //   },
+  // });
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -106,8 +78,6 @@ function App() {
         <div className="grid grid-cols-12 gap-6 h-[calc(100vh-12rem)]">
           <div className="col-span-7 bg-white shadow-lg rounded-lg overflow-hidden">
             <ParisMap
-              arrs={inseeCodes}
-              sectionIds={sectionIds}
               onMapClick={handleMapClick}
               hoveredFeatureId={hoveredFeatureId}
               setHoveredFeatureId={setHoveredFeatureId}

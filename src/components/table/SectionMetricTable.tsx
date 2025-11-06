@@ -21,12 +21,12 @@ import type {
   YearBreakdownRow,
 } from "./MetricTableShared";
 import { MAP_METRIC_FIELD_METADATA } from "@/constants/map";
-import type { ApartmentsBySectionYear } from "@/types";
+import type { SectionTableData } from "@/hooks/data/useAggregatesFromParams";
 
 const columnHelper = createColumnHelper<SectionMetricRow>();
 
 interface SectionMetricTableProps {
-  data: ApartmentsBySectionYear[];
+  data: SectionTableData[];
   isLoading: boolean;
   isError: boolean;
   error: unknown;
@@ -55,7 +55,7 @@ export function SectionMetricTable({
       const entry: YearBreakdownRow = {
         year: item.year,
         metricValue,
-        totalSales: item.total_sales,
+        totalSales: item.transactions,
       };
 
       const existing = map.get(sectionKey);

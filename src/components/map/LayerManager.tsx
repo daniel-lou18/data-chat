@@ -13,8 +13,6 @@ const EMPTY_FEATURE_COLLECTION: MapFeatureCollection = {
 };
 
 export type LayerManagerProps = {
-  arrs: string[];
-  sectionIds: string[];
   hoveredFeatureId?: string | null;
   selectedArrondissementId?: string | null;
 };

@@ -21,12 +21,12 @@ import type {
   YearBreakdownRow,
 } from "./MetricTableShared";
 import { MAP_METRIC_FIELD_METADATA } from "@/constants/map";
-import type { ApartmentsByInseeYear } from "@/types";
+import type { CommuneTableData } from "@/hooks/data/useAggregatesFromParams";
 
 const columnHelper = createColumnHelper<CommuneMetricRow>();
 
 interface CommuneMetricTableProps {
-  data: ApartmentsByInseeYear[];
+  data: CommuneTableData[];
   isLoading: boolean;
   isError: boolean;
   error: unknown;
@@ -54,7 +54,7 @@ export function CommuneMetricTable({
       const entry: YearBreakdownRow = {
         year: item.year,
         metricValue,
-        totalSales: item.total_sales,
+        totalSales: item.transactions,
       };
 
       const existing = map.get(item.inseeCode);

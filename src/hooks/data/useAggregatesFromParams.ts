@@ -22,13 +22,14 @@ import { useMapFilters } from "../map/useMapFilters";
  * ```
  */
 
-type CommuneTableData = {
+export type CommuneTableData = {
+  year: number;
   inseeCode: string;
   [key: string]: string | number | (number | null)[];
   transactions: number;
 };
 
-type SectionTableData = CommuneTableData & {
+export type SectionTableData = CommuneTableData & {
   section: string;
 };
 
@@ -40,24 +41,27 @@ export function useAggregatesFromParams() {
   const inseeCode = arrondissement?.split("-").at(-1);
 
   // Always call both hooks to avoid conditional hook calls
-  const arrondissementQuery = useGetAggregatesByInseeCode<CommuneTableData[]>(
-    { inseeCode, year: filterState.year },
+  const communeQuery = useGetAggregatesByInseeCode<CommuneTableData[]>(
+    { inseeCode },
     {
       select: (data) =>
         data.map((item) => ({
+          year: item.year,
           inseeCode: item.inseeCode,
           [filterState.field]: item[filterState.field],
           transactions: item.total_sales,
         })),
     }
   );
+  console.log("communeQuery", communeQuery);
   const sectionQuery = useGetAggregatesByInseeCodeAndSection<
     SectionTableData[]
   >(
-    { inseeCode, section, year: filterState.year },
+    { inseeCode, section },
     {
       select: (data) =>
         data.map((item) => ({
+          year: item.year,
           inseeCode: item.inseeCode,
           section: item.section,
           [filterState.field]: item[filterState.field],
@@ -65,7 +69,7 @@ export function useAggregatesFromParams() {
         })),
     }
   );
-
+  console.log("sectionQuery", sectionQuery);
   // Return the appropriate query based on whether we have a section
-  return filterState.level === "section" ? sectionQuery : arrondissementQuery;
+  return { communeQuery, sectionQuery };
 }

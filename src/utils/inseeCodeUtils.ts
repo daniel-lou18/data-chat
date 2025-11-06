@@ -1,4 +1,16 @@
+import type {
+  CommuneTableData,
+  SectionTableData,
+} from "@/hooks/data/useAggregatesFromParams";
 import { type GenericData } from "../components/table/tableColumns";
+
+export function extractInseeCodeArray(data: CommuneTableData[]): string[] {
+  return data.map((item) => item.inseeCode);
+}
+
+export function extractSectionCodeArray(data: SectionTableData[]): string[] {
+  return data.map((item) => item.section);
+}
 
 /**
  * Extracts INSEE codes/arrondissements from an array of data objects

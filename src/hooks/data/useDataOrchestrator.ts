@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { useChat } from "@/hooks/chat";
 import { useAggregatesFromParams } from "./useAggregatesFromParams";
+import { useMapFilters } from "../map/useMapFilters";
 
 export type DataSource = "chat" | "map" | null;
 
@@ -9,17 +10,19 @@ export type DataSource = "chat" | "map" | null;
  * Manages which data source is most recent and should be displayed
  */
 export function useDataOrchestrator() {
+  const { state: filterState } = useMapFilters();
   const {
     data: chatData,
     isProcessing: chatProcessing,
     ...chatRest
   } = useChat();
+  const { communeQuery, sectionQuery } = useAggregatesFromParams();
   const {
     data: mapData,
     isLoading: mapLoading,
     isError: isMapError,
     error: mapError,
-  } = useAggregatesFromParams();
+  } = filterState.level === "section" ? sectionQuery : communeQuery;
 
   // Track the most recent data source
   const [lastDataSource, setLastDataSource] = useState<DataSource>(null);

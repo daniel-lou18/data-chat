@@ -22,8 +22,6 @@ type MapProps = LayerManagerProps & {
 };
 
 export default function Map({
-  arrs,
-  sectionIds,
   onMapClick,
   hoveredFeatureId,
   setHoveredFeatureId,
@@ -122,8 +120,6 @@ export default function Map({
         onClick={onClick}
       >
         <LayerManager
-          arrs={arrs}
-          sectionIds={sectionIds}
           hoveredFeatureId={hoveredFeatureId}
           selectedArrondissementId={filterState.selectedInseeCode ?? null}
         />

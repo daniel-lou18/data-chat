@@ -20,7 +20,7 @@ export default function MapLegend({
     isLoading,
     error,
   } = useMapLegend({
-    inseeCode: filters.selectedInseeCode,
+    inseeCode: filters.selectedInseeCode ?? undefined,
   });
 
   if (isLoading) {
@@ -118,9 +118,9 @@ function LegendBucketRow({
         />
         <span className="font-medium text-gray-700">{bucket.label}</span>
       </div>
-      <span className="tabular-nums text-gray-500">
+      {/* <span className="tabular-nums text-gray-500">
         {typeof bucket.count === "number" ? bucket.count.toLocaleString() : "—"}
-      </span>
+      </span> */}
     </div>
   );
 }
