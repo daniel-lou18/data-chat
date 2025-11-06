@@ -13,12 +13,6 @@ import {
 } from "@/utils/dataTableUtils";
 import { createColumnsFromData } from "@/components/table/tableColumns";
 import { useTableState } from "@/hooks/table/useTableState";
-import {
-  DataTable,
-  TableHead,
-  TableBody,
-  TableFooter,
-} from "@/components/table/DataTable";
 import ParisMap from "@/components/map/Map";
 import { useMemo } from "react";
 import { extractInseeCodesAndCreateSectionIds } from "@/utils/inseeCodeUtils";
@@ -28,9 +22,14 @@ import { useDataOrchestrator } from "@/hooks/data/useDataOrchestrator";
 import ActionButtons from "./table/ActionButtons";
 import DataSource from "./table/DataSource";
 import Topbar from "./topbar";
+import { useMapFilters } from "@/hooks/map/useMapFilters";
+import { SectionMetricTable, CommuneMetricTable } from "./table";
 
 function App() {
   const tableState = useTableState();
+  const {
+    state: { field, level, selectedInseeCode },
+  } = useMapFilters();
   const {
     data,
     dataSource,
@@ -99,11 +98,19 @@ function App() {
               <ActionButtons tableState={tableState} />
             </TableHeader>
             <div className="flex-1 overflow-auto">
-              <DataTable data={data}>
+              {/* <DataTable data={data}>
                 <TableHead table={table} />
                 <TableBody table={table} />
               </DataTable>
-              <TableFooter table={table} data={data} />
+              <TableFooter table={table} data={data} /> */}
+              {level === "commune" ? (
+                <CommuneMetricTable metric={field} />
+              ) : (
+                <SectionMetricTable
+                  metric={field}
+                  params={{ inseeCode: selectedInseeCode }}
+                />
+              )}
             </div>
           </div>
         </div>

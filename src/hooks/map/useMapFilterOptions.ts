@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import {
   useGetAggregates,
-  useGetSectionsByInseeCode,
+  useGetAggregatesByInseeCodeAndSection,
 } from "@/hooks/data/useGetAggregates";
 
 export type SelectOption<Value extends string | number> = {
@@ -102,9 +102,12 @@ export function useMapInseeOptions() {
 }
 
 export function useMapSectionOptions(inseeCode: string | undefined | null) {
-  const query = useGetSectionsByInseeCode(inseeCode, {
-    enabled: Boolean(inseeCode),
-  });
+  const query = useGetAggregatesByInseeCodeAndSection(
+    { inseeCode: inseeCode ?? undefined },
+    {
+      enabled: Boolean(inseeCode),
+    }
+  );
 
   const options = useMemo(() => toSectionOptions(query.data), [query.data]);
 

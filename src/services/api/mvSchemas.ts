@@ -4,58 +4,52 @@ import { z } from "zod";
 // Shared metric schemas for MV responses
 // ----------------------------------------------------------------------------
 
-const PriceM2Deciles = z
-  .array(z.number().nullable())
-  .length(10)
-  .describe("Deciles p10..p100 of price per m²");
-
 export const AggregateMetricsMVSchema = z.object({
   // Counts and totals
-  total_sales: z.number().int().describe("Total number of transactions"),
-  total_price: z.number().describe("Sum of transaction prices"),
-  avg_price: z.number().describe("Average transaction price"),
+  total_sales: z.coerce.number().int().describe("Total number of transactions"),
+  total_price: z.coerce.number().describe("Sum of transaction prices"),
+  avg_price: z.coerce.number().describe("Average transaction price"),
 
   // Areas
-  total_area: z.number().describe("Sum of area for the group"),
-  avg_area: z.number().describe("Average area for the group"),
+  total_area: z.coerce.number().describe("Sum of area for the group"),
+  avg_area: z.coerce.number().describe("Average area for the group"),
 
   // Weighted price per m²
-  avg_price_m2: z
+  avg_price_m2: z.coerce
     .number()
     .describe("SUM(price) / NULLIF(SUM(area), 0) at group level"),
 
   // Distribution statistics
-  min_price: z.number(),
-  max_price: z.number(),
-  median_price: z.number(),
-  median_area: z.number(),
-  min_price_m2: z.number(),
-  max_price_m2: z.number(),
-  price_m2_p25: z.number(),
-  price_m2_p75: z.number(),
-  price_m2_iqr: z.number(),
-  price_m2_stddev: z.number(),
-  price_m2_deciles: PriceM2Deciles,
+  min_price: z.coerce.number(),
+  max_price: z.coerce.number(),
+  median_price: z.coerce.number(),
+  median_area: z.coerce.number(),
+  min_price_m2: z.coerce.number(),
+  max_price_m2: z.coerce.number(),
+  price_m2_p25: z.coerce.number(),
+  price_m2_p75: z.coerce.number(),
+  price_m2_iqr: z.coerce.number(),
+  price_m2_stddev: z.coerce.number(),
 });
 
 // Apartment composition
 const ApartmentComposition = z.object({
-  total_apartments: z.number().int(),
-  apartment_1_room: z.number().int(),
-  apartment_2_room: z.number().int(),
-  apartment_3_room: z.number().int(),
-  apartment_4_room: z.number().int(),
-  apartment_5_room: z.number().int(),
+  total_apartments: z.coerce.number().int(),
+  apartment_1_room: z.coerce.number().int(),
+  apartment_2_room: z.coerce.number().int(),
+  apartment_3_room: z.coerce.number().int(),
+  apartment_4_room: z.coerce.number().int(),
+  apartment_5_room: z.coerce.number().int(),
 });
 
 // House composition
 const HouseComposition = z.object({
-  total_houses: z.number().int(),
-  house_1_room: z.number().int(),
-  house_2_room: z.number().int(),
-  house_3_room: z.number().int(),
-  house_4_room: z.number().int(),
-  house_5_room: z.number().int(),
+  total_houses: z.coerce.number().int(),
+  house_1_room: z.coerce.number().int(),
+  house_2_room: z.coerce.number().int(),
+  house_3_room: z.coerce.number().int(),
+  house_4_room: z.coerce.number().int(),
+  house_5_room: z.coerce.number().int(),
 });
 
 // ----------------------------------------------------------------------------
@@ -64,15 +58,15 @@ const HouseComposition = z.object({
 
 export const ApartmentsByInseeMonthSchema = AggregateMetricsMVSchema.extend({
   inseeCode: z.string(),
-  year: z.number().int(),
-  month: z.number().int().min(1).max(12),
+  year: z.coerce.number().int(),
+  month: z.coerce.number().int().min(1).max(12),
   ...ApartmentComposition.shape,
 });
 
 export const HousesByInseeMonthSchema = AggregateMetricsMVSchema.extend({
   inseeCode: z.string(),
-  year: z.number().int(),
-  month: z.number().int().min(1).max(12),
+  year: z.coerce.number().int(),
+  month: z.coerce.number().int().min(1).max(12),
   ...HouseComposition.shape,
 });
 
@@ -82,13 +76,13 @@ export const HousesByInseeMonthSchema = AggregateMetricsMVSchema.extend({
 
 export const ApartmentsByInseeYearSchema = AggregateMetricsMVSchema.extend({
   inseeCode: z.string(),
-  year: z.number().int(),
+  year: z.coerce.number().int(),
   ...ApartmentComposition.shape,
 });
 
 export const HousesByInseeYearSchema = AggregateMetricsMVSchema.extend({
   inseeCode: z.string(),
-  year: z.number().int(),
+  year: z.coerce.number().int(),
   ...HouseComposition.shape,
 });
 
@@ -98,15 +92,15 @@ export const HousesByInseeYearSchema = AggregateMetricsMVSchema.extend({
 
 export const ApartmentsByInseeWeekSchema = AggregateMetricsMVSchema.extend({
   inseeCode: z.string(),
-  iso_year: z.number().int(),
-  iso_week: z.number().int().min(1).max(53),
+  iso_year: z.coerce.number().int(),
+  iso_week: z.coerce.number().int().min(1).max(53),
   ...ApartmentComposition.shape,
 });
 
 export const HousesByInseeWeekSchema = AggregateMetricsMVSchema.extend({
   inseeCode: z.string(),
-  iso_year: z.number().int(),
-  iso_week: z.number().int().min(1).max(53),
+  iso_year: z.coerce.number().int(),
+  iso_week: z.coerce.number().int().min(1).max(53),
   ...HouseComposition.shape,
 });
 
@@ -117,16 +111,16 @@ export const HousesByInseeWeekSchema = AggregateMetricsMVSchema.extend({
 export const ApartmentsBySectionMonthSchema = AggregateMetricsMVSchema.extend({
   inseeCode: z.string(),
   section: z.string(),
-  year: z.number().int(),
-  month: z.number().int().min(1).max(12),
+  year: z.coerce.number().int(),
+  month: z.coerce.number().int().min(1).max(12),
   ...ApartmentComposition.shape,
 });
 
 export const HousesBySectionMonthSchema = AggregateMetricsMVSchema.extend({
   inseeCode: z.string(),
   section: z.string(),
-  year: z.number().int(),
-  month: z.number().int().min(1).max(12),
+  year: z.coerce.number().int(),
+  month: z.coerce.number().int().min(1).max(12),
   ...HouseComposition.shape,
 });
 
@@ -137,14 +131,14 @@ export const HousesBySectionMonthSchema = AggregateMetricsMVSchema.extend({
 export const ApartmentsBySectionYearSchema = AggregateMetricsMVSchema.extend({
   inseeCode: z.string(),
   section: z.string(),
-  year: z.number().int(),
+  year: z.coerce.number().int(),
   ...ApartmentComposition.shape,
 });
 
 export const HousesBySectionYearSchema = AggregateMetricsMVSchema.extend({
   inseeCode: z.string(),
   section: z.string(),
-  year: z.number().int(),
+  year: z.coerce.number().int(),
   ...HouseComposition.shape,
 });
 

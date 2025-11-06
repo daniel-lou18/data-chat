@@ -70,32 +70,6 @@ export function useGetAggregatesByInseeCode<TData = ApartmentsByInseeYear[]>(
 }
 
 /**
- * Hook to get all sections for a specific INSEE code (commune)
- *
- * @param inseeCode - The INSEE code of the commune
- * @param options - Optional query configuration
- */
-export function useGetSectionsByInseeCode<TData = ApartmentsBySectionYear[]>(
-  params: Partial<SectionYearParams> = {},
-  options?: QueryOptions<ApartmentsBySectionYear[], TData>
-) {
-  return useQuery<ApartmentsBySectionYear[], Error, TData>({
-    queryKey: communeQueryKeys.list(
-      `sections-insee-${params.year}-${params.inseeCode}`
-    ),
-    queryFn: async (): Promise<ApartmentsBySectionYear[]> => {
-      const result = await analyticsService.getApartmentsBySectionYear({
-        ...params,
-      });
-      return result;
-    },
-    enabled: options?.enabled !== false,
-    ...defaultQueryOptions,
-    ...options,
-  });
-}
-
-/**
  * Hook to get commune data by INSEE code and section
  *
  * @param inseeCode - The INSEE code of the commune

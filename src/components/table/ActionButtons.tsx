@@ -16,7 +16,7 @@ export default function ActionButtons({ tableState }: ActionButtonsProps) {
             tableState.setExpanded({});
           } else {
             // Apply grouping
-            tableState.setGrouping(["province"]);
+            tableState.setGrouping(["inseeCode"]);
             tableState.setExpanded(true);
           }
         }}
@@ -28,7 +28,7 @@ export default function ActionButtons({ tableState }: ActionButtonsProps) {
         title={
           tableState.grouping.length > 0
             ? "Clear grouping"
-            : "Group by province"
+            : "Group by insee code"
         }
       >
         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
