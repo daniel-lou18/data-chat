@@ -20,8 +20,7 @@ import type {
   YearBreakdownRow,
 } from "./MetricTableShared";
 import { MAP_METRIC_FIELD_METADATA } from "@/constants/map";
-import { useGetAggregatesByInseeCode } from "@/hooks/data/useGetAggregates";
-import type { InseeYearParams } from "@/types";
+import type { ApartmentsByInseeYear } from "@/types";
 
 interface CommuneMetricRow extends MetricRowBase {
   inseeCode: string;
@@ -30,36 +29,31 @@ interface CommuneMetricRow extends MetricRowBase {
 const columnHelper = createColumnHelper<CommuneMetricRow>();
 
 interface CommuneMetricTableProps {
+  data: ApartmentsByInseeYear[];
+  isLoading: boolean;
+  isError: boolean;
+  error: unknown;
   metric: NumericMapMetricField;
-  params?: Partial<InseeYearParams>;
   selectedYear?: number;
-  enabled?: boolean;
 }
 
 export function CommuneMetricTable({
+  data = [],
+  isLoading,
+  isError,
+  error,
   metric,
-  params,
   selectedYear,
-  enabled = true,
 }: CommuneMetricTableProps) {
-  const { year: _yearParam, ...queryParams } = params ?? {};
-
-  const {
-    data: aggregates = [],
-    isLoading,
-    isError,
-    error,
-  } = useGetAggregatesByInseeCode(queryParams, { enabled });
-
   const breakdownByCommune = useMemo(() => {
     const map = new Map<string, YearBreakdownRow[]>();
 
-    aggregates.forEach((item) => {
+    data.forEach((item) => {
       const metricValue = item[metric] ?? null;
       const entry: YearBreakdownRow = {
         year: item.year,
         metricValue,
-        totalSales: item.total_sales ?? null,
+        totalSales: item.total_sales,
       };
 
       const existing = map.get(item.inseeCode);
@@ -75,7 +69,7 @@ export function CommuneMetricTable({
     });
 
     return map;
-  }, [aggregates, metric]);
+  }, [data, metric]);
 
   const tableData = useMemo<CommuneMetricRow[]>(() => {
     return Array.from(breakdownByCommune.entries())

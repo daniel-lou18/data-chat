@@ -14,11 +14,27 @@ export type QueryOptions<TQueryFnData, TData = TQueryFnData> = Omit<
 >;
 
 // Query keys for better cache management and invalidation
+const removeUndefinedEntries = <T extends object>(obj: T): Partial<T> =>
+  Object.fromEntries(
+    Object.entries(obj as Record<string, unknown>).filter(
+      ([, value]) => value !== undefined
+    )
+  ) as Partial<T>;
+
 export const communeQueryKeys = {
   all: ["communes"] as const,
   lists: () => [...communeQueryKeys.all, "list"] as const,
-  list: (filters: string) =>
-    [...communeQueryKeys.lists(), { filters }] as const,
+  list: (filters: Partial<InseeYearParams> = {}) =>
+    [
+      ...communeQueryKeys.lists(),
+      { filters: removeUndefinedEntries(filters) },
+    ] as const,
+  sectionLists: () => [...communeQueryKeys.all, "sections"] as const,
+  sectionList: (filters: Partial<SectionYearParams> = {}) =>
+    [
+      ...communeQueryKeys.sectionLists(),
+      { filters: removeUndefinedEntries(filters) },
+    ] as const,
 } as const;
 
 // Query options for reusability and consistency
@@ -55,12 +71,12 @@ export function useGetAggregatesByInseeCode<TData = ApartmentsByInseeYear[]>(
   params: Partial<InseeYearParams> = {},
   options?: QueryOptions<ApartmentsByInseeYear[], TData>
 ) {
+  const filters = removeUndefinedEntries(params);
+
   return useQuery<ApartmentsByInseeYear[], Error, TData>({
-    queryKey: communeQueryKeys.list(`insee-${params.year}-${params.inseeCode}`),
+    queryKey: communeQueryKeys.list(filters),
     queryFn: async () => {
-      const result = await analyticsService.getApartmentsByInseeYear({
-        ...params,
-      });
+      const result = await analyticsService.getApartmentsByInseeYear(filters);
       return result;
     },
     enabled: options?.enabled !== false,
@@ -82,14 +98,12 @@ export function useGetAggregatesByInseeCodeAndSection<
   params: Partial<SectionYearParams> = {},
   options?: QueryOptions<ApartmentsBySectionYear[], TData>
 ) {
+  const filters = removeUndefinedEntries(params);
+
   return useQuery<ApartmentsBySectionYear[], Error, TData>({
-    queryKey: communeQueryKeys.list(
-      `insee-${params.year}-${params.inseeCode}-section-${params.section}`
-    ),
+    queryKey: communeQueryKeys.sectionList(filters),
     queryFn: async (): Promise<ApartmentsBySectionYear[]> => {
-      const result = await analyticsService.getApartmentsBySectionYear({
-        ...params,
-      });
+      const result = await analyticsService.getApartmentsBySectionYear(filters);
       return result;
     },
     enabled: options?.enabled !== false,

@@ -19,9 +19,8 @@ import type {
   TableStatus,
   YearBreakdownRow,
 } from "./MetricTableShared";
-import { useGetAggregatesByInseeCodeAndSection } from "@/hooks/data/useGetAggregates";
 import { MAP_METRIC_FIELD_METADATA } from "@/constants/map";
-import type { SectionYearParams } from "@/types";
+import type { ApartmentsBySectionYear } from "@/types";
 
 interface SectionMetricRow extends MetricRowBase {
   section: string;
@@ -30,35 +29,32 @@ interface SectionMetricRow extends MetricRowBase {
 const columnHelper = createColumnHelper<SectionMetricRow>();
 
 interface SectionMetricTableProps {
+  data: ApartmentsBySectionYear[];
+  isLoading: boolean;
+  isError: boolean;
+  error: unknown;
   metric: NumericMapMetricField;
-  params?: Partial<SectionYearParams>;
   selectedYear?: number;
-  enabled?: boolean;
 }
 
 export function SectionMetricTable({
+  data = [],
+  isLoading,
+  isError,
+  error,
   metric,
-  params,
   selectedYear,
-  enabled = true,
 }: SectionMetricTableProps) {
-  const {
-    data: aggregates = [],
-    isLoading,
-    isError,
-    error,
-  } = useGetAggregatesByInseeCodeAndSection(params, { enabled });
-
   const breakdownBySection = useMemo(() => {
     const map = new Map<string, YearBreakdownRow[]>();
 
-    aggregates.forEach((item) => {
+    data.forEach((item) => {
       const sectionKey = item.section ?? "";
       const metricValue = item[metric] ?? null;
       const entry: YearBreakdownRow = {
         year: item.year,
         metricValue,
-        totalSales: item.total_sales ?? null,
+        totalSales: item.total_sales,
       };
 
       const existing = map.get(sectionKey);
@@ -74,7 +70,7 @@ export function SectionMetricTable({
     });
 
     return map;
-  }, [aggregates, metric]);
+  }, [data, metric]);
 
   const tableData = useMemo<SectionMetricRow[]>(() => {
     return Array.from(breakdownBySection.entries())

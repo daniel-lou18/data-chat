@@ -24,6 +24,10 @@ import DataSource from "./table/DataSource";
 import Topbar from "./topbar";
 import { useMapFilters } from "@/hooks/map/useMapFilters";
 import { SectionMetricTable, CommuneMetricTable } from "./table";
+import {
+  useGetAggregatesByInseeCode,
+  useGetAggregatesByInseeCodeAndSection,
+} from "@/hooks/data/useGetAggregates";
 
 function App() {
   const tableState = useTableState();
@@ -39,6 +43,24 @@ function App() {
     handleDataSourceToggle,
     handleMapClick,
   } = useDataOrchestrator();
+
+  const {
+    data: communeData,
+    isLoading: communeLoading,
+    isError: isCommuneError,
+    error: communeError,
+  } = useGetAggregatesByInseeCode({
+    inseeCode: selectedInseeCode,
+  });
+
+  const {
+    data: sectionData,
+    isLoading: sectionLoading,
+    isError: isSectionError,
+    error: sectionError,
+  } = useGetAggregatesByInseeCodeAndSection({
+    inseeCode: selectedInseeCode,
+  });
 
   const { inseeCodes, sectionIds } = useMemo(() => {
     return extractInseeCodesAndCreateSectionIds(data);
@@ -104,11 +126,20 @@ function App() {
               </DataTable>
               <TableFooter table={table} data={data} /> */}
               {level === "commune" ? (
-                <CommuneMetricTable metric={field} />
+                <CommuneMetricTable
+                  metric={field}
+                  data={communeData ?? []}
+                  isLoading={communeLoading}
+                  isError={isCommuneError}
+                  error={communeError}
+                />
               ) : (
                 <SectionMetricTable
                   metric={field}
-                  params={{ inseeCode: selectedInseeCode }}
+                  data={sectionData ?? []}
+                  isLoading={sectionLoading}
+                  isError={isSectionError}
+                  error={sectionError}
                 />
               )}
             </div>
