@@ -14,7 +14,7 @@ export default function MapLegend({
   selectedArrondissementId,
 }: MapLegendProps) {
   const { state: filters } = useMapFilters();
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const {
     data: legend,
     isLoading,

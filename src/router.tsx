@@ -3,7 +3,7 @@ import Main from "./pages/Main";
 
 export const router = createBrowserRouter([
   {
-    path: "/:arrondissement?/:section?",
+    path: "/:commune?/:section?",
     element: <Main />,
     errorElement: <div>ErrorPage</div>,
   },

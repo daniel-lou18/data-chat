@@ -10,7 +10,7 @@ import { useMapFilters } from "./useMapFilters";
  * Custom hook for MapLibre dynamic styling based on backend legend data
  *
  */
-export function useMapLibreFeatures() {
+export function useStyleMap() {
   const { state: filterState } = useMapFilters();
 
   // Fetch legends for commune and section levels
@@ -21,7 +21,7 @@ export function useMapLibreFeatures() {
   const sectionLegend = useMapLegend({
     level: "section",
     year: filterState.year,
-    inseeCode: filterState.selectedInseeCode,
+    inseeCode: filterState.selectedInseeCode ?? undefined,
   });
 
   const arrondissementFillColor = useMemo(

@@ -34,11 +34,10 @@ export type SectionTableData = CommuneTableData & {
 };
 
 export function useAggregatesFromParams() {
-  const { arrondissement, section } = useParams();
+  const { commune, section } = useParams();
   const { state: filterState } = useMapFilters();
 
-  // Extract INSEE code from arrondissement parameter
-  const inseeCode = arrondissement?.split("-").at(-1);
+  const inseeCode = commune?.split("-").at(-1);
 
   // Always call both hooks to avoid conditional hook calls
   const communeQuery = useGetAggregatesByInseeCode<CommuneTableData[]>(
@@ -53,7 +52,7 @@ export function useAggregatesFromParams() {
         })),
     }
   );
-  console.log("communeQuery", communeQuery);
+
   const sectionQuery = useGetAggregatesByInseeCodeAndSection<
     SectionTableData[]
   >(
@@ -69,7 +68,6 @@ export function useAggregatesFromParams() {
         })),
     }
   );
-  console.log("sectionQuery", sectionQuery);
-  // Return the appropriate query based on whether we have a section
+
   return { communeQuery, sectionQuery };
 }

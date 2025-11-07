@@ -1,9 +1,12 @@
 import type { CommuneFeature, SectionFeature } from "@/services/api/mapService";
 import { createSlug } from "@/utils/urlUtils";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 export function useMapNavigate() {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const parts = pathname.split("/").filter(Boolean);
+  const commune = parts[0];
 
   const navigateToArrondissement = (feature: CommuneFeature) => {
     navigate(
@@ -12,9 +15,7 @@ export function useMapNavigate() {
   };
 
   const navigateToSection = (feature: SectionFeature) => {
-    navigate(
-      `/commune-${createSlug(feature.properties.inseeCode)}/${feature.properties.section}`
-    );
+    navigate(`../${commune}/${feature.properties.section}`);
   };
 
   return { navigateToArrondissement, navigateToSection };

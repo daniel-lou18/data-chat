@@ -6,8 +6,8 @@ import {
   useState,
   type ReactNode,
 } from "react";
-
 import type { MapFeatureLevel, MapMetricField, MapPropertyType } from "@/types";
+import { useSyncUrlWithFilters } from "./useMapFiltersNavigate";
 
 export interface MapFilterState {
   level: MapFeatureLevel;
@@ -152,6 +152,8 @@ export function MapFilterProvider({
       return next;
     });
   }, []);
+
+  useSyncUrlWithFilters(setLevel);
 
   const value = useMemo<MapFilterContextValue>(
     () => ({

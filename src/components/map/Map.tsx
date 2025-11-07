@@ -9,12 +9,10 @@ import LayerManager, { type LayerManagerProps } from "./LayerManager";
 import FeaturePopup from "./FeaturePopup";
 import LoadingOverlay from "./LoadingOverlay";
 import ErrorOverlay from "./ErrorOverlay";
-import { useMapLibreFeatures } from "@/hooks/map/useMapLibreFeatures";
 import MapLegend from "./MapLegend";
 import { DEFAULT_MAP_VIEW_STATE, type PopupInfo } from "./config";
 import { getCenterFromCoordinates } from "@/utils/mapUtils";
-import { useMapNavigate } from "@/hooks/map/useMapNavigate";
-import { useMapFilters } from "@/hooks/map/useMapFilters";
+import { useMapNavigate, useMapFilters, useStyleMap } from "@/hooks/map";
 
 type MapProps = LayerManagerProps & {
   onMapClick?: () => void;
@@ -31,7 +29,7 @@ export default function Map({
   const [popupInfo, setPopupInfo] = useState<PopupInfo | null>(null);
 
   const { state: filterState, setSelectedInseeCode } = useMapFilters();
-  const { isLoading: isDataLoading, error: dataError } = useMapLibreFeatures();
+  const { isLoading: isDataLoading, error: dataError } = useStyleMap();
 
   const onMouseMove = useCallback((event: any) => {
     const { features, lngLat } = event;
@@ -122,6 +120,7 @@ export default function Map({
         <LayerManager
           hoveredFeatureId={hoveredFeatureId}
           selectedArrondissementId={filterState.selectedInseeCode ?? null}
+          level={filterState.level}
         />
 
         {popupInfo && (

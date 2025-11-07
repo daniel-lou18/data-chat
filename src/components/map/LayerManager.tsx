@@ -1,11 +1,10 @@
 import { memo } from "react";
 import { Source, Layer } from "react-map-gl/maplibre";
 
-import { useMapFeatureCollection } from "@/hooks/map/useMapData";
 import type { MapFeatureCollection } from "@/services/api";
 import { arrondissementLayerStyles, sectionLayerStyles } from "./config";
-import { useMapLibreZoom } from "@/hooks/map/useMapLibreZoom";
-import { useMapLibreFeatures } from "@/hooks/map/useMapLibreFeatures";
+import { useStyleMap, useMapFeatureCollection } from "@/hooks/map";
+import type { MapFeatureLevel } from "@/types";
 
 const EMPTY_FEATURE_COLLECTION: MapFeatureCollection = {
   type: "FeatureCollection",
@@ -13,11 +12,13 @@ const EMPTY_FEATURE_COLLECTION: MapFeatureCollection = {
 };
 
 export type LayerManagerProps = {
+  level: MapFeatureLevel;
   hoveredFeatureId?: string | null;
   selectedArrondissementId?: string | null;
 };
 
 const LayerManager = memo(function ({
+  level,
   hoveredFeatureId,
   selectedArrondissementId,
 }: LayerManagerProps) {
@@ -33,16 +34,12 @@ const LayerManager = memo(function ({
   const sectionsGeoData = (sectionFeatures ??
     EMPTY_FEATURE_COLLECTION) as MapFeatureCollection;
 
-  // Use zoom hook to get current zoom level
-  const { zoomLevel } = useMapLibreZoom();
-
-  // Use dynamic styling hook
   const {
     arrondissementFillColor,
     arrondissementFillOpacity,
     sectionFillColor,
     sectionFillOpacity,
-  } = useMapLibreFeatures();
+  } = useStyleMap();
 
   return (
     <>
@@ -57,21 +54,15 @@ const LayerManager = memo(function ({
             "fill-opacity": arrondissementFillOpacity,
           }}
           filter={
-            selectedArrondissementId
+            selectedArrondissementId && level === "section"
               ? ["!=", ["get", "id"], selectedArrondissementId]
               : ["!=", ["get", "id"], ""]
           }
-          layout={{
-            visibility: "visible",
-          }}
         />
         <Layer
           id="arrondissements-stroke"
           type="line"
           paint={arrondissementLayerStyles.stroke}
-          layout={{
-            visibility: "visible",
-          }}
         />
         <Layer
           id="arrondissements-stroke-hover"
@@ -86,9 +77,6 @@ const LayerManager = memo(function ({
               ? ["==", ["get", "id"], hoveredFeatureId]
               : ["==", ["get", "id"], ""]
           }
-          layout={{
-            visibility: "visible",
-          }}
         />
         <Layer
           id="arrondissements-stroke-selected"
@@ -103,9 +91,6 @@ const LayerManager = memo(function ({
               ? ["==", ["get", "id"], selectedArrondissementId]
               : ["==", ["get", "id"], ""]
           }
-          layout={{
-            visibility: selectedArrondissementId ? "visible" : "none",
-          }}
         />
       </Source>
 
@@ -120,28 +105,20 @@ const LayerManager = memo(function ({
             "fill-opacity": sectionFillOpacity,
           }}
           filter={
-            selectedArrondissementId
+            selectedArrondissementId && level === "section"
               ? ["==", ["get", "inseeCode"], selectedArrondissementId]
               : ["==", ["get", "inseeCode"], ""]
           }
-          layout={{
-            visibility:
-              selectedArrondissementId && zoomLevel >= 12 ? "visible" : "none",
-          }}
         />
         <Layer
           id="sections-stroke"
           type="line"
           paint={sectionLayerStyles.stroke}
           filter={
-            selectedArrondissementId
+            selectedArrondissementId && level === "section"
               ? ["==", ["get", "inseeCode"], selectedArrondissementId]
               : ["==", ["get", "inseeCode"], ""]
           }
-          layout={{
-            visibility:
-              selectedArrondissementId && zoomLevel >= 12 ? "visible" : "none",
-          }}
         />
         <Layer
           id="sections-stroke-hover"
@@ -152,14 +129,10 @@ const LayerManager = memo(function ({
             "line-opacity": 1,
           }}
           filter={
-            hoveredFeatureId
+            hoveredFeatureId && level === "section"
               ? ["==", ["get", "id"], hoveredFeatureId]
               : ["==", ["get", "id"], ""]
           }
-          layout={{
-            visibility:
-              selectedArrondissementId && zoomLevel >= 12 ? "visible" : "none",
-          }}
         />
       </Source>
     </>

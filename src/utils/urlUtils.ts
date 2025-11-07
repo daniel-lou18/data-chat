@@ -7,3 +7,17 @@ export const createSlug = (text: string): string => {
     .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
     .replace(/^-|-$/g, ""); // Remove leading/trailing hyphens
 };
+
+export const inseeCodeFromCommuneParam = (
+  urlParam: string | null | undefined
+): string => {
+  if (!urlParam) return "";
+  return urlParam.split("-").at(-1) ?? "";
+};
+
+export const sectionFromSectionParam = (
+  urlParam: string | null | undefined
+): string => {
+  if (!urlParam) return "";
+  return urlParam.split("-").at(-1) ?? "";
+};
