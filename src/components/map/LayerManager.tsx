@@ -4,7 +4,7 @@ import { Source, Layer } from "react-map-gl/maplibre";
 import type { MapFeatureCollection } from "@/services/api";
 import { arrondissementLayerStyles, sectionLayerStyles } from "./config";
 import { useStyleMap, useMapFeatureCollection } from "@/hooks/map";
-import type { MapFeatureLevel } from "@/types";
+import type { FeatureLevel } from "@/types";
 
 const EMPTY_FEATURE_COLLECTION: MapFeatureCollection = {
   type: "FeatureCollection",
@@ -12,7 +12,7 @@ const EMPTY_FEATURE_COLLECTION: MapFeatureCollection = {
 };
 
 export type LayerManagerProps = {
-  level: MapFeatureLevel;
+  level: FeatureLevel;
   hoveredFeatureId?: string | null;
   selectedArrondissementId?: string | null;
 };

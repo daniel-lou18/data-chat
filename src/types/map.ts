@@ -1,53 +1,72 @@
-import { z } from "zod";
-import * as mvSchemas from "@/services/api/mvSchemas";
+import type { MetricField } from "@/types";
+import type { FeatureLevel, PropertyType } from "@/constants";
+import type { Feature, FeatureCollection, MultiPolygon } from "geojson";
 
-export type MapFeatureLevel = "commune" | "section";
-export type MapPropertyType = "house" | "apartment";
+export type BaseFeatureProperties = {
+  metricName: MetricField;
+  metricValue: number | null;
+  [key: string]: string | number | null | undefined;
+};
 
-export type AggregateMetricsMV = z.infer<
-  typeof mvSchemas.AggregateMetricsMVSchema
->;
-export type MapMetricField = keyof AggregateMetricsMV;
+export interface CommuneFeatureProperties extends BaseFeatureProperties {
+  id: string;
+  name: string;
+}
 
-export type ApartmentsByInseeMonth = z.infer<
-  typeof mvSchemas.ApartmentsByInseeMonthSchema
->;
-export type HousesByInseeMonth = z.infer<
-  typeof mvSchemas.HousesByInseeMonthSchema
->;
-export type ApartmentsByInseeYear = z.infer<
-  typeof mvSchemas.ApartmentsByInseeYearSchema
->;
-export type HousesByInseeYear = z.infer<
-  typeof mvSchemas.HousesByInseeYearSchema
->;
-export type ApartmentsByInseeWeek = z.infer<
-  typeof mvSchemas.ApartmentsByInseeWeekSchema
->;
-export type HousesByInseeWeek = z.infer<
-  typeof mvSchemas.HousesByInseeWeekSchema
->;
-export type ApartmentsBySectionYear = z.infer<
-  typeof mvSchemas.ApartmentsBySectionYearSchema
->;
-export type HousesBySectionYear = z.infer<
-  typeof mvSchemas.HousesBySectionYearSchema
->;
-export type ApartmentsBySectionMonth = z.infer<
-  typeof mvSchemas.ApartmentsBySectionMonthSchema
->;
-export type HousesBySectionMonth = z.infer<
-  typeof mvSchemas.HousesBySectionMonthSchema
+export interface SectionFeatureProperties extends BaseFeatureProperties {
+  id: string;
+  inseeCode: string;
+  section: string;
+  prefix: string;
+  code: string;
+}
+
+export type MapFeatureProperties =
+  | CommuneFeatureProperties
+  | SectionFeatureProperties;
+
+export type MapFeature = Feature<MultiPolygon, MapFeatureProperties>;
+export type CommuneFeature = Feature<MultiPolygon, CommuneFeatureProperties>;
+export type SectionFeature = Feature<MultiPolygon, SectionFeatureProperties>;
+
+export type MapFeatureCollection = FeatureCollection<
+  MultiPolygon,
+  MapFeatureProperties
 >;
 
-export type InseeMonthParams = z.infer<typeof mvSchemas.InseeMonthParamsSchema>;
-export type InseeYearParams = z.infer<typeof mvSchemas.InseeYearParamsSchema>;
-export type InseeWeekParams = z.infer<typeof mvSchemas.InseeWeekParamsSchema>;
-export type SectionMonthParams = z.infer<
-  typeof mvSchemas.SectionMonthParamsSchema
->;
-export type SectionYearParams = z.infer<
-  typeof mvSchemas.SectionYearParamsSchema
->;
-export type SortBy = z.infer<typeof mvSchemas.SortBySchema>;
-export type SortOrder = z.infer<typeof mvSchemas.SortOrderSchema>;
+export interface MapLegendBucket {
+  min: number | null;
+  max: number | null;
+  label: string;
+  count: number;
+}
+
+export interface MapLegendStats {
+  min: number | null;
+  max: number | null;
+  median: number | null;
+  count: number;
+}
+
+export interface MapLegendResponse {
+  field: MetricField;
+  method: "quantile";
+  buckets: MapLegendBucket[];
+  breaks: number[];
+  stats: MapLegendStats;
+}
+
+export interface MapFeatureParams {
+  level?: FeatureLevel;
+  propertyType?: PropertyType;
+  field?: MetricField;
+  year?: number;
+  month?: number;
+  bbox?: [number, number, number, number];
+  limit?: number;
+  offset?: number;
+}
+
+export interface MapLegendParams extends MapFeatureParams {
+  inseeCode?: string;
+}

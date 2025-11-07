@@ -6,13 +6,13 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { MapFeatureLevel, MapMetricField, MapPropertyType } from "@/types";
+import type { FeatureLevel, MetricField, PropertyType } from "@/types";
 import { useSyncUrlWithFilters } from "./useMapFiltersNavigate";
 
 export interface MapFilterState {
-  level: MapFeatureLevel;
-  propertyType: MapPropertyType;
-  field: MapMetricField;
+  level: FeatureLevel;
+  propertyType: PropertyType;
+  field: MetricField;
   year: number;
   selectedInseeCode: string | null;
   selectedSection: string | null;
@@ -26,9 +26,9 @@ export interface MapFilterContextValue {
   state: MapFilterState;
   setFilters: (updates: Partial<MapFilterState>) => void;
   resetFilters: (nextState?: Partial<MapFilterState>) => void;
-  setLevel: (level: MapFeatureLevel) => void;
-  setField: (field: MapMetricField) => void;
-  setPropertyType: (propertyType: MapPropertyType) => void;
+  setLevel: (level: FeatureLevel) => void;
+  setField: (field: MetricField) => void;
+  setPropertyType: (propertyType: PropertyType) => void;
   setYear: (year: number) => void;
   setMonth: (month?: number) => void;
   setBoundingBox: (bbox?: [number, number, number, number]) => void;
@@ -78,21 +78,21 @@ export function MapFilterProvider({
   }, []);
 
   const setLevel = useCallback(
-    (level: MapFeatureLevel) => {
+    (level: FeatureLevel) => {
       setFilters({ level });
     },
     [setFilters]
   );
 
   const setField = useCallback(
-    (field: MapMetricField) => {
+    (field: MetricField) => {
       setFilters({ field });
     },
     [setFilters]
   );
 
   const setPropertyType = useCallback(
-    (propertyType: MapPropertyType) => {
+    (propertyType: PropertyType) => {
       setFilters({ propertyType });
     },
     [setFilters]

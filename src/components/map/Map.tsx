@@ -14,7 +14,7 @@ import { DEFAULT_MAP_VIEW_STATE, type PopupInfo } from "./config";
 import { getCenterFromCoordinates } from "@/utils/mapUtils";
 import { useMapNavigate, useMapFilters, useStyleMap } from "@/hooks/map";
 
-type MapProps = LayerManagerProps & {
+type MapProps = Omit<LayerManagerProps, "level"> & {
   onMapClick?: () => void;
   setHoveredFeatureId: Dispatch<SetStateAction<string | null>>;
 };

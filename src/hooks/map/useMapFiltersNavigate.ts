@@ -4,11 +4,9 @@ import {
   inseeCodeFromCommuneParam,
   sectionFromSectionParam,
 } from "@/utils/urlUtils";
-import type { MapFeatureLevel } from "@/types";
+import type { FeatureLevel } from "@/types";
 
-export function useSyncUrlWithFilters(
-  setLevel: (level: MapFeatureLevel) => void
-) {
+export function useSyncUrlWithFilters(setLevel: (level: FeatureLevel) => void) {
   const { commune, section } = useParams();
   const inseeCode = inseeCodeFromCommuneParam(commune);
   const sectionCode = sectionFromSectionParam(section);

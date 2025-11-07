@@ -8,8 +8,8 @@ import {
 } from "react";
 import { flexRender, type Row, type Table } from "@tanstack/react-table";
 
-import { MAP_METRIC_FIELD_METADATA } from "@/constants/map";
-import type { AggregateMetricsMV, MapMetricField } from "@/types";
+import { METRIC_FIELD_METADATA } from "@/constants/catalog";
+import type { AggregateMetricsMV, MetricField } from "@/types";
 
 export interface YearBreakdownRow {
   year: number;
@@ -33,15 +33,15 @@ export interface SectionMetricRow extends MetricRowBase {
 
 export type MetricTableRow = CommuneMetricRow | SectionMetricRow;
 
-export type NumericMapMetricField = {
-  [K in MapMetricField]: AggregateMetricsMV[K] extends number ? K : never;
-}[MapMetricField];
+export type NumericMetricField = {
+  [K in MetricField]: AggregateMetricsMV[K] extends number ? K : never;
+}[MetricField];
 
 export type TableStatus = "loading" | "error" | "empty" | "ready";
 
 export type MetricTableContextValue<TRow extends MetricTableRow> = {
   table: Table<TRow> | null;
-  metric: NumericMapMetricField;
+  metric: NumericMetricField;
   metricLabel: string;
   hoveredRowId: string | null;
   setHoveredRowId: Dispatch<SetStateAction<string | null>>;
@@ -297,7 +297,7 @@ export function MetricTableExpandedRow<TRow extends MetricTableRow>({
 }
 
 export function getFractionDigits(
-  metric: MapMetricField
+  metric: MetricField
 ): Pick<
   Intl.NumberFormatOptions,
   "maximumFractionDigits" | "minimumFractionDigits"
@@ -317,13 +317,13 @@ export function getFractionDigits(
 
 export function formatMetricValue(
   value: number | null,
-  metric: MapMetricField
+  metric: MetricField
 ): string {
   if (value === null || Number.isNaN(value)) {
     return "—";
   }
 
-  const metadataEntry = MAP_METRIC_FIELD_METADATA[metric] as {
+  const metadataEntry = METRIC_FIELD_METADATA[metric] as {
     label: string;
     unit?: string;
   };

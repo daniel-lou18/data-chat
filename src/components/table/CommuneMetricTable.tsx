@@ -16,12 +16,11 @@ import {
 } from "./MetricTableShared";
 import type {
   CommuneMetricRow,
-  NumericMapMetricField,
+  NumericMetricField,
   TableStatus,
   YearBreakdownRow,
 } from "./MetricTableShared";
-import { MAP_METRIC_FIELD_METADATA } from "@/constants/map";
-import type { CommuneTableData } from "@/hooks/data/useAggregatesFromParams";
+import { METRIC_FIELD_METADATA, type CommuneTableData } from "@/constants";
 
 const columnHelper = createColumnHelper<CommuneMetricRow>();
 
@@ -30,7 +29,7 @@ interface CommuneMetricTableProps {
   isLoading: boolean;
   isError: boolean;
   error: unknown;
-  metric: NumericMapMetricField;
+  metric: NumericMetricField;
   selectedYear?: number;
   hoveredRowId: string | null;
   setHoveredRowId: Dispatch<SetStateAction<string | null>>;
@@ -95,7 +94,7 @@ export function CommuneMetricTable({
       });
   }, [breakdownByCommune, selectedYear]);
 
-  const metricMetadata = MAP_METRIC_FIELD_METADATA[metric];
+  const metricMetadata = METRIC_FIELD_METADATA[metric];
   const metricLabel = metricMetadata?.label ?? metric;
 
   const columns = useMemo(

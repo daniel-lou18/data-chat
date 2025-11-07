@@ -4,6 +4,7 @@ import {
   useGetAggregatesByInseeCodeAndSection,
 } from "./useGetAggregates";
 import { useMapFilters } from "../map/useMapFilters";
+import type { CommuneTableData, SectionTableData } from "@/constants";
 
 /**
  * Custom hook that combines URL parameters with data fetching
@@ -21,17 +22,6 @@ import { useMapFilters } from "../map/useMapFilters";
  * // - /paris-1er-arrondissement-75101/section-A -> fetches section data
  * ```
  */
-
-export type CommuneTableData = {
-  year: number;
-  inseeCode: string;
-  [key: string]: string | number | (number | null)[];
-  transactions: number;
-};
-
-export type SectionTableData = CommuneTableData & {
-  section: string;
-};
 
 export function useAggregatesFromParams() {
   const { commune, section } = useParams();
