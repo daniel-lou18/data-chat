@@ -8,12 +8,9 @@ import {
 } from "@tanstack/react-table";
 
 import {
-  formatCount,
-  formatMetricValue,
   MetricTableBody,
   MetricTableContainer,
   MetricTableHeader,
-  PercentChangeCell,
 } from "./MetricTableShared";
 import type {
   MetricRowBase,
@@ -23,6 +20,13 @@ import type {
 } from "./MetricTableShared";
 import { METRIC_CATALOG, type MetricPercentChangeField } from "@/constants";
 import type { SectionTableData } from "@/types";
+import {
+  CountCell,
+  MetricValueCell,
+  PercentChangeCell,
+  SparklineCell,
+} from "./MetricTableCell";
+import { DimensionTableCell } from "./DimensionTableCell";
 
 export interface SectionMetricRow extends MetricRowBase {
   section: string;
@@ -113,43 +117,44 @@ export function SectionMetricTable({
     () => [
       columnHelper.accessor("section", {
         header: "Section",
-        cell: ({ row, getValue }) => {
-          const canExpand = row.getCanExpand();
-          const toggleHandler = row.getToggleExpandedHandler();
-          return (
-            <div className="flex items-center space-x-3">
-              {canExpand && (
-                <button
-                  type="button"
-                  onClick={toggleHandler}
-                  className="text-gray-500 hover:text-gray-700 focus:outline-none"
-                  aria-label={
-                    row.getIsExpanded() ? "Collapse row" : "Expand row"
-                  }
-                >
-                  {row.getIsExpanded() ? "−" : "+"}
-                </button>
-              )}
-              <span className="font-medium text-gray-900">
-                {getValue() || "—"}
-              </span>
-            </div>
-          );
-        },
+        cell: ({ row, getValue }) => (
+          <DimensionTableCell
+            label={getValue() || "—"}
+            canExpand={row.getCanExpand()}
+            isExpanded={row.getIsExpanded()}
+            onToggleExpand={row.getToggleExpandedHandler()}
+          />
+        ),
       }),
       columnHelper.accessor("metricValue", {
         header: metricLabel,
-        cell: ({ getValue }) => formatMetricValue(getValue(), metric),
+        cell: ({ getValue }) => (
+          <MetricValueCell value={getValue()} metric={metric} />
+        ),
         meta: { className: "text-right" },
       }),
-      columnHelper.accessor("metricPctChange", {
-        header: "YoY %",
-        cell: ({ getValue }) => <PercentChangeCell value={getValue()} />,
+      columnHelper.display({
+        id: "trend",
+        header: "Trend",
+        cell: ({ row }) => (
+          <SparklineCell
+            values={row.original.yearlyBreakdown
+              .slice()
+              .reverse()
+              .map((entry) => entry.metricValue)}
+            alignment="end"
+          />
+        ),
         meta: { className: "text-right" },
       }),
+      // columnHelper.accessor("metricPctChange", {
+      //   header: "YoY %",
+      //   cell: ({ getValue }) => <PercentChangeCell value={getValue()} />,
+      //   meta: { className: "text-right" },
+      // }),
       columnHelper.accessor("totalSales", {
-        header: "Transactions",
-        cell: ({ getValue }) => formatCount(getValue()),
+        header: "N° Sales",
+        cell: ({ getValue }) => <CountCell value={getValue()} />,
         meta: { className: "text-right" },
       }),
     ],

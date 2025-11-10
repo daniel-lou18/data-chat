@@ -95,11 +95,6 @@ function App() {
               <ActionButtons tableState={tableState} />
             </TableHeader>
             <div className="flex-1 overflow-auto">
-              {/* <DataTable data={data}>
-                <TableHead table={table} />
-                <TableBody table={table} />
-              </DataTable>
-              <TableFooter table={table} data={data} /> */}
               {level === "commune" ? (
                 <CommuneMetricTable
                   metric={field}

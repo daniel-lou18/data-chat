@@ -1,4 +1,3 @@
-export * from "./DataTable";
 export * from "./CommuneMetricTable";
 export * from "./SectionMetricTable";
 export * from "./ActionButtons";

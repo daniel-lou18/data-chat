@@ -9,7 +9,7 @@ import { z } from "zod";
 
 const TOTAL_SALES: MetricCatalogItem = {
   id: "total_sales",
-  label: "Transactions",
+  label: "N° Sales",
   group: "volume",
   type: "count",
   unit: undefined,
@@ -19,7 +19,7 @@ const TOTAL_SALES: MetricCatalogItem = {
 
 const AVG_PRICE: MetricCatalogItem = {
   id: "avg_price",
-  label: "Average price",
+  label: "Avg price",
   group: "pricing",
   type: "measure",
   unit: "€",
@@ -29,7 +29,7 @@ const AVG_PRICE: MetricCatalogItem = {
 
 const AVG_AREA: MetricCatalogItem = {
   id: "avg_area",
-  label: "Average area",
+  label: "Avg area",
   group: "area",
   type: "measure",
   unit: "m²",
@@ -39,7 +39,7 @@ const AVG_AREA: MetricCatalogItem = {
 
 const AVG_PRICE_M2: MetricCatalogItem = {
   id: "avg_price_m2",
-  label: "Average price / m²",
+  label: "Avg price/m²",
   group: "pricing",
   type: "measure",
   unit: "€/m²",
@@ -49,7 +49,7 @@ const AVG_PRICE_M2: MetricCatalogItem = {
 
 const MIN_PRICE: MetricCatalogItem = {
   id: "min_price",
-  label: "Minimum price",
+  label: "Min price",
   group: "pricing",
   type: "measure",
   unit: "€",
@@ -59,7 +59,7 @@ const MIN_PRICE: MetricCatalogItem = {
 
 const MAX_PRICE: MetricCatalogItem = {
   id: "max_price",
-  label: "Maximum price",
+  label: "Max price",
   group: "pricing",
   type: "measure",
   unit: "€",
@@ -89,7 +89,7 @@ const MEDIAN_AREA: MetricCatalogItem = {
 
 const MIN_PRICE_M2: MetricCatalogItem = {
   id: "min_price_m2",
-  label: "Minimum price / m²",
+  label: "Min price/m²",
   group: "pricing",
   type: "measure",
   unit: "€/m²",
@@ -99,7 +99,7 @@ const MIN_PRICE_M2: MetricCatalogItem = {
 
 const MAX_PRICE_M2: MetricCatalogItem = {
   id: "max_price_m2",
-  label: "Maximum price / m²",
+  label: "Max price/m²",
   group: "pricing",
   type: "measure",
   unit: "€/m²",
@@ -109,7 +109,7 @@ const MAX_PRICE_M2: MetricCatalogItem = {
 
 const PRICE_M2_P25: MetricCatalogItem = {
   id: "price_m2_p25",
-  label: "Price / m² p25",
+  label: "Price/m² p25",
   group: "pricing",
   type: "measure",
   unit: "€/m²",
@@ -119,7 +119,7 @@ const PRICE_M2_P25: MetricCatalogItem = {
 
 const PRICE_M2_P75: MetricCatalogItem = {
   id: "price_m2_p75",
-  label: "Price / m² p75",
+  label: "Price/m² p75",
   group: "pricing",
   type: "measure",
   unit: "€/m²",
@@ -129,7 +129,7 @@ const PRICE_M2_P75: MetricCatalogItem = {
 
 const PRICE_M2_IQR: MetricCatalogItem = {
   id: "price_m2_iqr",
-  label: "Price / m² IQR",
+  label: "Price/m² IQR",
   group: "pricing",
   type: "measure",
   unit: "€/m²",
@@ -139,7 +139,7 @@ const PRICE_M2_IQR: MetricCatalogItem = {
 
 const PRICE_M2_STDDEV: MetricCatalogItem = {
   id: "price_m2_stddev",
-  label: "Price / m² Std Dev",
+  label: "Price/m² Std Dev",
   group: "pricing",
   type: "measure",
   unit: "€/m²",
@@ -215,7 +215,7 @@ const ISO_WEEK: DimensionCatalogItem = {
   id: "iso_week",
   label: "ISO Week",
   category: "temporal",
-  type: z.coerce.number().int().min(1).max(52),
+  type: z.coerce.number().int().min(1).max(53),
 };
 
 export const DIMENSION_CATALOG: Record<DimensionField, DimensionCatalogItem> = {

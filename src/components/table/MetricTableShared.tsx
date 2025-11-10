@@ -7,11 +7,10 @@ import {
   type SetStateAction,
 } from "react";
 import { flexRender, type Row, type Table } from "@tanstack/react-table";
-
 import type { AggregateMetricsMV, MetricField } from "@/types";
 import type { CommuneMetricRow } from "./CommuneMetricTable";
 import type { SectionMetricRow } from "./SectionMetricTable";
-import { METRIC_CATALOG } from "@/constants";
+import { MetricTableExpandedRow } from "./MetricTableExpandedRow";
 
 export interface YearBreakdownRow {
   year: number;
@@ -234,150 +233,6 @@ export function MetricTableRow<TRow extends MetricTableRow>({
         </td>
       ))}
     </tr>
-  );
-}
-
-export function MetricTableExpandedRow<TRow extends MetricTableRow>({
-  row,
-  columnCount,
-}: {
-  row: Row<TRow>;
-  columnCount: number;
-}) {
-  const { metric, metricLabel } = useMetricTableContext();
-
-  if (!row.getIsExpanded() || row.original.yearlyBreakdown.length === 0) {
-    return null;
-  }
-
-  return (
-    <tr className="bg-gray-50">
-      <td colSpan={columnCount} className="px-12 pb-6">
-        <div className="border border-gray-200 rounded-lg overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-2 text-left font-medium text-gray-600 uppercase tracking-wider">
-                  Year
-                </th>
-                <th className="px-4 py-2 text-left font-medium text-gray-600 uppercase tracking-wider">
-                  {metricLabel}
-                </th>
-                <th className="px-4 py-2 text-left font-medium text-gray-600 uppercase tracking-wider">
-                  YoY %
-                </th>
-                <th className="px-4 py-2 text-left font-medium text-gray-600 uppercase tracking-wider">
-                  Transactions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {row.original.yearlyBreakdown.map((yearRow) => (
-                <tr
-                  key={`${row.id}-${yearRow.year}`}
-                  className="odd:bg-white even:bg-gray-50"
-                >
-                  <td className="px-4 py-2 text-gray-700">{yearRow.year}</td>
-                  <td className="px-4 py-2 text-gray-700">
-                    {formatMetricValue(yearRow.metricValue, metric)}
-                  </td>
-                  <td className="px-4 py-2">
-                    <PercentChangeCell
-                      value={yearRow.metricPctChange}
-                      alignment="start"
-                    />
-                  </td>
-                  <td className="px-4 py-2 text-gray-700">
-                    {formatCount(yearRow.totalSales)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </td>
-    </tr>
-  );
-}
-
-export function getFractionDigits(
-  metric: MetricField
-): Pick<
-  Intl.NumberFormatOptions,
-  "maximumFractionDigits" | "minimumFractionDigits"
-> {
-  if (
-    metric.startsWith("avg_") ||
-    metric.includes("median") ||
-    metric.includes("stddev") ||
-    metric.includes("p25") ||
-    metric.includes("p75") ||
-    metric.includes("iqr")
-  ) {
-    return { minimumFractionDigits: 1, maximumFractionDigits: 1 };
-  }
-  return { minimumFractionDigits: 0, maximumFractionDigits: 0 };
-}
-
-export function formatMetricValue(
-  value: number | null,
-  metric: MetricField
-): string {
-  if (value === null || Number.isNaN(value)) {
-    return "—";
-  }
-
-  const metadataEntry = METRIC_CATALOG[metric];
-  const formatted = value.toLocaleString("fr-FR", getFractionDigits(metric));
-  return metadataEntry?.unit ? `${formatted} ${metadataEntry.unit}` : formatted;
-}
-
-export function formatCount(value: number | null | undefined): string {
-  if (value === null || value === undefined || !Number.isFinite(value)) {
-    return "—";
-  }
-  return value.toLocaleString("fr-FR");
-}
-
-export function PercentChangeCell({
-  value,
-  alignment = "end",
-}: {
-  value: number | null | undefined;
-  alignment?: "start" | "end";
-}) {
-  if (value === null || value === undefined || Number.isNaN(value)) {
-    return <span className="text-gray-400">—</span>;
-  }
-
-  const direction = value > 0 ? "positive" : value < 0 ? "negative" : "neutral";
-  const icon =
-    direction === "positive" ? "↗" : direction === "negative" ? "↘" : "→";
-  const sign =
-    direction === "positive" ? "+" : direction === "negative" ? "−" : "±";
-  const colorClass =
-    direction === "positive"
-      ? "text-emerald-600"
-      : direction === "negative"
-        ? "text-rose-600"
-        : "text-gray-500";
-  const formatted = Math.abs(value).toLocaleString("fr-FR", {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  });
-  const alignmentClass =
-    alignment === "start" ? "justify-start" : "justify-end";
-
-  return (
-    <span
-      className={`inline-flex items-center ${alignmentClass} space-x-1 font-medium ${colorClass}`}
-    >
-      <span aria-hidden>{icon}</span>
-      <span>
-        {sign}
-        {formatted}%
-      </span>
-    </span>
   );
 }
 

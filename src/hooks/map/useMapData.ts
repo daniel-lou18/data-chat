@@ -6,7 +6,7 @@ import type {
   MapFeatureParams,
   MapLegendParams,
   MapLegendResponse,
-} from "@/services/api/mapService";
+} from "@/types";
 import { GC_TIME, STALE_TIME } from "@/hooks/data/constants";
 import { useMapFilters } from "./useMapFilters";
 
