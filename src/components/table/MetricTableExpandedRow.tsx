@@ -25,16 +25,16 @@ export function MetricTableExpandedRow<TRow extends MetricTableRow>({
           <table className="w-full text-sm">
             <thead className="bg-gray-100">
               <tr>
-                <th className="px-4 py-2 text-left font-medium text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                   Year
                 </th>
-                <th className="px-4 py-2 text-left font-medium text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                   {metricLabel}
                 </th>
-                <th className="px-4 py-2 text-left font-medium text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                   YoY %
                 </th>
-                <th className="px-4 py-2 text-left font-medium text-gray-600 uppercase tracking-wider">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                   Transactions
                 </th>
               </tr>
@@ -45,26 +45,29 @@ export function MetricTableExpandedRow<TRow extends MetricTableRow>({
                   key={`${row.id}-${yearRow.year}`}
                   className="odd:bg-white even:bg-gray-50"
                 >
-                  <td className="px-4 py-2 text-gray-700">{yearRow.year}</td>
+                  <td className="px-4 py-2 text-gray-700 text-xs font-medium">
+                    {yearRow.year}
+                  </td>
                   <td className="px-4 py-2">
                     <MetricValueCell
                       value={yearRow.metricValue}
                       metric={metric}
                       alignment="start"
-                      className="text-gray-700"
+                      className="text-xs text-gray-700"
                     />
                   </td>
                   <td className="px-4 py-2">
                     <PercentChangeCell
                       value={yearRow.metricPctChange}
                       alignment="start"
+                      className="text-xs text-gray-700"
                     />
                   </td>
                   <td className="px-4 py-2">
                     <CountCell
                       value={yearRow.totalSales}
                       alignment="start"
-                      className="text-gray-700"
+                      className="text-xs text-gray-700"
                     />
                   </td>
                 </tr>

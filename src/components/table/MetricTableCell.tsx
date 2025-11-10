@@ -4,9 +4,11 @@ import type { MetricField } from "@/types";
 export function PercentChangeCell({
   value,
   alignment = "end",
+  className = "",
 }: {
   value: number | null | undefined;
   alignment?: "start" | "end";
+  className?: string;
 }) {
   if (value === null || value === undefined || Number.isNaN(value)) {
     return <span className="text-gray-400">—</span>;
@@ -32,7 +34,7 @@ export function PercentChangeCell({
 
   return (
     <span
-      className={`inline-flex items-center ${alignmentClass} space-x-1 font-medium ${colorClass}`}
+      className={`inline-flex items-center ${alignmentClass} space-x-1 font-medium ${colorClass} ${className}`.trim()}
     >
       <span aria-hidden>{icon}</span>
       <span>

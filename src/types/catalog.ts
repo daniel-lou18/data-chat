@@ -1,5 +1,5 @@
 import { z } from "zod";
-import * as mvSchemas from "@/services/api/mvSchemas";
+import * as mvSchemas from "@/services/api/schemas/mvSchemas";
 import type { DimensionField } from "@/types";
 import type { MetricField } from "./metrics";
 import type { MetricPercentChangeField } from "@/constants/metrics";

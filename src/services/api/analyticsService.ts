@@ -1,24 +1,9 @@
 import { z } from "zod";
 
 import { apiService, BaseApiService } from "./baseApiService";
-import * as mvSchemas from "@/services/api/mvSchemas";
-import type {
-  ApartmentsByInseeMonth,
-  ApartmentsByInseeWeek,
-  ApartmentsByInseeYear,
-  ApartmentsBySectionMonth,
-  ApartmentsBySectionYear,
-  HousesByInseeMonth,
-  HousesByInseeWeek,
-  HousesByInseeYear,
-  HousesBySectionMonth,
-  HousesBySectionYear,
-  InseeMonthParams,
-  InseeWeekParams,
-  InseeYearParams,
-  SectionMonthParams,
-  SectionYearParams,
-} from "@/types";
+import * as mvSchemas from "@/services/api/schemas/mvSchemas";
+import * as mvDeltasSchemas from "@/services/api/schemas/mv_deltas.schemas";
+import type * as mvTypes from "@/types";
 
 type QueryParams = Record<string, string | number | boolean>;
 
@@ -87,8 +72,8 @@ export class AnalyticsService {
   }
 
   async getApartmentsByInseeYear(
-    params: Partial<InseeYearParams> = {}
-  ): Promise<ApartmentsByInseeYear[]> {
+    params: Partial<mvTypes.InseeYearParams> = {}
+  ): Promise<mvTypes.ApartmentsByInseeYear[]> {
     return this.fetchCollection(
       "/apartments/by-insee-code/year",
       mvSchemas.ApartmentsByInseeYearSchema.array(),
@@ -96,9 +81,17 @@ export class AnalyticsService {
     );
   }
 
+  async getApartmentsByInseeYoY(params: Partial<mvTypes.InseeYearParams> = {}) {
+    return this.fetchCollection(
+      "/apartments/by-insee-code/year/deltas",
+      mvDeltasSchemas.YearlyDeltasByInseeSchema.array(),
+      params
+    );
+  }
+
   async getHousesByInseeYear(
-    params: Partial<InseeYearParams> = {}
-  ): Promise<HousesByInseeYear[]> {
+    params: Partial<mvTypes.InseeYearParams> = {}
+  ): Promise<mvTypes.HousesByInseeYear[]> {
     return this.fetchCollection(
       "/houses/by-insee-code/year",
       mvSchemas.HousesByInseeYearSchema.array(),
@@ -106,9 +99,17 @@ export class AnalyticsService {
     );
   }
 
+  async getHousesByInseeYoY(params: Partial<mvTypes.InseeYearParams> = {}) {
+    return this.fetchCollection(
+      "/houses/by-insee-code/year/deltas",
+      mvDeltasSchemas.YearlyDeltasByInseeSchema.array(),
+      params
+    );
+  }
+
   async getApartmentsByInseeMonth(
-    params: Partial<InseeMonthParams> = {}
-  ): Promise<ApartmentsByInseeMonth[]> {
+    params: Partial<mvTypes.InseeMonthParams> = {}
+  ): Promise<mvTypes.ApartmentsByInseeMonth[]> {
     return this.fetchCollection(
       "/apartments/by-insee-code/month",
       mvSchemas.ApartmentsByInseeMonthSchema.array(),
@@ -117,8 +118,8 @@ export class AnalyticsService {
   }
 
   async getHousesByInseeMonth(
-    params: Partial<InseeMonthParams> = {}
-  ): Promise<HousesByInseeMonth[]> {
+    params: Partial<mvTypes.InseeMonthParams> = {}
+  ): Promise<mvTypes.HousesByInseeMonth[]> {
     return this.fetchCollection(
       "/houses/by-insee-code/month",
       mvSchemas.HousesByInseeMonthSchema.array(),
@@ -127,8 +128,8 @@ export class AnalyticsService {
   }
 
   async getApartmentsByInseeWeek(
-    params: Partial<InseeWeekParams> = {}
-  ): Promise<ApartmentsByInseeWeek[]> {
+    params: Partial<mvTypes.InseeWeekParams> = {}
+  ): Promise<mvTypes.ApartmentsByInseeWeek[]> {
     return this.fetchCollection(
       "/apartments/by-insee-code/week",
       mvSchemas.ApartmentsByInseeWeekSchema.array(),
@@ -137,8 +138,8 @@ export class AnalyticsService {
   }
 
   async getHousesByInseeWeek(
-    params: Partial<InseeWeekParams> = {}
-  ): Promise<HousesByInseeWeek[]> {
+    params: Partial<mvTypes.InseeWeekParams> = {}
+  ): Promise<mvTypes.HousesByInseeWeek[]> {
     return this.fetchCollection(
       "/houses/by-insee-code/week",
       mvSchemas.HousesByInseeWeekSchema.array(),
@@ -147,8 +148,8 @@ export class AnalyticsService {
   }
 
   async getApartmentsBySectionYear(
-    params: Partial<SectionYearParams> = {}
-  ): Promise<ApartmentsBySectionYear[]> {
+    params: Partial<mvTypes.SectionYearParams> = {}
+  ): Promise<mvTypes.ApartmentsBySectionYear[]> {
     return this.fetchCollection(
       "/apartments/by-section/year",
       mvSchemas.ApartmentsBySectionYearSchema.array(),
@@ -156,9 +157,25 @@ export class AnalyticsService {
     );
   }
 
+  async getApartmentsBySectionYoY(params: Partial<mvTypes.SectionYearParams> = {}) {
+    return this.fetchCollection(
+      "/apartments/by-section/year/deltas",
+      mvDeltasSchemas.YearlyDeltasBySectionSchema.array(),
+      params
+    );
+  }
+
+  async getHousesBySectionYoY(params: Partial<mvTypes.SectionYearParams> = {}) {
+    return this.fetchCollection(
+      "/houses/by-section/year/deltas",
+      mvDeltasSchemas.YearlyDeltasBySectionSchema.array(),
+      params
+    );
+  }
+
   async getHousesBySectionYear(
-    params: Partial<SectionYearParams> = {}
-  ): Promise<HousesBySectionYear[]> {
+    params: Partial<mvTypes.SectionYearParams> = {}
+  ): Promise<mvTypes.HousesBySectionYear[]> {
     return this.fetchCollection(
       "/houses/by-section/year",
       mvSchemas.HousesBySectionYearSchema.array(),
@@ -167,8 +184,8 @@ export class AnalyticsService {
   }
 
   async getApartmentsBySectionMonth(
-    params: Partial<SectionMonthParams> = {}
-  ): Promise<ApartmentsBySectionMonth[]> {
+    params: Partial<mvTypes.SectionMonthParams> = {}
+  ): Promise<mvTypes.ApartmentsBySectionMonth[]> {
     return this.fetchCollection(
       "/apartments/by-section/month",
       mvSchemas.ApartmentsBySectionMonthSchema.array(),
@@ -177,8 +194,8 @@ export class AnalyticsService {
   }
 
   async getHousesBySectionMonth(
-    params: Partial<SectionMonthParams> = {}
-  ): Promise<HousesBySectionMonth[]> {
+    params: Partial<mvTypes.SectionMonthParams> = {}
+  ): Promise<mvTypes.HousesBySectionMonth[]> {
     return this.fetchCollection(
       "/houses/by-section/month",
       mvSchemas.HousesBySectionMonthSchema.array(),

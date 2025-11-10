@@ -4,7 +4,7 @@ import {
   useGetAggregatesByInseeCodeAndSection,
 } from "./useGetAggregates";
 import { useMapFilters } from "../map/useMapFilters";
-import type { CommuneTableData, SectionTableData } from "@/constants";
+import type { CommuneTableData, SectionTableData } from "@/types";
 
 /**
  * Custom hook that combines URL parameters with data fetching

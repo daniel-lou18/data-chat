@@ -146,11 +146,11 @@ export function CommuneMetricTable({
         ),
         meta: { className: "text-right" },
       }),
-      columnHelper.accessor("metricPctChange", {
-        header: "YoY %",
-        cell: ({ getValue }) => <PercentChangeCell value={getValue()} />,
-        meta: { className: "text-right" },
-      }),
+      // columnHelper.accessor("metricPctChange", {
+      //   header: "YoY %",
+      //   cell: ({ getValue }) => <PercentChangeCell value={getValue()} />,
+      //   meta: { className: "text-right" },
+      // }),
       columnHelper.accessor("totalSales", {
         header: "N° Sales",
         cell: ({ getValue }) => <CountCell value={getValue()} />,

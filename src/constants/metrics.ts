@@ -1,4 +1,4 @@
-import { AggregateMetricsMVSchema } from "@/services/api/mvSchemas";
+import { AggregateMetricsMVSchema } from "@/services/api/schemas/mvSchemas";
 import type { MetricField } from "@/types";
 import { METRIC_CATALOG } from "./catalog";
 

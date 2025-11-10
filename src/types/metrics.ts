@@ -1,5 +1,5 @@
 import { z } from "zod";
-import * as mvSchemas from "@/services/api/mvSchemas";
+import * as mvSchemas from "@/services/api/schemas/mvSchemas";
 
 export type AggregateMetricsMV = z.infer<
   typeof mvSchemas.AggregateMetricsMVSchema
