@@ -13,14 +13,20 @@ import {
   MetricTableBody,
   MetricTableContainer,
   MetricTableHeader,
+  PercentChangeCell,
 } from "./MetricTableShared";
 import type {
-  CommuneMetricRow,
+  MetricRowBase,
   NumericMetricField,
   TableStatus,
   YearBreakdownRow,
 } from "./MetricTableShared";
-import { METRIC_FIELD_METADATA, type CommuneTableData } from "@/constants";
+import { METRIC_CATALOG, type MetricPercentChangeField } from "@/constants";
+import type { CommuneTableData } from "@/types";
+
+export interface CommuneMetricRow extends MetricRowBase {
+  inseeCode: string;
+}
 
 const columnHelper = createColumnHelper<CommuneMetricRow>();
 
@@ -47,12 +53,16 @@ export function CommuneMetricTable({
 }: CommuneMetricTableProps) {
   const breakdownByCommune = useMemo(() => {
     const map = new Map<string, YearBreakdownRow[]>();
+    const pctChangeKey = `${metric}_pct_change` as MetricPercentChangeField;
 
     data.forEach((item) => {
       const metricValue = item[metric] ?? null;
+      const metricPctChange =
+        (item[pctChangeKey] as number | null | undefined) ?? null;
       const entry: YearBreakdownRow = {
         year: item.year,
         metricValue,
+        metricPctChange,
         totalSales: item.transactions,
       };
 
@@ -83,6 +93,7 @@ export function CommuneMetricTable({
         return {
           inseeCode,
           metricValue: selectedRow?.metricValue ?? null,
+          metricPctChange: selectedRow?.metricPctChange ?? null,
           totalSales: selectedRow?.totalSales ?? null,
           yearlyBreakdown: breakdown,
         } satisfies CommuneMetricRow;
@@ -94,7 +105,7 @@ export function CommuneMetricTable({
       });
   }, [breakdownByCommune, selectedYear]);
 
-  const metricMetadata = METRIC_FIELD_METADATA[metric];
+  const metricMetadata = METRIC_CATALOG[metric];
   const metricLabel = metricMetadata?.label ?? metric;
 
   const columns = useMemo(
@@ -126,6 +137,11 @@ export function CommuneMetricTable({
       columnHelper.accessor("metricValue", {
         header: metricLabel,
         cell: ({ getValue }) => formatMetricValue(getValue(), metric),
+        meta: { className: "text-right" },
+      }),
+      columnHelper.accessor("metricPctChange", {
+        header: "YoY %",
+        cell: ({ getValue }) => <PercentChangeCell value={getValue()} />,
         meta: { className: "text-right" },
       }),
       columnHelper.accessor("totalSales", {

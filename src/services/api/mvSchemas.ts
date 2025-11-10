@@ -7,11 +7,9 @@ import { z } from "zod";
 export const AggregateMetricsMVSchema = z.object({
   // Counts and totals
   total_sales: z.coerce.number().int().describe("Total number of transactions"),
-  total_price: z.coerce.number().describe("Sum of transaction prices"),
   avg_price: z.coerce.number().describe("Average transaction price"),
 
   // Areas
-  total_area: z.coerce.number().describe("Sum of area for the group"),
   avg_area: z.coerce.number().describe("Average area for the group"),
 
   // Weighted price per m²

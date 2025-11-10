@@ -1,148 +1,228 @@
-import { AggregateMetricsMVSchema } from "@/services/api/mvSchemas";
-import type { MetricField } from "@/types";
-import z from "zod";
+import type {
+  DimensionCatalogItem,
+  DimensionField,
+  MetricCatalogItem,
+  MetricField,
+} from "@/types";
+import { FEATURE_YEARS } from "./dimensions";
+import { z } from "zod";
 
-export const DIMENSIONS = [
-  "inseeCode",
-  "section",
-  "year",
-  "month",
-  "iso_year",
-  "iso_week",
-] as const;
-
-const DIMENSION_CATEGORIES = ["spatial", "temporal"] as const;
-
-export const FEATURE_YEARS = [
-  2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024,
-] as const;
-
-export const DIMENSION_METADATA = {
-  inseeCode: {
-    label: "INSEE Code",
-    category: "spatial",
-    level: "commune",
-    type: z.string().length(5),
-  },
-  section: {
-    label: "Section",
-    category: "spatial",
-    level: "section",
-    type: z.string().length(10),
-  },
-  year: {
-    label: "Year",
-    category: "temporal",
-    type: z.coerce
-      .number()
-      .int()
-      .min(FEATURE_YEARS[0])
-      .max(FEATURE_YEARS[FEATURE_YEARS.length - 1]),
-  },
-  month: {
-    label: "Month",
-    category: "temporal",
-    type: z.coerce.number().int().min(1).max(12),
-  },
-  iso_year: {
-    label: "ISO Year",
-    category: "temporal",
-    type: z.coerce
-      .number()
-      .int()
-      .min(FEATURE_YEARS[0])
-      .max(FEATURE_YEARS[FEATURE_YEARS.length - 1]),
-  },
-  iso_week: {
-    label: "ISO Week",
-    category: "temporal",
-    type: z.coerce.number().int().min(1).max(52),
-  },
-} satisfies Record<
-  Dimension,
-  {
-    label: string;
-    category: DimensionCategory;
-    level?: FeatureLevel;
-    type: z.ZodType<any>;
-  }
->;
-
-export const FEATURE_YEAR_OPTIONS = FEATURE_YEARS.map((year) => ({
-  value: year,
-  label: year.toString(),
-}));
-
-export const FEATURE_LEVELS = ["commune", "section"] as const;
-
-export const FEATURE_LEVEL_LABELS = {
-  commune: "Commune",
-  section: "Section",
-} satisfies Record<FeatureLevel, string>;
-
-export const FEATURE_LEVEL_OPTIONS = FEATURE_LEVELS.map((level) => ({
-  value: level,
-  label: FEATURE_LEVEL_LABELS[level],
-}));
-
-export const PROPERTY_TYPES = ["house", "apartment"] as const;
-
-export const PROPERTY_TYPE_LABELS = {
-  house: "House",
-  apartment: "Apartment",
-} satisfies Record<PropertyType, string>;
-
-export const PROPERTY_TYPE_OPTIONS = PROPERTY_TYPES.map((type) => ({
-  value: type,
-  label: PROPERTY_TYPE_LABELS[type],
-}));
-
-export const METRIC_FIELDS = Object.keys(
-  AggregateMetricsMVSchema.shape
-) as MetricField[];
-
-export const METRIC_FIELD_METADATA = {
-  total_sales: { label: "Transactions" },
-  total_price: { label: "Total price" },
-  avg_price: { label: "Average price" },
-  total_area: { label: "Total area", unit: "m²" },
-  avg_area: { label: "Average area", unit: "m²" },
-  avg_price_m2: { label: "Average price / m²", unit: "€/m²" },
-  min_price: { label: "Minimum price" },
-  max_price: { label: "Maximum price" },
-  median_price: { label: "Median price" },
-  median_area: { label: "Median area", unit: "m²" },
-  min_price_m2: { label: "Minimum price / m²", unit: "€/m²" },
-  max_price_m2: { label: "Maximum price / m²", unit: "€/m²" },
-  price_m2_p25: { label: "Price / m² p25", unit: "€/m²" },
-  price_m2_p75: { label: "Price / m² p75", unit: "€/m²" },
-  price_m2_iqr: { label: "Price / m² IQR", unit: "€/m²" },
-  price_m2_stddev: { label: "Price / m² Std Dev", unit: "€/m²" },
-} satisfies Record<MetricField, { label: string; unit?: string }>;
-
-export const METRIC_OPTIONS = METRIC_FIELDS.map((field) => ({
-  value: field,
-  label: METRIC_FIELD_METADATA[field].label,
-}));
-
-// Types
-export type Dimension = (typeof DIMENSIONS)[number];
-export type FeatureLevel = (typeof FEATURE_LEVELS)[number];
-export type PropertyType = (typeof PROPERTY_TYPES)[number];
-export type DimensionCategory = (typeof DIMENSION_CATEGORIES)[number];
-
-export type CommuneTableData = {
-  inseeCode: string;
-  year: number;
-  month?: number;
-  iso_year?: number;
-  iso_week?: number;
-  transactions: number;
-} & Partial<Record<MetricField, number | null>>;
-
-export type SectionTableData = CommuneTableData & {
-  section: string;
+const TOTAL_SALES: MetricCatalogItem = {
+  id: "total_sales",
+  label: "Transactions",
+  group: "volume",
+  type: "count",
+  unit: undefined,
+  digits: { minimum: 0, maximum: 0 },
+  columnTemplate: ["count", "deltaCompact"],
 };
 
-export type TableData = Partial<Record<Dimension, string | number>> &
-  Partial<Record<MetricField, number | null>>;
+const AVG_PRICE: MetricCatalogItem = {
+  id: "avg_price",
+  label: "Average price",
+  group: "pricing",
+  type: "measure",
+  unit: "€",
+  digits: { minimum: 0, maximum: 0 },
+  columnTemplate: ["value", "delta"],
+};
+
+const AVG_AREA: MetricCatalogItem = {
+  id: "avg_area",
+  label: "Average area",
+  group: "area",
+  type: "measure",
+  unit: "m²",
+  digits: { minimum: 0, maximum: 0 },
+  columnTemplate: ["value", "delta"],
+};
+
+const AVG_PRICE_M2: MetricCatalogItem = {
+  id: "avg_price_m2",
+  label: "Average price / m²",
+  group: "pricing",
+  type: "measure",
+  unit: "€/m²",
+  digits: { minimum: 0, maximum: 0 },
+  columnTemplate: ["value", "deltaCompact"],
+};
+
+const MIN_PRICE: MetricCatalogItem = {
+  id: "min_price",
+  label: "Minimum price",
+  group: "pricing",
+  type: "measure",
+  unit: "€",
+  digits: { minimum: 0, maximum: 0 },
+  columnTemplate: ["value", "delta"],
+};
+
+const MAX_PRICE: MetricCatalogItem = {
+  id: "max_price",
+  label: "Maximum price",
+  group: "pricing",
+  type: "measure",
+  unit: "€",
+  digits: { minimum: 0, maximum: 0 },
+  columnTemplate: ["value", "delta"],
+};
+
+const MEDIAN_PRICE: MetricCatalogItem = {
+  id: "median_price",
+  label: "Median price",
+  group: "pricing",
+  type: "measure",
+  unit: "€",
+  digits: { minimum: 0, maximum: 0 },
+  columnTemplate: ["value", "delta"],
+};
+
+const MEDIAN_AREA: MetricCatalogItem = {
+  id: "median_area",
+  label: "Median area",
+  group: "area",
+  type: "measure",
+  unit: "m²",
+  digits: { minimum: 0, maximum: 0 },
+  columnTemplate: ["value", "delta"],
+};
+
+const MIN_PRICE_M2: MetricCatalogItem = {
+  id: "min_price_m2",
+  label: "Minimum price / m²",
+  group: "pricing",
+  type: "measure",
+  unit: "€/m²",
+  digits: { minimum: 0, maximum: 0 },
+  columnTemplate: ["value", "deltaCompact"],
+};
+
+const MAX_PRICE_M2: MetricCatalogItem = {
+  id: "max_price_m2",
+  label: "Maximum price / m²",
+  group: "pricing",
+  type: "measure",
+  unit: "€/m²",
+  digits: { minimum: 0, maximum: 0 },
+  columnTemplate: ["value", "deltaCompact"],
+};
+
+const PRICE_M2_P25: MetricCatalogItem = {
+  id: "price_m2_p25",
+  label: "Price / m² p25",
+  group: "pricing",
+  type: "measure",
+  unit: "€/m²",
+  digits: { minimum: 0, maximum: 0 },
+  columnTemplate: ["value", "deltaCompact"],
+};
+
+const PRICE_M2_P75: MetricCatalogItem = {
+  id: "price_m2_p75",
+  label: "Price / m² p75",
+  group: "pricing",
+  type: "measure",
+  unit: "€/m²",
+  digits: { minimum: 0, maximum: 0 },
+  columnTemplate: ["value", "deltaCompact"],
+};
+
+const PRICE_M2_IQR: MetricCatalogItem = {
+  id: "price_m2_iqr",
+  label: "Price / m² IQR",
+  group: "pricing",
+  type: "measure",
+  unit: "€/m²",
+  digits: { minimum: 0, maximum: 0 },
+  columnTemplate: ["value", "deltaCompact"],
+};
+
+const PRICE_M2_STDDEV: MetricCatalogItem = {
+  id: "price_m2_stddev",
+  label: "Price / m² Std Dev",
+  group: "pricing",
+  type: "measure",
+  unit: "€/m²",
+  digits: { minimum: 0, maximum: 0 },
+  columnTemplate: ["value", "deltaCompact"],
+};
+
+export const METRIC_CATALOG: Record<MetricField, MetricCatalogItem> = {
+  total_sales: TOTAL_SALES,
+  avg_price: AVG_PRICE,
+  avg_area: AVG_AREA,
+  avg_price_m2: AVG_PRICE_M2,
+  min_price: MIN_PRICE,
+  max_price: MAX_PRICE,
+  median_price: MEDIAN_PRICE,
+  median_area: MEDIAN_AREA,
+  min_price_m2: MIN_PRICE_M2,
+  max_price_m2: MAX_PRICE_M2,
+  price_m2_p25: PRICE_M2_P25,
+  price_m2_p75: PRICE_M2_P75,
+  price_m2_iqr: PRICE_M2_IQR,
+  price_m2_stddev: PRICE_M2_STDDEV,
+} satisfies Record<MetricField, MetricCatalogItem>;
+
+// DIMENSIONS
+
+const INSEE_CODE: DimensionCatalogItem = {
+  id: "inseeCode",
+  label: "INSEE Code",
+  category: "spatial",
+  level: "commune",
+  type: z.string().length(5),
+};
+
+const SECTION: DimensionCatalogItem = {
+  id: "section",
+  label: "Section",
+  category: "spatial",
+  level: "section",
+  type: z.string().length(10),
+};
+
+const YEAR: DimensionCatalogItem = {
+  id: "year",
+  label: "Year",
+  category: "temporal",
+  type: z.coerce
+    .number()
+    .int()
+    .min(FEATURE_YEARS[0])
+    .max(FEATURE_YEARS[FEATURE_YEARS.length - 1]),
+};
+
+const MONTH: DimensionCatalogItem = {
+  id: "month",
+  label: "Month",
+  category: "temporal",
+  type: z.coerce.number().int().min(1).max(12),
+};
+
+const ISO_YEAR: DimensionCatalogItem = {
+  id: "iso_year",
+  label: "ISO Year",
+  category: "temporal",
+  type: z.coerce
+    .number()
+    .int()
+    .min(FEATURE_YEARS[0])
+    .max(FEATURE_YEARS[FEATURE_YEARS.length - 1]),
+};
+
+const ISO_WEEK: DimensionCatalogItem = {
+  id: "iso_week",
+  label: "ISO Week",
+  category: "temporal",
+  type: z.coerce.number().int().min(1).max(52),
+};
+
+export const DIMENSION_CATALOG: Record<DimensionField, DimensionCatalogItem> = {
+  inseeCode: INSEE_CODE,
+  section: SECTION,
+  year: YEAR,
+  month: MONTH,
+  iso_year: ISO_YEAR,
+  iso_week: ISO_WEEK,
+} satisfies Record<DimensionField, DimensionCatalogItem>;

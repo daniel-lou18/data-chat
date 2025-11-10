@@ -8,27 +8,23 @@ import {
 } from "react";
 import { flexRender, type Row, type Table } from "@tanstack/react-table";
 
-import { METRIC_FIELD_METADATA } from "@/constants/catalog";
 import type { AggregateMetricsMV, MetricField } from "@/types";
+import type { CommuneMetricRow } from "./CommuneMetricTable";
+import type { SectionMetricRow } from "./SectionMetricTable";
+import { METRIC_CATALOG } from "@/constants";
 
 export interface YearBreakdownRow {
   year: number;
   metricValue: number | null;
+  metricPctChange: number | null;
   totalSales: number | null;
 }
 
 export interface MetricRowBase {
   metricValue: number | null;
+  metricPctChange: number | null;
   totalSales: number | null;
   yearlyBreakdown: YearBreakdownRow[];
-}
-
-export interface CommuneMetricRow extends MetricRowBase {
-  inseeCode: string;
-}
-
-export interface SectionMetricRow extends MetricRowBase {
-  section: string;
 }
 
 export type MetricTableRow = CommuneMetricRow | SectionMetricRow;
@@ -196,8 +192,7 @@ export function MetricTableRow<TRow extends MetricTableRow>({
   row: Row<TRow>;
 }) {
   const { hoveredRowId, setHoveredRowId } = useMetricTableContext();
-  const rowId =
-    "inseeCode" in row.original ? row.original.inseeCode : row.original.section;
+  const rowId = getRowIdentifier(row);
   const isHovered = hoveredRowId === rowId;
   const handleMouseEnter = () => {
     setHoveredRowId(isHovered ? null : rowId);
@@ -269,6 +264,9 @@ export function MetricTableExpandedRow<TRow extends MetricTableRow>({
                   {metricLabel}
                 </th>
                 <th className="px-4 py-2 text-left font-medium text-gray-600 uppercase tracking-wider">
+                  YoY %
+                </th>
+                <th className="px-4 py-2 text-left font-medium text-gray-600 uppercase tracking-wider">
                   Transactions
                 </th>
               </tr>
@@ -282,6 +280,12 @@ export function MetricTableExpandedRow<TRow extends MetricTableRow>({
                   <td className="px-4 py-2 text-gray-700">{yearRow.year}</td>
                   <td className="px-4 py-2 text-gray-700">
                     {formatMetricValue(yearRow.metricValue, metric)}
+                  </td>
+                  <td className="px-4 py-2">
+                    <PercentChangeCell
+                      value={yearRow.metricPctChange}
+                      alignment="start"
+                    />
                   </td>
                   <td className="px-4 py-2 text-gray-700">
                     {formatCount(yearRow.totalSales)}
@@ -323,10 +327,7 @@ export function formatMetricValue(
     return "—";
   }
 
-  const metadataEntry = METRIC_FIELD_METADATA[metric] as {
-    label: string;
-    unit?: string;
-  };
+  const metadataEntry = METRIC_CATALOG[metric];
   const formatted = value.toLocaleString("fr-FR", getFractionDigits(metric));
   return metadataEntry?.unit ? `${formatted} ${metadataEntry.unit}` : formatted;
 }
@@ -336,4 +337,56 @@ export function formatCount(value: number | null | undefined): string {
     return "—";
   }
   return value.toLocaleString("fr-FR");
+}
+
+export function PercentChangeCell({
+  value,
+  alignment = "end",
+}: {
+  value: number | null | undefined;
+  alignment?: "start" | "end";
+}) {
+  if (value === null || value === undefined || Number.isNaN(value)) {
+    return <span className="text-gray-400">—</span>;
+  }
+
+  const direction = value > 0 ? "positive" : value < 0 ? "negative" : "neutral";
+  const icon =
+    direction === "positive" ? "↗" : direction === "negative" ? "↘" : "→";
+  const sign =
+    direction === "positive" ? "+" : direction === "negative" ? "−" : "±";
+  const colorClass =
+    direction === "positive"
+      ? "text-emerald-600"
+      : direction === "negative"
+        ? "text-rose-600"
+        : "text-gray-500";
+  const formatted = Math.abs(value).toLocaleString("fr-FR", {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  const alignmentClass =
+    alignment === "start" ? "justify-start" : "justify-end";
+
+  return (
+    <span
+      className={`inline-flex items-center ${alignmentClass} space-x-1 font-medium ${colorClass}`}
+    >
+      <span aria-hidden>{icon}</span>
+      <span>
+        {sign}
+        {formatted}%
+      </span>
+    </span>
+  );
+}
+
+function getRowIdentifier<TRow extends MetricTableRow>(row: Row<TRow>): string {
+  if ("inseeCode" in row.original) {
+    return row.original.inseeCode;
+  }
+  if ("section" in row.original) {
+    return row.original.section;
+  }
+  return row.id;
 }

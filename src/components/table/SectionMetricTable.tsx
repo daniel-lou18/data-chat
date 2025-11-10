@@ -13,14 +13,20 @@ import {
   MetricTableBody,
   MetricTableContainer,
   MetricTableHeader,
+  PercentChangeCell,
 } from "./MetricTableShared";
 import type {
-  SectionMetricRow,
+  MetricRowBase,
   NumericMetricField,
   TableStatus,
   YearBreakdownRow,
 } from "./MetricTableShared";
-import { METRIC_FIELD_METADATA, type SectionTableData } from "@/constants";
+import { METRIC_CATALOG, type MetricPercentChangeField } from "@/constants";
+import type { SectionTableData } from "@/types";
+
+export interface SectionMetricRow extends MetricRowBase {
+  section: string;
+}
 
 const columnHelper = createColumnHelper<SectionMetricRow>();
 
@@ -47,13 +53,17 @@ export function SectionMetricTable({
 }: SectionMetricTableProps) {
   const breakdownBySection = useMemo(() => {
     const map = new Map<string, YearBreakdownRow[]>();
+    const pctChangeKey = `${metric}_pct_change` as MetricPercentChangeField;
 
     data.forEach((item) => {
       const sectionKey = item.section ?? "";
       const metricValue = item[metric] ?? null;
+      const metricPctChange =
+        (item[pctChangeKey] as number | null | undefined) ?? null;
       const entry: YearBreakdownRow = {
         year: item.year,
         metricValue,
+        metricPctChange,
         totalSales: item.transactions,
       };
 
@@ -84,6 +94,7 @@ export function SectionMetricTable({
         return {
           section,
           metricValue: selectedRow?.metricValue ?? null,
+          metricPctChange: selectedRow?.metricPctChange ?? null,
           totalSales: selectedRow?.totalSales ?? null,
           yearlyBreakdown: breakdown,
         } satisfies SectionMetricRow;
@@ -95,7 +106,7 @@ export function SectionMetricTable({
       });
   }, [breakdownBySection, selectedYear]);
 
-  const metricMetadata = METRIC_FIELD_METADATA[metric];
+  const metricMetadata = METRIC_CATALOG[metric];
   const metricLabel = metricMetadata?.label ?? metric;
 
   const columns = useMemo(
@@ -129,6 +140,11 @@ export function SectionMetricTable({
       columnHelper.accessor("metricValue", {
         header: metricLabel,
         cell: ({ getValue }) => formatMetricValue(getValue(), metric),
+        meta: { className: "text-right" },
+      }),
+      columnHelper.accessor("metricPctChange", {
+        header: "YoY %",
+        cell: ({ getValue }) => <PercentChangeCell value={getValue()} />,
         meta: { className: "text-right" },
       }),
       columnHelper.accessor("totalSales", {

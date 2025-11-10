@@ -1,10 +1,8 @@
 import { z } from "zod";
 import * as mvSchemas from "@/services/api/mvSchemas";
-
-export type AggregateMetricsMV = z.infer<
-  typeof mvSchemas.AggregateMetricsMVSchema
->;
-export type MetricField = keyof AggregateMetricsMV;
+import type { DimensionField } from "@/types";
+import type { MetricField } from "./metrics";
+import type { MetricPercentChangeField } from "@/constants/metrics";
 
 export type ApartmentsByInseeMonth = z.infer<
   typeof mvSchemas.ApartmentsByInseeMonthSchema
@@ -48,3 +46,19 @@ export type SectionYearParams = z.infer<
 >;
 export type SortBy = z.infer<typeof mvSchemas.SortBySchema>;
 export type SortOrder = z.infer<typeof mvSchemas.SortOrderSchema>;
+
+export type CommuneTableData = {
+  inseeCode: string;
+  year: number;
+  month?: number;
+  iso_year?: number;
+  iso_week?: number;
+  transactions: number;
+} & Partial<Record<MetricField | MetricPercentChangeField, number | null>>;
+
+export type SectionTableData = CommuneTableData & {
+  section: string;
+};
+
+export type TableData = Partial<Record<DimensionField, string | number>> &
+  Partial<Record<MetricField, number | null>>;
