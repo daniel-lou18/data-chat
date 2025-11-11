@@ -1,9 +1,7 @@
 import { z } from "zod";
-
 import { apiService, BaseApiService } from "./baseApiService";
-import * as mvSchemas from "@/services/api/schemas/mvSchemas";
-import * as mvDeltasSchemas from "@/services/api/schemas/mv_deltas.schemas";
-import type * as mvTypes from "@/types";
+import * as mvSchemas from "./schemas";
+import type * as mvTypes from "./types";
 
 type QueryParams = Record<string, string | number | boolean>;
 
@@ -81,14 +79,6 @@ export class AnalyticsService {
     );
   }
 
-  async getApartmentsByInseeYoY(params: Partial<mvTypes.InseeYearParams> = {}) {
-    return this.fetchCollection(
-      "/apartments/by-insee-code/year/deltas",
-      mvDeltasSchemas.YearlyDeltasByInseeSchema.array(),
-      params
-    );
-  }
-
   async getHousesByInseeYear(
     params: Partial<mvTypes.InseeYearParams> = {}
   ): Promise<mvTypes.HousesByInseeYear[]> {
@@ -99,10 +89,18 @@ export class AnalyticsService {
     );
   }
 
-  async getHousesByInseeYoY(params: Partial<mvTypes.InseeYearParams> = {}) {
+  async getApartmentsByInseeYoY(params: Partial<mvTypes.YearDeltaParams> = {}) {
+    return this.fetchCollection(
+      "/apartments/by-insee-code/year/deltas",
+      mvSchemas.YearlyDeltasByInseeSchema.array(),
+      params
+    );
+  }
+
+  async getHousesByInseeYoY(params: Partial<mvTypes.YearDeltaParams> = {}) {
     return this.fetchCollection(
       "/houses/by-insee-code/year/deltas",
-      mvDeltasSchemas.YearlyDeltasByInseeSchema.array(),
+      mvSchemas.YearlyDeltasByInseeSchema.array(),
       params
     );
   }
@@ -157,18 +155,20 @@ export class AnalyticsService {
     );
   }
 
-  async getApartmentsBySectionYoY(params: Partial<mvTypes.SectionYearParams> = {}) {
+  async getApartmentsBySectionYoY(
+    params: Partial<mvTypes.YearDeltaParams> = {}
+  ) {
     return this.fetchCollection(
       "/apartments/by-section/year/deltas",
-      mvDeltasSchemas.YearlyDeltasBySectionSchema.array(),
+      mvSchemas.YearlyDeltasBySectionSchema.array(),
       params
     );
   }
 
-  async getHousesBySectionYoY(params: Partial<mvTypes.SectionYearParams> = {}) {
+  async getHousesBySectionYoY(params: Partial<mvTypes.YearDeltaParams> = {}) {
     return this.fetchCollection(
       "/houses/by-section/year/deltas",
-      mvDeltasSchemas.YearlyDeltasBySectionSchema.array(),
+      mvSchemas.YearlyDeltasBySectionSchema.array(),
       params
     );
   }

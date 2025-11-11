@@ -7,30 +7,8 @@ import {
   type SetStateAction,
 } from "react";
 import { flexRender, type Row, type Table } from "@tanstack/react-table";
-import type { AggregateMetricsMV, MetricField } from "@/types";
-import type { CommuneMetricRow } from "./CommuneMetricTable";
-import type { SectionMetricRow } from "./SectionMetricTable";
 import { MetricTableExpandedRow } from "./MetricTableExpandedRow";
-
-export interface YearBreakdownRow {
-  year: number;
-  metricValue: number | null;
-  metricPctChange: number | null;
-  totalSales: number | null;
-}
-
-export interface MetricRowBase {
-  metricValue: number | null;
-  metricPctChange: number | null;
-  totalSales: number | null;
-  yearlyBreakdown: YearBreakdownRow[];
-}
-
-export type MetricTableRow = CommuneMetricRow | SectionMetricRow;
-
-export type NumericMetricField = {
-  [K in MetricField]: AggregateMetricsMV[K] extends number ? K : never;
-}[MetricField];
+import type { MetricTableRow, NumericMetricField } from "./types";
 
 export type TableStatus = "loading" | "error" | "empty" | "ready";
 

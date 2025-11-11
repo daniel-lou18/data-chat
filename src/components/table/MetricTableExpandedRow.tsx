@@ -1,9 +1,11 @@
 import type { Row } from "@tanstack/react-table";
-import type { MetricTableRow } from "./MetricTableShared";
+import type { MetricTableRow } from "./types";
 import { useMetricTableContext } from "./MetricTableShared";
-import { MetricValueCell } from "./MetricTableCell";
-import { PercentChangeCell } from "./MetricTableCell";
-import { CountCell } from "./MetricTableCell";
+import {
+  MetricValueCell,
+  PercentChangeCell,
+  CountCell,
+} from "./MetricTableCell";
 
 export function MetricTableExpandedRow<TRow extends MetricTableRow>({
   row,

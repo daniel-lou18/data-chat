@@ -6,36 +6,31 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-
 import {
   MetricTableBody,
   MetricTableContainer,
   MetricTableHeader,
+  type TableStatus,
 } from "./MetricTableShared";
+import { METRIC_CATALOG } from "@/constants";
 import type {
-  MetricRowBase,
   NumericMetricField,
-  TableStatus,
-  YearBreakdownRow,
-} from "./MetricTableShared";
-import { METRIC_CATALOG, type MetricPercentChangeField } from "@/constants";
-import type { SectionTableData } from "@/types";
-import {
-  CountCell,
-  MetricValueCell,
-  PercentChangeCell,
-  SparklineCell,
-} from "./MetricTableCell";
+  SectionTableData,
+  SectionMetricRow,
+  SectionYoYTableData,
+} from "@/types";
+import { CountCell, MetricValueCell, SparklineCell } from "./MetricTableCell";
 import { DimensionTableCell } from "./DimensionTableCell";
-
-export interface SectionMetricRow extends MetricRowBase {
-  section: string;
-}
+import {
+  groupDataByKey,
+  groupYoYDataByKey,
+  transformBreakdownToTableRows,
+} from "./tableDataHelpers";
 
 const columnHelper = createColumnHelper<SectionMetricRow>();
 
 interface SectionMetricTableProps {
-  data: SectionTableData[];
+  data: SectionYoYTableData[];
   isLoading: boolean;
   isError: boolean;
   error: unknown;
@@ -55,60 +50,26 @@ export function SectionMetricTable({
   hoveredRowId,
   setHoveredRowId,
 }: SectionMetricTableProps) {
-  const breakdownBySection = useMemo(() => {
-    const map = new Map<string, YearBreakdownRow[]>();
-    const pctChangeKey = `${metric}_pct_change` as MetricPercentChangeField;
+  const breakdownBySection = useMemo(
+    () => groupYoYDataByKey(data, metric, (item) => item.section ?? ""),
+    [data, metric]
+  );
 
-    data.forEach((item) => {
-      const sectionKey = item.section ?? "";
-      const metricValue = item[metric] ?? null;
-      const metricPctChange =
-        (item[pctChangeKey] as number | null | undefined) ?? null;
-      const entry: YearBreakdownRow = {
-        year: item.year,
-        metricValue,
-        metricPctChange,
-        totalSales: item.transactions,
-      };
-
-      const existing = map.get(sectionKey);
-      if (existing) {
-        existing.push(entry);
-      } else {
-        map.set(sectionKey, [entry]);
-      }
-    });
-
-    map.forEach((rows) => {
-      rows.sort((a, b) => b.year - a.year);
-    });
-
-    return map;
-  }, [data, metric]);
-
-  const tableData = useMemo<SectionMetricRow[]>(() => {
-    return Array.from(breakdownBySection.entries())
-      .map(([section, breakdown]) => {
-        const selectedRow =
-          selectedYear !== undefined
-            ? (breakdown.find((row) => row.year === selectedYear) ??
-              breakdown[0])
-            : breakdown[0];
-
-        return {
-          section,
-          metricValue: selectedRow?.metricValue ?? null,
-          metricPctChange: selectedRow?.metricPctChange ?? null,
-          totalSales: selectedRow?.totalSales ?? null,
-          yearlyBreakdown: breakdown,
-        } satisfies SectionMetricRow;
-      })
-      .sort((a, b) => {
-        if (a.metricValue === null) return 1;
-        if (b.metricValue === null) return -1;
-        return b.metricValue - a.metricValue;
-      });
-  }, [breakdownBySection, selectedYear]);
+  const tableData = useMemo<SectionMetricRow[]>(
+    () =>
+      transformBreakdownToTableRows(
+        breakdownBySection,
+        (section, breakdown, selectedRow) =>
+          ({
+            section,
+            metricValue: selectedRow?.metricValue ?? null,
+            totalSales: selectedRow?.totalSales ?? null,
+            yearlyBreakdown: breakdown,
+          }) satisfies SectionMetricRow,
+        selectedYear
+      ),
+    [breakdownBySection, selectedYear]
+  );
 
   const metricMetadata = METRIC_CATALOG[metric];
   const metricLabel = metricMetadata?.label ?? metric;
@@ -147,11 +108,6 @@ export function SectionMetricTable({
         ),
         meta: { className: "text-right" },
       }),
-      // columnHelper.accessor("metricPctChange", {
-      //   header: "YoY %",
-      //   cell: ({ getValue }) => <PercentChangeCell value={getValue()} />,
-      //   meta: { className: "text-right" },
-      // }),
       columnHelper.accessor("totalSales", {
         header: "N° Sales",
         cell: ({ getValue }) => <CountCell value={getValue()} />,

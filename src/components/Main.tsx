@@ -9,7 +9,7 @@ import DataSource from "./table/DataSource";
 import Topbar from "./topbar";
 import { useMapFilters } from "@/hooks/map/useMapFilters";
 import { SectionMetricTable, CommuneMetricTable } from "./table";
-import { useAggregatesFromParams } from "@/hooks/data/useAggregatesFromParams";
+import { useYoYAggregatesFromParams } from "@/hooks/data/useYoYAggregatesFromParams";
 
 function App() {
   const tableState = useTableState();
@@ -30,14 +30,14 @@ function App() {
     isLoading: communeLoading,
     isError: isCommuneError,
     error: communeError,
-  } = useAggregatesFromParams().communeQuery;
+  } = useYoYAggregatesFromParams().communeQuery;
 
   const {
     data: sectionData,
     isLoading: sectionLoading,
     isError: isSectionError,
     error: sectionError,
-  } = useAggregatesFromParams().sectionQuery;
+  } = useYoYAggregatesFromParams().sectionQuery;
 
   const [hoveredFeatureId, setHoveredFeatureId] = useState<string | null>(null);
 

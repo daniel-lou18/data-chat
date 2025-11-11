@@ -8,7 +8,7 @@ const NullableNumber = z.union([z.number(), z.null()]);
 // ----------------------------------------------------------------------------
 // Deltas for a single metric: base, current, delta, pct_change
 // ----------------------------------------------------------------------------
-const MetricDelta = z.object({
+export const MetricDelta = z.object({
   base: NullableNumber.describe("Value in the base period (e.g. year N-1)"),
   current: NullableNumber.describe(
     "Value in the comparison period (e.g. year N)"
@@ -170,11 +170,3 @@ export const YearDeltaParamsSchema = PaginationParams.extend({
     .optional()
     .describe("Minimum percentage change (e.g. 10 => 10%)"),
 });
-
-// ----------------------------------------------------------------------------
-// Type exports
-// ----------------------------------------------------------------------------
-export type YearlyDeltasMetrics = z.infer<typeof YearlyDeltasMetrics>;
-export type YearlyDeltasByInsee = z.infer<typeof YearlyDeltasByInseeSchema>;
-export type YearlyDeltasBySection = z.infer<typeof YearlyDeltasBySectionSchema>;
-export type YearDeltaParams = z.infer<typeof YearDeltaParamsSchema>;
