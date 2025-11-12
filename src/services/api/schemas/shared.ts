@@ -2,7 +2,9 @@ import { z } from "zod";
 import {
   FEATURE_LEVELS,
   FEATURE_YEARS,
+  ISO_WEEKS,
   METRIC_FIELDS,
+  MONTHS,
   PROPERTY_TYPES,
 } from "@/constants";
 import type { MetricField } from "@/types";
@@ -20,13 +22,21 @@ export const YEAR_SCHEMA = z.coerce
   .int()
   .min(FEATURE_YEARS[0])
   .max(FEATURE_YEARS[FEATURE_YEARS.length - 1]);
-export const MONTH_SCHEMA = z.coerce.number().int().min(1).max(12);
+export const MONTH_SCHEMA = z.coerce
+  .number()
+  .int()
+  .min(MONTHS[0])
+  .max(MONTHS[MONTHS.length - 1]);
 export const ISO_YEAR_SCHEMA = z.coerce
   .number()
   .int()
   .min(FEATURE_YEARS[0])
   .max(FEATURE_YEARS[FEATURE_YEARS.length - 1]);
-export const ISO_WEEK_SCHEMA = z.coerce.number().int().min(1).max(53);
+export const ISO_WEEK_SCHEMA = z.coerce
+  .number()
+  .int()
+  .min(ISO_WEEKS[0])
+  .max(ISO_WEEKS[ISO_WEEKS.length - 1]);
 
 export const LEVEL_SCHEMA = z.enum(FEATURE_LEVELS).default("commune");
 export const PROPERTY_TYPE_SCHEMA = z.enum(PROPERTY_TYPES).default("apartment");

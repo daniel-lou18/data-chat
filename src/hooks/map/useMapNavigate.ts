@@ -1,4 +1,4 @@
-import type { CommuneFeature, SectionFeature } from "@/services/api/mapService";
+import type { CommuneFeature, SectionFeature } from "@/types";
 import { createSlug } from "@/utils/urlUtils";
 import { useLocation, useNavigate } from "react-router";
 

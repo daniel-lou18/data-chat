@@ -1,6 +1,6 @@
 import { useState } from "react";
 import PriceLegend from "./PriceLegend";
-import { useMapLegend, useMapFilters } from "@/hooks/map";
+import { useMapLegend, useFilters } from "@/hooks/map";
 import type { MapLegendBucket } from "@/types";
 import { MAP_BUCKET_COLORS } from "./colors";
 import { formatMetricValue, humanizeMetricName } from "./mapLegendUtils";
@@ -12,7 +12,7 @@ type MapLegendProps = {
 export default function MapLegend({
   selectedArrondissementIds,
 }: MapLegendProps) {
-  const { state: filters } = useMapFilters();
+  const { state: filters } = useFilters();
   const [isExpanded, setIsExpanded] = useState(false);
   const {
     data: legend,

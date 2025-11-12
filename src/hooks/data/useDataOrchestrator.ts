@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { useChat } from "@/hooks/chat";
 import { useAggregatesFromParams } from "./useAggregatesFromParams";
-import { useMapFilters } from "../map/useMapFilters";
+import { useFilters } from "../map";
 
 export type DataSource = "chat" | "map" | null;
 
@@ -10,7 +10,7 @@ export type DataSource = "chat" | "map" | null;
  * Manages which data source is most recent and should be displayed
  */
 export function useDataOrchestrator() {
-  const { state: filterState } = useMapFilters();
+  const { state: filterState } = useFilters();
   const {
     data: chatData,
     isProcessing: chatProcessing,

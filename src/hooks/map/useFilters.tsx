@@ -7,9 +7,9 @@ import {
   type ReactNode,
 } from "react";
 import type { FeatureLevel, MetricField, PropertyType } from "@/types";
-import { useSyncUrlWithFilters } from "./useMapFiltersNavigate";
+import { useSyncUrlWithFilters } from "./useFiltersNavigate";
 
-export interface MapFilterState {
+export interface FilterState {
   level: FeatureLevel;
   propertyType: PropertyType;
   field: MetricField;
@@ -22,10 +22,10 @@ export interface MapFilterState {
   offset?: number;
 }
 
-export interface MapFilterContextValue {
-  state: MapFilterState;
-  setFilters: (updates: Partial<MapFilterState>) => void;
-  resetFilters: (nextState?: Partial<MapFilterState>) => void;
+export interface FilterContextValue {
+  state: FilterState;
+  setFilters: (updates: Partial<FilterState>) => void;
+  resetFilters: (nextState?: Partial<FilterState>) => void;
   setLevel: (level: FeatureLevel) => void;
   setField: (field: MetricField) => void;
   setPropertyType: (propertyType: PropertyType) => void;
@@ -36,7 +36,7 @@ export interface MapFilterContextValue {
   setSections: (sections: string[]) => void;
 }
 
-export const DEFAULT_MAP_FILTERS: MapFilterState = {
+export const DEFAULT_FILTERS: FilterState = {
   level: "commune",
   propertyType: "apartment",
   field: "avg_price_m2",
@@ -45,34 +45,32 @@ export const DEFAULT_MAP_FILTERS: MapFilterState = {
   sections: [],
 };
 
-const MapFilterContext = createContext<MapFilterContextValue | undefined>(
-  undefined
-);
+const FilterContext = createContext<FilterContextValue | undefined>(undefined);
 
-interface MapFilterProviderProps {
+interface FilterProviderProps {
   children: ReactNode;
-  initialState?: Partial<MapFilterState>;
+  initialState?: Partial<FilterState>;
 }
 
 export function MapFilterProvider({
   children,
   initialState,
-}: MapFilterProviderProps) {
-  const [state, setState] = useState<MapFilterState>({
-    ...DEFAULT_MAP_FILTERS,
+}: FilterProviderProps) {
+  const [state, setState] = useState<FilterState>({
+    ...DEFAULT_FILTERS,
     ...initialState,
   });
 
-  const setFilters = useCallback((updates: Partial<MapFilterState>) => {
+  const setFilters = useCallback((updates: Partial<FilterState>) => {
     setState((prev) => ({
       ...prev,
       ...updates,
     }));
   }, []);
 
-  const resetFilters = useCallback((nextState?: Partial<MapFilterState>) => {
+  const resetFilters = useCallback((nextState?: Partial<FilterState>) => {
     setState({
-      ...DEFAULT_MAP_FILTERS,
+      ...DEFAULT_FILTERS,
       ...nextState,
     });
   }, []);
@@ -155,7 +153,7 @@ export function MapFilterProvider({
 
   useSyncUrlWithFilters(setLevel);
 
-  const value = useMemo<MapFilterContextValue>(
+  const value = useMemo<FilterContextValue>(
     () => ({
       state,
       setFilters,
@@ -185,16 +183,14 @@ export function MapFilterProvider({
   );
 
   return (
-    <MapFilterContext.Provider value={value}>
-      {children}
-    </MapFilterContext.Provider>
+    <FilterContext.Provider value={value}>{children}</FilterContext.Provider>
   );
 }
 
-export function useMapFilters(): MapFilterContextValue {
-  const context = useContext(MapFilterContext);
+export function useFilters(): FilterContextValue {
+  const context = useContext(FilterContext);
   if (!context) {
-    throw new Error("useMapFilters must be used within a MapFilterProvider");
+    throw new Error("useFilters must be used within a MapFilterProvider");
   }
 
   return context;

@@ -12,7 +12,7 @@ import ErrorOverlay from "./ErrorOverlay";
 import MapLegend from "./MapLegend";
 import { DEFAULT_MAP_VIEW_STATE, type PopupInfo } from "./config";
 import { getCenterFromCoordinates } from "@/utils/mapUtils";
-import { useMapNavigate, useMapFilters, useStyleMap } from "@/hooks/map";
+import { useMapNavigate, useFilters, useStyleMap } from "@/hooks/map";
 
 type MapProps = Omit<LayerManagerProps, "level"> & {
   onMapClick?: () => void;
@@ -28,7 +28,7 @@ export default function Map({
   const [viewState, setViewState] = useState(DEFAULT_MAP_VIEW_STATE);
   const [popupInfo, setPopupInfo] = useState<PopupInfo | null>(null);
 
-  const { state: filterState, setInseeCodes } = useMapFilters();
+  const { state: filterState, setInseeCodes } = useFilters();
   const { isLoading: isDataLoading, error: dataError } = useStyleMap();
 
   const onMouseMove = useCallback((event: any) => {

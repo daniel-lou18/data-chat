@@ -3,7 +3,7 @@ import {
   useGetAggregatesYoYByInseeCode,
   useGetAggregatesYoYByInseeCodeAndSection,
 } from "./useGetAggregatesYoY";
-import { useMapFilters } from "../map/useMapFilters";
+import { useFilters } from "../map";
 import type {
   CommuneYoYTableData,
   SectionYoYTableData,
@@ -28,7 +28,7 @@ import type { UseQueryResult } from "@tanstack/react-query";
  */
 export function useYoYAggregatesFromParams() {
   const { commune, section } = useParams();
-  const { state: filterState } = useMapFilters();
+  const { state: filterState } = useFilters();
 
   const inseeCode = commune?.split("-").at(-1);
 

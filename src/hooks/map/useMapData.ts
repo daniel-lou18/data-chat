@@ -8,7 +8,7 @@ import type {
   MapLegendResponse,
 } from "@/types";
 import { GC_TIME, STALE_TIME } from "@/hooks/data/constants";
-import { useMapFilters } from "./useMapFilters";
+import { useFilters } from "./useFilters";
 
 export const mapQueryKeys = {
   all: ["map"] as const,
@@ -45,7 +45,7 @@ export function useMapFeatureCollection(
   params?: Partial<MapFeatureParams>,
   options?: MapFeaturesQueryOptions
 ) {
-  const { state: filterState } = useMapFilters();
+  const { state: filterState } = useFilters();
 
   const mergedParams = {
     ...filterState,
@@ -72,7 +72,7 @@ export function useMapLegend(
   params?: Partial<MapLegendParams>,
   options?: MapLegendQueryOptions
 ) {
-  const { state: filterState } = useMapFilters();
+  const { state: filterState } = useFilters();
 
   const mergedParams = {
     ...filterState,

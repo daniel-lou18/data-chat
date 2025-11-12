@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import type { MapFilterState } from "@/hooks/map/useMapFilters";
+import type { FilterState } from "@/hooks/map";
 
 import {
   CLEAR_VALUE,
@@ -72,7 +72,7 @@ export function MapFilterSelect<K extends FilterableKeys>({
         return;
       }
 
-      applyValue(option.value as MapFilterState[K]);
+      applyValue(option.value as FilterState[K]);
     },
     [applyValue, clearable, valueMap]
   );

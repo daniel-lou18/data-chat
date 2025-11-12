@@ -3,7 +3,7 @@ import { MessagesList } from "./MessagesList";
 import { ErrorDisplay } from "./ErrorDisplay";
 import { MessageInput } from "./MessageInput";
 import { ClearChatButton } from "./ClearChatButton";
-import type { GenericData } from "../table/tableColumns";
+import type { TableData } from "@/types";
 
 interface ChatInterfaceProps {
   messages: ChatMessage[];
@@ -14,8 +14,8 @@ interface ChatInterfaceProps {
   onSubmit: (message: string) => void;
   isProcessing: boolean;
   onClear: () => void;
-  data: GenericData[];
-  table: Table<GenericData>;
+  data: TableData[];
+  table: Table<TableData>;
 }
 
 export interface ChatMessage {

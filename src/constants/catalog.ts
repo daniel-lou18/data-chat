@@ -4,8 +4,7 @@ import type {
   MetricCatalogItem,
   MetricField,
 } from "@/types";
-import { FEATURE_YEARS } from "./dimensions";
-import { z } from "zod";
+import * as schemas from "@/services/api/schemas/shared";
 
 const TOTAL_SALES: MetricCatalogItem = {
   id: "total_sales",
@@ -193,7 +192,7 @@ const INSEE_CODE: DimensionCatalogItem = {
   label: "INSEE Code",
   category: "spatial",
   level: "commune",
-  type: z.string().length(5),
+  type: schemas.INSEE_CODE_SCHEMA,
 };
 
 const SECTION: DimensionCatalogItem = {
@@ -201,43 +200,35 @@ const SECTION: DimensionCatalogItem = {
   label: "Section",
   category: "spatial",
   level: "section",
-  type: z.string().length(10),
+  type: schemas.SECTION_SCHEMA,
 };
 
 const YEAR: DimensionCatalogItem = {
   id: "year",
   label: "Year",
   category: "temporal",
-  type: z.coerce
-    .number()
-    .int()
-    .min(FEATURE_YEARS[0])
-    .max(FEATURE_YEARS[FEATURE_YEARS.length - 1]),
+  type: schemas.YEAR_SCHEMA,
 };
 
 const MONTH: DimensionCatalogItem = {
   id: "month",
   label: "Month",
   category: "temporal",
-  type: z.coerce.number().int().min(1).max(12),
+  type: schemas.MONTH_SCHEMA,
 };
 
 const ISO_YEAR: DimensionCatalogItem = {
   id: "iso_year",
   label: "ISO Year",
   category: "temporal",
-  type: z.coerce
-    .number()
-    .int()
-    .min(FEATURE_YEARS[0])
-    .max(FEATURE_YEARS[FEATURE_YEARS.length - 1]),
+  type: schemas.ISO_YEAR_SCHEMA,
 };
 
 const ISO_WEEK: DimensionCatalogItem = {
   id: "iso_week",
   label: "ISO Week",
   category: "temporal",
-  type: z.coerce.number().int().min(1).max(53),
+  type: schemas.ISO_WEEK_SCHEMA,
 };
 
 export const DIMENSION_CATALOG: Record<DimensionField, DimensionCatalogItem> = {

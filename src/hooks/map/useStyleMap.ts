@@ -4,14 +4,14 @@ import { useMapLegend } from "./useMapData";
 import { MAP_BUCKET_COLOR_HEX } from "@/components/map/colors";
 import type { MapLegendResponse } from "@/types";
 import type { ExpressionSpecification } from "maplibre-gl";
-import { useMapFilters } from "./useMapFilters";
+import { useFilters } from "./useFilters";
 
 /**
  * Custom hook for MapLibre dynamic styling based on backend legend data
  *
  */
 export function useStyleMap() {
-  const { state: filterState } = useMapFilters();
+  const { state: filterState } = useFilters();
 
   // Fetch legends for commune and section levels
   const communeLegend = useMapLegend({

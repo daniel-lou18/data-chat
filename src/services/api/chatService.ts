@@ -1,10 +1,10 @@
-import type { GenericData } from "@/components/table/tableColumns";
+import type { TableData } from "@/types";
 import { apiService } from "./baseApiService";
 import type { ModelMessage } from "ai";
 
 export type DataChatResponse = {
   messages: ModelMessage[];
-  data: GenericData[];
+  data: TableData[];
 };
 
 /**

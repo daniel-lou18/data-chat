@@ -1,10 +1,10 @@
-import { type GenericData } from "../components/table/tableColumns";
+import { type TableData } from "@/types";
 
 /**
  * Extracts INSEE codes/arrondissements from an array of data objects
  * Uses multiple strategies to identify and extract the codes
  */
-export function extractInseeCodes(data: GenericData[]): string[] {
+export function extractInseeCodes(data: TableData[]): string[] {
   if (!data || data.length === 0) return [];
 
   const codes = new Set<string>();
@@ -88,7 +88,7 @@ function findInseeColumns(sampleRow: Record<string, any>): string[] {
 /**
  * Finds columns that contain values matching INSEE code patterns
  */
-function findInseePatternColumns(data: GenericData[]): string[] {
+function findInseePatternColumns(data: TableData[]): string[] {
   const patternColumns: string[] = [];
   const sampleRow = data[0];
 
@@ -173,7 +173,7 @@ export function getInseeCodeStats(codes: string[]): {
  * Extracts parcel IDs from an array of data objects
  * Uses multiple strategies to identify and extract the parcel IDs
  */
-export function extractParcelIds(data: GenericData[]): string[] {
+export function extractParcelIds(data: TableData[]): string[] {
   if (!data || data.length === 0) return [];
 
   const parcelIds = new Set<string>();
@@ -247,7 +247,7 @@ function findParcelColumns(sampleRow: Record<string, any>): string[] {
 /**
  * Finds columns that contain values matching parcel ID patterns
  */
-function findParcelPatternColumns(data: GenericData[]): string[] {
+function findParcelPatternColumns(data: TableData[]): string[] {
   const patternColumns: string[] = [];
   const sampleRow = data[0];
 
@@ -358,7 +358,7 @@ export function getParcelIdStats(parcelIds: string[]): {
   };
 }
 
-export function extractInseeCodesAndSectionIds(data: GenericData[]): {
+export function extractInseeCodesAndSectionIds(data: TableData[]): {
   inseeCodes: string[];
   sectionIds: string[];
 } {
@@ -388,7 +388,7 @@ export function getSectionIds(parcelIds: string[]): string[] {
 /**
  * Extracts section IDs directly from data by parsing parcel IDs
  */
-export function extractSectionIds(data: GenericData[]): string[] {
+export function extractSectionIds(data: TableData[]): string[] {
   const parcelIds = extractParcelIds(data);
   return getSectionIds(parcelIds);
 }
@@ -396,7 +396,7 @@ export function extractSectionIds(data: GenericData[]): string[] {
 /**
  * Extracts section codes (AA, BD, DX, etc.) from dataset columns
  */
-export function extractSectionCodes(data: GenericData[]): string[] {
+export function extractSectionCodes(data: TableData[]): string[] {
   if (!data || data.length === 0) return [];
 
   const sectionCodes = new Set<string>();
@@ -460,7 +460,7 @@ function findSectionColumns(sampleRow: Record<string, any>): string[] {
 /**
  * Finds columns that contain values matching section code patterns
  */
-function findSectionPatternColumns(data: GenericData[]): string[] {
+function findSectionPatternColumns(data: TableData[]): string[] {
   const patternColumns: string[] = [];
   const sampleRow = data[0];
 
@@ -530,7 +530,7 @@ export function createSectionIdsFromCodes(
 /**
  * Extracts both INSEE codes and section codes, then creates section IDs
  */
-export function extractInseeCodesAndCreateSectionIds(data: GenericData[]): {
+export function extractInseeCodesAndCreateSectionIds(data: TableData[]): {
   inseeCodes: string[];
   sectionIds: string[];
 } {

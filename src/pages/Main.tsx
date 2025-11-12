@@ -1,4 +1,4 @@
-import { MapFilterProvider } from "@/hooks/map/useMapFilters";
+import { MapFilterProvider } from "@/hooks/map";
 import Main from "../components/Main";
 
 export default function MainPage() {

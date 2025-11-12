@@ -7,7 +7,7 @@ import { useDataOrchestrator } from "@/hooks/data/useDataOrchestrator";
 import ActionButtons from "./table/ActionButtons";
 import DataSource from "./table/DataSource";
 import Topbar from "./topbar";
-import { useMapFilters } from "@/hooks/map/useMapFilters";
+import { useFilters } from "@/hooks/map";
 import { SectionMetricTable, CommuneMetricTable } from "./table";
 import { useYoYAggregatesFromParams } from "@/hooks/data/useYoYAggregatesFromParams";
 
@@ -15,7 +15,7 @@ function App() {
   const tableState = useTableState();
   const {
     state: { field, level },
-  } = useMapFilters();
+  } = useFilters();
   const {
     dataSource,
     isProcessing,

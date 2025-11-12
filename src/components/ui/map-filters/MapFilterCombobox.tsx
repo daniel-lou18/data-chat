@@ -18,7 +18,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-import type { MapFilterState } from "@/hooks/map/useMapFilters";
+import type { FilterState } from "@/hooks/map";
 
 import {
   CLEAR_VALUE,
@@ -83,7 +83,7 @@ export function MapFilterCombobox<K extends FilterableKeys>({
         return;
       }
 
-      const nextValue = option.value as MapFilterState[K];
+      const nextValue = option.value as FilterState[K];
 
       if (currentValue === nextValue) {
         if (clearable && currentValue !== undefined) {

@@ -3,7 +3,7 @@ import {
   useGetAggregatesByInseeCode,
   useGetAggregatesByInseeCodeAndSection,
 } from "./useGetAggregates";
-import { useMapFilters } from "../map/useMapFilters";
+import { useFilters } from "../map";
 import type { CommuneTableData, SectionTableData } from "@/types";
 import type { UseQueryResult } from "@tanstack/react-query";
 
@@ -26,7 +26,7 @@ import type { UseQueryResult } from "@tanstack/react-query";
 
 export function useAggregatesFromParams() {
   const { commune, section } = useParams();
-  const { state: filterState } = useMapFilters();
+  const { state: filterState } = useFilters();
 
   const inseeCode = commune?.split("-").at(-1);
 
