@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 type DataSourceProps = {
   dataSource?: "chat" | "map" | null;
   lastUpdateTime?: number;
@@ -19,15 +21,17 @@ export default function DataSource({
           <div className="flex items-center space-x-2">
             <div className="relative">
               <div
-                className={`w-3 h-3 rounded-full ${
+                className={cn(
+                  "w-3 h-3 rounded-full",
                   dataSource === "chat" ? "bg-blue-500" : "bg-emerald-500"
-                }`}
+                )}
               />
               {isProcessing && (
                 <div
-                  className={`absolute -top-1 -right-1 w-2 h-2 rounded-full animate-pulse ${
+                  className={cn(
+                    "absolute -top-1 -right-1 w-2 h-2 rounded-full animate-pulse",
                     dataSource === "chat" ? "bg-blue-300" : "bg-emerald-300"
-                  }`}
+                  )}
                 />
               )}
             </div>

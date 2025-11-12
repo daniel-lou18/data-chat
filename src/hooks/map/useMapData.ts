@@ -47,10 +47,8 @@ export function useMapFeatureCollection(
 ) {
   const { state: filterState } = useMapFilters();
 
-  const { selectedInseeCode, ...filterParams } = filterState;
-
   const mergedParams = {
-    ...filterParams,
+    ...filterState,
     ...(params ?? {}),
   } as MapFeatureParams;
 
@@ -76,20 +74,10 @@ export function useMapLegend(
 ) {
   const { state: filterState } = useMapFilters();
 
-  const { selectedInseeCode, ...filterParams } = filterState;
-
   const mergedParams = {
-    ...filterParams,
+    ...filterState,
     ...(params ?? {}),
   } as MapLegendParams;
-
-  if (!("inseeCode" in mergedParams) && selectedInseeCode) {
-    mergedParams.inseeCode = selectedInseeCode;
-  }
-
-  if (mergedParams.inseeCode === undefined) {
-    delete mergedParams.inseeCode;
-  }
 
   const queryParams = sanitizeLegendParams(mergedParams);
 
@@ -119,7 +107,10 @@ function createParamsKey(params: MapFeatureParams | MapLegendParams): string {
 function sanitizeFeatureParams(params: MapFeatureParams): MapFeatureParams {
   return Object.fromEntries(
     Object.entries(params).filter(
-      ([, value]) => value !== undefined && value !== null
+      ([, value]) =>
+        value !== undefined &&
+        value !== null &&
+        (!Array.isArray(value) || value.length > 0)
     )
   ) as MapFeatureParams;
 }
@@ -127,7 +118,10 @@ function sanitizeFeatureParams(params: MapFeatureParams): MapFeatureParams {
 function sanitizeLegendParams(params: MapLegendParams): MapLegendParams {
   return Object.fromEntries(
     Object.entries(params).filter(
-      ([, value]) => value !== undefined && value !== null
+      ([, value]) =>
+        value !== undefined &&
+        value !== null &&
+        (!Array.isArray(value) || value.length > 0)
     )
   ) as MapLegendParams;
 }

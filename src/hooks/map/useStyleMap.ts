@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { useMapLegend } from "./useMapData";
 import { MAP_BUCKET_COLOR_HEX } from "@/components/map/colors";
-import type { MapLegendResponse } from "@/services/api";
+import type { MapLegendResponse } from "@/types";
 import type { ExpressionSpecification } from "maplibre-gl";
 import { useMapFilters } from "./useMapFilters";
 
@@ -21,7 +21,7 @@ export function useStyleMap() {
   const sectionLegend = useMapLegend({
     level: "section",
     year: filterState.year,
-    inseeCode: filterState.selectedInseeCode ?? undefined,
+    inseeCodes: filterState.inseeCodes,
   });
 
   const arrondissementFillColor = useMemo(

@@ -1,10 +1,13 @@
 import { z } from "zod";
-import * as mvSchemas from "@/services/api/schemas/mvSchemas";
+import type {
+  COMPOSITION_FIELDS,
+  HOUSE_COMPOSITION_FIELDS,
+  METRIC_FIELDS,
+} from "@/constants";
+import type { AggregateMetricsMVSchema } from "@/services/api/schemas";
 
-export type AggregateMetricsMV = z.infer<
-  typeof mvSchemas.AggregateMetricsMVSchema
->;
-export type MetricField = keyof AggregateMetricsMV;
+export type AggregateMetricsMV = z.infer<typeof AggregateMetricsMVSchema>;
+export type MetricField = (typeof METRIC_FIELDS)[number];
 
 export type MetricType = "measure" | "percentage" | "count" | "ratio";
 
@@ -28,3 +31,6 @@ export type ColumnTemplate =
   | "sparkline" // small inline series
   | "slope" // linear trend slope
   | "qualityBadge"; // data quality indicator
+
+export type ApartmentCompositionField = (typeof COMPOSITION_FIELDS)[number];
+export type HouseCompositionField = (typeof HOUSE_COMPOSITION_FIELDS)[number];

@@ -28,7 +28,7 @@ export default function Map({
   const [viewState, setViewState] = useState(DEFAULT_MAP_VIEW_STATE);
   const [popupInfo, setPopupInfo] = useState<PopupInfo | null>(null);
 
-  const { state: filterState, setSelectedInseeCode } = useMapFilters();
+  const { state: filterState, setInseeCodes } = useMapFilters();
   const { isLoading: isDataLoading, error: dataError } = useStyleMap();
 
   const onMouseMove = useCallback((event: any) => {
@@ -65,7 +65,7 @@ export default function Map({
       const isArrondissement = feature.properties && feature.properties.name;
 
       if (isArrondissement) {
-        setSelectedInseeCode(feature.properties.id);
+        setInseeCodes([feature.properties.id]);
         navigateToArrondissement(feature);
 
         // Notify parent component that map was clicked
@@ -88,7 +88,7 @@ export default function Map({
         onMapClick?.();
       }
     },
-    [onMapClick]
+    [navigateToArrondissement, navigateToSection, onMapClick, setInseeCodes]
   );
 
   return (
@@ -96,9 +96,7 @@ export default function Map({
       {isDataLoading && <LoadingOverlay message="Loading price data..." />}
       {dataError && <ErrorOverlay message="Error loading data" />}
 
-      <MapLegend
-        selectedArrondissementId={filterState.selectedInseeCode ?? null}
-      />
+      <MapLegend selectedArrondissementIds={filterState.inseeCodes} />
 
       <MapLibreMap
         {...viewState}
@@ -119,7 +117,7 @@ export default function Map({
       >
         <LayerManager
           hoveredFeatureId={hoveredFeatureId}
-          selectedArrondissementId={filterState.selectedInseeCode ?? null}
+          selectedArrondissementIds={filterState.inseeCodes}
           level={filterState.level}
         />
 

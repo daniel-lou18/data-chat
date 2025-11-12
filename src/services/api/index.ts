@@ -10,12 +10,3 @@ export { MapService, mapService } from "./mapService";
 
 // Re-export types for convenience
 export type { ApiRequestConfig, ApiResponse, ApiError } from "./baseApiService";
-export type {
-  MapFeature,
-  MapFeatureCollection,
-  MapLegendBucket,
-  MapLegendResponse,
-  MapLegendStats,
-  SectionFeatureProperties,
-  CommuneFeatureProperties,
-} from "./mapService";

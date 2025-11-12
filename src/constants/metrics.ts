@@ -1,10 +1,24 @@
-import { AggregateMetricsMVSchema } from "@/services/api/schemas/mvSchemas";
 import type { MetricField } from "@/types";
 import { METRIC_CATALOG } from "./catalog";
 
-export const METRIC_FIELDS = Object.keys(
-  AggregateMetricsMVSchema.shape
-) as MetricField[];
+export const METRIC_FIELDS = [
+  "total_sales",
+  "total_price",
+  "avg_price",
+  "total_area",
+  "avg_area",
+  "avg_price_m2",
+  "min_price",
+  "max_price",
+  "median_price",
+  "median_area",
+  "min_price_m2",
+  "max_price_m2",
+  "price_m2_p25",
+  "price_m2_p75",
+  "price_m2_iqr",
+  "price_m2_stddev",
+] as const;
 
 export const METRIC_OPTIONS = METRIC_FIELDS.map((field) => ({
   value: field,
@@ -12,3 +26,21 @@ export const METRIC_OPTIONS = METRIC_FIELDS.map((field) => ({
 }));
 
 export type MetricPercentChangeField = `${MetricField}_pct_change`;
+
+export const COMPOSITION_FIELDS = [
+  "total_apartments",
+  "apartment_1_room",
+  "apartment_2_room",
+  "apartment_3_room",
+  "apartment_4_room",
+  "apartment_5_room",
+] as const;
+
+export const HOUSE_COMPOSITION_FIELDS = [
+  "total_houses",
+  "house_1_room",
+  "house_2_room",
+  "house_3_room",
+  "house_4_room",
+  "house_5_room",
+] as const;

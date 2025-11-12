@@ -9,6 +9,7 @@ import {
 import { flexRender, type Row, type Table } from "@tanstack/react-table";
 import { MetricTableExpandedRow } from "./MetricTableExpandedRow";
 import type { MetricTableRow, NumericMetricField } from "./types";
+import { cn } from "@/lib/utils";
 
 export type TableStatus = "loading" | "error" | "empty" | "ready";
 
@@ -183,13 +184,14 @@ export function MetricTableRow<TRow extends MetricTableRow>({
       key={row.id}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className={`transition-colors ${
+      className={cn(
+        "transition-colors",
         row.getIsSelected() || isHovered
           ? "bg-blue-50"
           : row.index % 2 === 0
             ? "bg-white"
             : "bg-gray-50/50"
-      }`}
+      )}
     >
       <td className="px-4 py-4">
         <input
@@ -202,10 +204,10 @@ export function MetricTableRow<TRow extends MetricTableRow>({
       {row.getVisibleCells().map((cell) => (
         <td
           key={cell.id}
-          className={`px-6 py-4 whitespace-nowrap ${
-            (cell.column.columnDef.meta as { className?: string })?.className ??
-            ""
-          }`}
+          className={cn(
+            "px-6 py-4 whitespace-nowrap",
+            (cell.column.columnDef.meta as { className?: string })?.className
+          )}
         >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}
         </td>

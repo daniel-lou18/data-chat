@@ -14,8 +14,8 @@ export interface MapFilterState {
   propertyType: PropertyType;
   field: MetricField;
   year: number;
-  selectedInseeCode: string | null;
-  selectedSection: string | null;
+  inseeCodes: string[];
+  sections: string[];
   month?: number;
   bbox?: [number, number, number, number];
   limit?: number;
@@ -32,8 +32,8 @@ export interface MapFilterContextValue {
   setYear: (year: number) => void;
   setMonth: (month?: number) => void;
   setBoundingBox: (bbox?: [number, number, number, number]) => void;
-  setSelectedInseeCode: (inseeCode: string | null) => void;
-  setSelectedSection: (section: string | null) => void;
+  setInseeCodes: (inseeCodes: string[]) => void;
+  setSections: (sections: string[]) => void;
 }
 
 export const DEFAULT_MAP_FILTERS: MapFilterState = {
@@ -41,8 +41,8 @@ export const DEFAULT_MAP_FILTERS: MapFilterState = {
   propertyType: "apartment",
   field: "avg_price_m2",
   year: 2024,
-  selectedInseeCode: null,
-  selectedSection: null,
+  inseeCodes: [],
+  sections: [],
 };
 
 const MapFilterContext = createContext<MapFilterContextValue | undefined>(
@@ -119,16 +119,16 @@ export function MapFilterProvider({
     [setFilters]
   );
 
-  const setSelectedInseeCode = useCallback((inseeCode: string | null) => {
+  const setInseeCodes = useCallback((inseeCodes: string[]) => {
     setState((prev) => {
       const next = {
         ...prev,
-        selectedInseeCode: inseeCode,
+        inseeCodes,
       };
 
-      if (inseeCode && prev.level !== "section") {
+      if (inseeCodes.length > 0 && prev.level !== "section") {
         next.level = "section";
-      } else if (!inseeCode && prev.level === "section") {
+      } else if (inseeCodes.length === 0 && prev.level === "section") {
         next.level = "commune";
       }
 
@@ -136,16 +136,16 @@ export function MapFilterProvider({
     });
   }, []);
 
-  const setSelectedSection = useCallback((section: string | null) => {
+  const setSections = useCallback((sections: string[]) => {
     setState((prev) => {
       const next = {
         ...prev,
-        selectedSection: section,
+        sections,
       };
 
-      if (section && prev.level !== "commune") {
+      if (sections.length > 0 && prev.level !== "commune") {
         next.level = "commune";
-      } else if (!section && prev.level === "commune") {
+      } else if (sections.length === 0 && prev.level === "commune") {
         next.level = "section";
       }
 
@@ -166,8 +166,8 @@ export function MapFilterProvider({
       setYear,
       setMonth,
       setBoundingBox,
-      setSelectedInseeCode,
-      setSelectedSection,
+      setInseeCodes,
+      setSections,
     }),
     [
       state,
@@ -179,8 +179,8 @@ export function MapFilterProvider({
       setYear,
       setMonth,
       setBoundingBox,
-      setSelectedInseeCode,
-      setSelectedSection,
+      setInseeCodes,
+      setSections,
     ]
   );
 

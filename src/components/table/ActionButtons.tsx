@@ -1,4 +1,5 @@
 import type { UseTableStateReturn } from "@/hooks/table/useTableState";
+import { cn } from "@/lib/utils";
 
 type ActionButtonsProps = {
   tableState: UseTableStateReturn;
@@ -20,11 +21,12 @@ export default function ActionButtons({ tableState }: ActionButtonsProps) {
             tableState.setExpanded(true);
           }
         }}
-        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+        className={cn(
+          "w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2",
           tableState.grouping.length > 0
             ? "bg-indigo-600 text-white focus:ring-indigo-500 shadow-md"
             : "bg-gray-100 text-gray-600 hover:bg-gray-200 focus:ring-gray-400"
-        }`}
+        )}
         title={
           tableState.grouping.length > 0
             ? "Clear grouping"

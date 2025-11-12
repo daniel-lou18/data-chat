@@ -1,5 +1,5 @@
-import type { MetricField } from "@/types";
-import type { FeatureLevel, PropertyType } from "@/constants";
+import type { MetricField } from "@/types/metrics";
+import type { FeatureLevel, PropertyType } from "@/types/dimensions";
 import type { Feature, FeatureCollection, MultiPolygon } from "geojson";
 
 export type BaseFeatureProperties = {
@@ -65,8 +65,8 @@ export interface MapFeatureParams {
   bbox?: [number, number, number, number];
   limit?: number;
   offset?: number;
+  inseeCodes?: string[];
+  sections?: string[];
 }
 
-export interface MapLegendParams extends MapFeatureParams {
-  inseeCode?: string;
-}
+export type MapLegendParams = MapFeatureParams;

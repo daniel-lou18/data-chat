@@ -1,5 +1,6 @@
 import { METRIC_CATALOG } from "@/constants";
 import type { MetricField } from "@/types";
+import { cn } from "@/lib/utils";
 
 export function PercentChangeCell({
   value,
@@ -34,7 +35,13 @@ export function PercentChangeCell({
 
   return (
     <span
-      className={`inline-flex items-center ${alignmentClass} space-x-1 font-medium ${colorClass} ${className}`.trim()}
+      className={cn(
+        "inline-flex items-center",
+        alignmentClass,
+        "space-x-1 font-medium",
+        className,
+        colorClass
+      )}
     >
       <span aria-hidden>{icon}</span>
       <span>
@@ -75,7 +82,11 @@ export function MetricValueCell({
 
   return (
     <span
-      className={`inline-flex items-center text-sm ${alignmentClass} ${className}`.trim()}
+      className={cn(
+        "inline-flex items-center text-sm",
+        alignmentClass,
+        className
+      )}
     >
       {formatted}
       {unit ? ` ${unit}` : ""}
@@ -119,7 +130,12 @@ export function AbsoluteChangeCell({
 
   return (
     <span
-      className={`inline-flex items-center ${alignmentClass} space-x-1 text-sm font-medium ${colorClass}`}
+      className={cn(
+        "inline-flex items-center",
+        alignmentClass,
+        "space-x-1 text-sm font-medium",
+        colorClass
+      )}
     >
       <span>
         {sign}
@@ -151,7 +167,11 @@ export function CountCell({
 
   return (
     <span
-      className={`inline-flex items-center text-sm ${alignmentClass} ${className}`.trim()}
+      className={cn(
+        "inline-flex items-center text-sm",
+        alignmentClass,
+        className
+      )}
     >
       {formatted}
     </span>
@@ -239,7 +259,7 @@ export function SparklineCell({
 
   return (
     <span
-      className={`inline-flex ${alignmentClass} ${className}`.trim()}
+      className={cn("inline-flex", alignmentClass, className)}
       aria-label="Trend sparkline"
     >
       <svg

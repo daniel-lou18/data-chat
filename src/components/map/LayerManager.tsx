@@ -1,10 +1,9 @@
 import { memo } from "react";
 import { Source, Layer } from "react-map-gl/maplibre";
 
-import type { MapFeatureCollection } from "@/services/api";
+import type { MapFeatureCollection, FeatureLevel } from "@/types";
 import { arrondissementLayerStyles, sectionLayerStyles } from "./config";
 import { useStyleMap, useMapFeatureCollection } from "@/hooks/map";
-import type { FeatureLevel } from "@/types";
 
 const EMPTY_FEATURE_COLLECTION: MapFeatureCollection = {
   type: "FeatureCollection",
@@ -14,14 +13,15 @@ const EMPTY_FEATURE_COLLECTION: MapFeatureCollection = {
 export type LayerManagerProps = {
   level: FeatureLevel;
   hoveredFeatureId?: string | null;
-  selectedArrondissementId?: string | null;
+  selectedArrondissementIds?: string[];
 };
 
 const LayerManager = memo(function ({
   level,
   hoveredFeatureId,
-  selectedArrondissementId,
+  selectedArrondissementIds,
 }: LayerManagerProps) {
+  const selectedIds = selectedArrondissementIds ?? [];
   const { data: communeFeatures } = useMapFeatureCollection({
     level: "commune",
   });
@@ -54,8 +54,8 @@ const LayerManager = memo(function ({
             "fill-opacity": arrondissementFillOpacity,
           }}
           filter={
-            selectedArrondissementId && level === "section"
-              ? ["!=", ["get", "id"], selectedArrondissementId]
+            selectedIds.length > 0 && level === "section"
+              ? ["!", ["in", ["get", "id"], ["literal", selectedIds]]]
               : ["!=", ["get", "id"], ""]
           }
         />
@@ -87,8 +87,8 @@ const LayerManager = memo(function ({
             "line-opacity": 1,
           }}
           filter={
-            selectedArrondissementId
-              ? ["==", ["get", "id"], selectedArrondissementId]
+            selectedIds.length > 0
+              ? ["in", ["get", "id"], ["literal", selectedIds]]
               : ["==", ["get", "id"], ""]
           }
         />
@@ -105,8 +105,8 @@ const LayerManager = memo(function ({
             "fill-opacity": sectionFillOpacity,
           }}
           filter={
-            selectedArrondissementId && level === "section"
-              ? ["==", ["get", "inseeCode"], selectedArrondissementId]
+            selectedIds.length > 0 && level === "section"
+              ? ["in", ["get", "inseeCode"], ["literal", selectedIds]]
               : ["==", ["get", "inseeCode"], ""]
           }
         />
@@ -115,8 +115,8 @@ const LayerManager = memo(function ({
           type="line"
           paint={sectionLayerStyles.stroke}
           filter={
-            selectedArrondissementId && level === "section"
-              ? ["==", ["get", "inseeCode"], selectedArrondissementId]
+            selectedIds.length > 0 && level === "section"
+              ? ["in", ["get", "inseeCode"], ["literal", selectedIds]]
               : ["==", ["get", "inseeCode"], ""]
           }
         />

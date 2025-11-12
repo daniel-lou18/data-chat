@@ -8,13 +8,7 @@ export type SelectOption<Value extends string | number> = {
 
 export const CLEAR_VALUE = "__clear__";
 
-export type FilterableKeys =
-  | "level"
-  | "propertyType"
-  | "field"
-  | "year"
-  | "month"
-  | "selectedInseeCode";
+export type FilterableKeys = "propertyType" | "field" | "year" | "month";
 
 export type FilterOptionValue<K extends FilterableKeys> = Extract<
   MapFilterState[K],
@@ -44,17 +38,11 @@ export function useFilterControl<K extends FilterableKeys>(
     setField,
     setYear,
     setMonth,
-    setSelectedInseeCode,
   } = useMapFilters();
 
   const applyValue = useCallback(
     (nextValue: MapFilterState[K] | undefined) => {
       switch (filterKey) {
-        case "level":
-          if (nextValue !== undefined) {
-            setLevel(nextValue as MapFilterState["level"]);
-          }
-          break;
         case "propertyType":
           if (nextValue !== undefined) {
             setPropertyType(nextValue as MapFilterState["propertyType"]);
@@ -73,11 +61,6 @@ export function useFilterControl<K extends FilterableKeys>(
         case "month":
           setMonth(nextValue as MapFilterState["month"]);
           break;
-        case "selectedInseeCode":
-          setSelectedInseeCode(
-            nextValue as MapFilterState["selectedInseeCode"]
-          );
-          break;
         default:
           setFilters({ [filterKey]: nextValue } as Partial<MapFilterState>);
       }
@@ -92,7 +75,6 @@ export function useFilterControl<K extends FilterableKeys>(
       setLevel,
       setMonth,
       setPropertyType,
-      setSelectedInseeCode,
       setYear,
     ]
   );

@@ -1,17 +1,16 @@
 import { useState } from "react";
 import PriceLegend from "./PriceLegend";
-import { useMapLegend } from "@/hooks/map/useMapData";
-import { useMapFilters } from "@/hooks/map/useMapFilters";
-import type { MapLegendBucket } from "@/services/api";
+import { useMapLegend, useMapFilters } from "@/hooks/map";
+import type { MapLegendBucket } from "@/types";
 import { MAP_BUCKET_COLORS } from "./colors";
 import { formatMetricValue, humanizeMetricName } from "./mapLegendUtils";
 
 type MapLegendProps = {
-  selectedArrondissementId: string | null;
+  selectedArrondissementIds: string[];
 };
 
 export default function MapLegend({
-  selectedArrondissementId,
+  selectedArrondissementIds,
 }: MapLegendProps) {
   const { state: filters } = useMapFilters();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -20,7 +19,7 @@ export default function MapLegend({
     isLoading,
     error,
   } = useMapLegend({
-    inseeCode: filters.selectedInseeCode ?? undefined,
+    inseeCodes: filters.inseeCodes,
   });
 
   if (isLoading) {
@@ -49,7 +48,7 @@ export default function MapLegend({
   const title = buildLegendTitle(
     filters.level,
     legend.field,
-    selectedArrondissementId
+    selectedArrondissementIds
   );
 
   return (
@@ -141,14 +140,13 @@ function StatItem({ label, value }: { label: string; value: number | null }) {
 function buildLegendTitle(
   level: string,
   field: string,
-  selectedArrondissementId: string | null
+  selectedArrondissementIds: string[]
 ): string {
-  const levelLabel =
-    level === "section"
-      ? selectedArrondissementId
-        ? `Sections (${selectedArrondissementId})`
-        : "Sections"
-      : "Communes";
+  const hasSelection = selectedArrondissementIds.length > 0;
+  const selectionLabel = hasSelection
+    ? `Sections (${selectedArrondissementIds.join(", ")})`
+    : "Sections";
+  const levelLabel = level === "section" ? selectionLabel : "Communes";
 
   return `${humanizeMetricName(field)} • ${levelLabel}`;
 }

@@ -17,12 +17,32 @@ const TOTAL_SALES: MetricCatalogItem = {
   columnTemplate: ["count", "deltaCompact"],
 };
 
+const TOTAL_PRICE: MetricCatalogItem = {
+  id: "total_price",
+  label: "Total price",
+  group: "pricing",
+  type: "measure",
+  unit: "€",
+  digits: { minimum: 0, maximum: 0 },
+  columnTemplate: ["value", "delta"],
+};
+
 const AVG_PRICE: MetricCatalogItem = {
   id: "avg_price",
   label: "Avg price",
   group: "pricing",
   type: "measure",
   unit: "€",
+  digits: { minimum: 0, maximum: 0 },
+  columnTemplate: ["value", "delta"],
+};
+
+const TOTAL_AREA: MetricCatalogItem = {
+  id: "total_area",
+  label: "Total area",
+  group: "area",
+  type: "measure",
+  unit: "m²",
   digits: { minimum: 0, maximum: 0 },
   columnTemplate: ["value", "delta"],
 };
@@ -149,7 +169,9 @@ const PRICE_M2_STDDEV: MetricCatalogItem = {
 
 export const METRIC_CATALOG: Record<MetricField, MetricCatalogItem> = {
   total_sales: TOTAL_SALES,
+  total_price: TOTAL_PRICE,
   avg_price: AVG_PRICE,
+  total_area: TOTAL_AREA,
   avg_area: AVG_AREA,
   avg_price_m2: AVG_PRICE_M2,
   min_price: MIN_PRICE,

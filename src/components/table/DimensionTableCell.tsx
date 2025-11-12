@@ -1,4 +1,5 @@
 import type { MouseEventHandler, ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 type DimensionTableCellProps = {
   label: ReactNode;
@@ -19,7 +20,10 @@ export function DimensionTableCell({
 }: DimensionTableCellProps) {
   return (
     <div
-      className={`flex items-center space-x-3 text-sm text-gray-900 ${className}`.trim()}
+      className={cn(
+        "flex items-center space-x-3 text-sm text-gray-900",
+        className
+      )}
     >
       {canExpand ? (
         <button

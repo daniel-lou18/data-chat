@@ -96,8 +96,7 @@ export default function PriceLegend({
  * crash if the user provides fewer colors than segments.
  */
 function expandColors(colors: string[], target: number) {
-  if (!colors || colors.length === 0)
-    return DEFAULT_BUCKET_COLORS.slice(0, target);
+  if (!colors || colors.length === 0) return MAP_BUCKET_COLORS.slice(0, target);
   const out: string[] = [];
   for (let i = 0; i < target; i++) {
     // pick from existing colors cycling through
