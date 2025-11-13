@@ -3,11 +3,13 @@ import type {
   COMPOSITION_FIELDS,
   HOUSE_COMPOSITION_FIELDS,
   METRIC_FIELDS,
-} from "@/constants";
+} from "@/constants/base";
 import type { AggregateMetricsMVSchema } from "@/services/api/schemas";
 
 export type AggregateMetricsMV = z.infer<typeof AggregateMetricsMVSchema>;
 export type MetricField = (typeof METRIC_FIELDS)[number];
+
+export type MetricPercentChangeField = `${MetricField}_pct_change`;
 
 export type MetricType = "measure" | "percentage" | "count" | "ratio";
 

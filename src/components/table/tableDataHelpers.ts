@@ -1,4 +1,4 @@
-import type { MetricPercentChangeField } from "@/constants";
+import type { MetricPercentChangeField } from "@/types";
 import type {
   CommuneTableData,
   SectionTableData,

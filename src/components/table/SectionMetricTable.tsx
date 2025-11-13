@@ -12,7 +12,7 @@ import {
   MetricTableHeader,
   type TableStatus,
 } from "./MetricTableShared";
-import { METRIC_CATALOG } from "@/constants";
+import { METRIC_CATALOG } from "@/constants/catalog";
 import type {
   NumericMetricField,
   SectionTableData,

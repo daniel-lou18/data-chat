@@ -15,7 +15,7 @@ import {
 } from "./MetricTableShared";
 import { CountCell, MetricValueCell, SparklineCell } from "./MetricTableCell";
 import { DimensionTableCell } from "./DimensionTableCell";
-import { METRIC_CATALOG } from "@/constants";
+import { METRIC_CATALOG } from "@/constants/catalog";
 import type {
   CommuneTableData,
   CommuneMetricRow,

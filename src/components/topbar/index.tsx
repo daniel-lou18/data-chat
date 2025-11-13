@@ -1,9 +1,6 @@
 import { MapFilterSelect } from "@/components/ui/map-filters";
-import {
-  METRIC_OPTIONS,
-  FEATURE_YEAR_OPTIONS,
-  PROPERTY_TYPE_OPTIONS,
-} from "@/constants";
+import { FEATURE_YEAR_OPTIONS, PROPERTY_TYPE_OPTIONS } from "@/constants/base";
+import { METRIC_OPTIONS } from "@/constants/catalog";
 import { MapFilterCombobox } from "@/components/ui/map-filters";
 import Breadcrumb from "./Breadcrumb";
 

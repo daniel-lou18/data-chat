@@ -6,7 +6,12 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { FeatureLevel, MetricField, PropertyType } from "@/types";
+import type {
+  FeatureLevel,
+  MetricField,
+  NumericFilter,
+  PropertyType,
+} from "@/types";
 import { useSyncUrlWithFilters } from "./useFiltersNavigate";
 
 export interface FilterState {
@@ -17,9 +22,12 @@ export interface FilterState {
   inseeCodes: string[];
   sections: string[];
   month?: number;
-  bbox?: [number, number, number, number];
+  filters?: NumericFilter;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
   limit?: number;
   offset?: number;
+  bbox?: [number, number, number, number];
 }
 
 export interface FilterContextValue {

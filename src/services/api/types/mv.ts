@@ -1,5 +1,6 @@
 import { z } from "zod";
 import * as mvSchemas from "../schemas";
+import type * as mvDeltasSchemas from "../schemas/mv_deltas.schemas";
 
 export type ApartmentsByInseeMonth = z.infer<
   typeof mvSchemas.ApartmentsByInseeMonthSchema
@@ -43,3 +44,17 @@ export type SectionYearParams = z.infer<
 >;
 export type SortBy = z.infer<typeof mvSchemas.SortBySchema>;
 export type SortOrder = z.infer<typeof mvSchemas.SortOrderSchema>;
+
+export type MetricDelta = z.infer<typeof mvDeltasSchemas.MetricDelta>;
+export type YearlyDeltasMetrics = z.infer<
+  typeof mvDeltasSchemas.YearlyDeltasMetrics
+>;
+export type YearlyDeltasByInsee = z.infer<
+  typeof mvDeltasSchemas.YearlyDeltasByInseeSchema
+>;
+export type YearlyDeltasBySection = z.infer<
+  typeof mvDeltasSchemas.YearlyDeltasBySectionSchema
+>;
+export type YearDeltaParams = z.infer<
+  typeof mvDeltasSchemas.YearDeltaParamsSchema
+>;

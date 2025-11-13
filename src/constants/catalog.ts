@@ -4,7 +4,8 @@ import type {
   MetricCatalogItem,
   MetricField,
 } from "@/types";
-import * as schemas from "@/services/api/schemas/shared";
+import * as baseSchemas from "@/services/api/schemas/base";
+import { METRIC_FIELDS } from "./base/metrics";
 
 const TOTAL_SALES: MetricCatalogItem = {
   id: "total_sales",
@@ -185,6 +186,11 @@ export const METRIC_CATALOG: Record<MetricField, MetricCatalogItem> = {
   price_m2_stddev: PRICE_M2_STDDEV,
 } satisfies Record<MetricField, MetricCatalogItem>;
 
+export const METRIC_OPTIONS = METRIC_FIELDS.map((field) => ({
+  value: field,
+  label: METRIC_CATALOG[field].label,
+}));
+
 // DIMENSIONS
 
 const INSEE_CODE: DimensionCatalogItem = {
@@ -192,7 +198,7 @@ const INSEE_CODE: DimensionCatalogItem = {
   label: "INSEE Code",
   category: "spatial",
   level: "commune",
-  type: schemas.INSEE_CODE_SCHEMA,
+  type: baseSchemas.INSEE_CODE_SCHEMA,
 };
 
 const SECTION: DimensionCatalogItem = {
@@ -200,35 +206,35 @@ const SECTION: DimensionCatalogItem = {
   label: "Section",
   category: "spatial",
   level: "section",
-  type: schemas.SECTION_SCHEMA,
+  type: baseSchemas.SECTION_SCHEMA,
 };
 
 const YEAR: DimensionCatalogItem = {
   id: "year",
   label: "Year",
   category: "temporal",
-  type: schemas.YEAR_SCHEMA,
+  type: baseSchemas.YEAR_SCHEMA,
 };
 
 const MONTH: DimensionCatalogItem = {
   id: "month",
   label: "Month",
   category: "temporal",
-  type: schemas.MONTH_SCHEMA,
+  type: baseSchemas.MONTH_SCHEMA,
 };
 
 const ISO_YEAR: DimensionCatalogItem = {
   id: "iso_year",
   label: "ISO Year",
   category: "temporal",
-  type: schemas.ISO_YEAR_SCHEMA,
+  type: baseSchemas.ISO_YEAR_SCHEMA,
 };
 
 const ISO_WEEK: DimensionCatalogItem = {
   id: "iso_week",
   label: "ISO Week",
   category: "temporal",
-  type: schemas.ISO_WEEK_SCHEMA,
+  type: baseSchemas.ISO_WEEK_SCHEMA,
 };
 
 export const DIMENSION_CATALOG: Record<DimensionField, DimensionCatalogItem> = {

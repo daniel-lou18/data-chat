@@ -1,4 +1,4 @@
-import type { MetricPercentChangeField } from "@/constants";
+import type { MetricPercentChangeField } from "@/types";
 import type { MetricDelta } from "@/services/api/types";
 import type { AggregateMetricsMV, DimensionField, MetricField } from "@/types";
 

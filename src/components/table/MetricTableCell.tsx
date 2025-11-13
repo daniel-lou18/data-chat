@@ -1,4 +1,4 @@
-import { METRIC_CATALOG } from "@/constants";
+import { METRIC_CATALOG } from "@/constants/catalog";
 import type { MetricField } from "@/types";
 import { cn } from "@/lib/utils";
 

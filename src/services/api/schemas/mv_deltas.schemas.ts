@@ -4,7 +4,7 @@ import type {
   MetricField,
 } from "@/types";
 import { z } from "zod";
-import * as schemas from "./shared";
+import * as base from "./base";
 
 // ----------------------------------------------------------------------------
 // Shared numeric helper (allows nulls for pct_change when base==0 or missing)
@@ -89,9 +89,9 @@ const HouseCompositionDeltas = z.object<
 // ----------------------------------------------------------------------------
 export const YearlyDeltasByInseeSchema = z.object({
   // Dimensions
-  inseeCode: schemas.INSEE_CODE_SCHEMA,
-  year: schemas.YEAR_SCHEMA.describe("Comparison year (current period)"),
-  base_year: schemas.YEAR_SCHEMA.describe(
+  inseeCode: base.INSEE_CODE_SCHEMA,
+  year: base.YEAR_SCHEMA.describe("Comparison year (current period)"),
+  base_year: base.YEAR_SCHEMA.describe(
     "Base year used for the delta (e.g. year - 1)"
   ),
 
@@ -107,7 +107,7 @@ export const YearlyDeltasByInseeSchema = z.object({
 // Yearly deltas by SECTION (if you want section-level MV rows)
 // ----------------------------------------------------------------------------
 export const YearlyDeltasBySectionSchema = YearlyDeltasByInseeSchema.extend({
-  section: schemas.SECTION_SCHEMA,
+  section: base.SECTION_SCHEMA,
   // inseeCode, year, base_year and metrics are inherited
 });
 
@@ -120,12 +120,12 @@ const PaginationParams = z.object({
 });
 
 export const YearDeltaParamsSchema = PaginationParams.extend({
-  level: schemas.LEVEL_SCHEMA,
-  inseeCode: schemas.INSEE_CODE_SCHEMA.optional(),
-  section: schemas.SECTION_SCHEMA.optional(),
-  year: schemas.YEAR_SCHEMA.describe("Comparison year (e.g. 2024)").optional(),
-  base_year: schemas.YEAR_SCHEMA.describe("Base year (e.g. 2023)").optional(),
-  metric: schemas.METRIC_FIELD_SCHEMA.optional().describe(
+  level: base.LEVEL_SCHEMA,
+  inseeCode: base.INSEE_CODE_SCHEMA.optional(),
+  section: base.SECTION_SCHEMA.optional(),
+  year: base.YEAR_SCHEMA.describe("Comparison year (e.g. 2024)").optional(),
+  base_year: base.YEAR_SCHEMA.describe("Base year (e.g. 2023)").optional(),
+  metric: base.METRIC_FIELD_SCHEMA.optional().describe(
     "If provided, limit sorting/filters to this metric"
   ),
   sortBy: z

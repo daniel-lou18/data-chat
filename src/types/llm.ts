@@ -1,5 +1,7 @@
+import type { NumericFilterSchema } from "@/services/api/schemas/userIntent";
 import type { DimensionField, Year, Month } from "./dimensions";
 import type { MetricField } from "./metrics";
+import type z from "zod";
 
 type Intent = "rank" | "filter" | "compare" | "show";
 
@@ -14,3 +16,5 @@ export type UserIntent = {
   sortOrder?: "asc" | "desc";
   minSales?: number;
 };
+
+export type NumericFilter = z.infer<typeof NumericFilterSchema>;

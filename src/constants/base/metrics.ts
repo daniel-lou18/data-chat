@@ -1,6 +1,3 @@
-import type { MetricField } from "@/types";
-import { METRIC_CATALOG } from "./catalog";
-
 export const METRIC_FIELDS = [
   "total_sales",
   "total_price",
@@ -19,13 +16,6 @@ export const METRIC_FIELDS = [
   "price_m2_iqr",
   "price_m2_stddev",
 ] as const;
-
-export const METRIC_OPTIONS = METRIC_FIELDS.map((field) => ({
-  value: field,
-  label: METRIC_CATALOG[field].label,
-}));
-
-export type MetricPercentChangeField = `${MetricField}_pct_change`;
 
 export const COMPOSITION_FIELDS = [
   "total_apartments",
